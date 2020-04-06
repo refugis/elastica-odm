@@ -3,10 +3,10 @@
 namespace Refugis\ODM\Elastica\Tests\Traits;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Kcs\Metadata\Loader\Processor\ProcessorFactory;
 use Refugis\ODM\Elastica\Builder;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Metadata\Loader\AnnotationLoader;
-use Kcs\Metadata\Loader\Processor\ProcessorFactory;
 
 trait DocumentManagerTestTrait
 {

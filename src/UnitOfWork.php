@@ -6,6 +6,7 @@ use Doctrine\Common\Comparable;
 use Doctrine\Common\EventManager;
 use Doctrine\Common\Persistence\ObjectManagerAware;
 use Elastica\Document;
+use ProxyManager\Proxy\LazyLoadingInterface;
 use Refugis\ODM\Elastica\Events\LifecycleEventManager;
 use Refugis\ODM\Elastica\Events\PreFlushEventArgs;
 use Refugis\ODM\Elastica\Exception\IndexNotFoundException;
@@ -18,7 +19,6 @@ use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 use Refugis\ODM\Elastica\Persister\DocumentPersister;
 use Refugis\ODM\Elastica\Util\ClassUtil;
-use ProxyManager\Proxy\LazyLoadingInterface;
 
 final class UnitOfWork
 {

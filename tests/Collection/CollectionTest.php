@@ -10,6 +10,8 @@ use Elastica\Scroll as ElasticaScroll;
 use Elastica\Search as ElasticaSearch;
 use Elastica\Type;
 use Elasticsearch\Endpoints;
+use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
 use Refugis\ODM\Elastica\Collection\Collection;
 use Refugis\ODM\Elastica\Collection\CollectionInterface;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
@@ -19,8 +21,6 @@ use Refugis\ODM\Elastica\Tests\Fixtures\Document\Foo;
 use Refugis\ODM\Elastica\Tests\Fixtures\Document\FooNoAutoCreate;
 use Refugis\ODM\Elastica\Tests\Traits\DocumentManagerTestTrait;
 use Refugis\ODM\Elastica\Tests\Traits\FixturesTestTrait;
-use PHPUnit\Framework\TestCase;
-use Prophecy\Prophecy\ObjectProphecy;
 
 class CollectionTest extends TestCase
 {

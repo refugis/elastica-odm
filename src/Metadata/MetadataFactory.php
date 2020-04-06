@@ -4,10 +4,10 @@ namespace Refugis\ODM\Elastica\Metadata;
 
 use Doctrine\Common\EventManager;
 use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
-use Refugis\ODM\Elastica\Metadata\Loader\LoaderInterface;
 use Kcs\Metadata\ClassMetadataInterface;
 use Kcs\Metadata\Exception\InvalidMetadataException;
 use Kcs\Metadata\Factory\AbstractMetadataFactory;
+use Refugis\ODM\Elastica\Metadata\Loader\LoaderInterface;
 
 class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFactory
 {

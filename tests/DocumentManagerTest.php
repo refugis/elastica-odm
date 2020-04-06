@@ -4,6 +4,8 @@ namespace Refugis\ODM\Elastica\Tests;
 
 use Elastica\Index;
 use Elastica\Type;
+use PHPUnit\Framework\TestCase;
+use ProxyManager\Proxy\ProxyInterface;
 use Refugis\ODM\Elastica\DocumentManager;
 use Refugis\ODM\Elastica\Geotools\Coordinate\Coordinate;
 use Refugis\ODM\Elastica\Tests\Fixtures\Document\Foo;
@@ -12,8 +14,6 @@ use Refugis\ODM\Elastica\Tests\Fixtures\Document\FooWithLazyField;
 use Refugis\ODM\Elastica\Tests\Traits\DocumentManagerTestTrait;
 use Refugis\ODM\Elastica\Tests\Traits\FixturesTestTrait;
 use Refugis\ODM\Elastica\VarDumper\VarDumperTestTrait;
-use PHPUnit\Framework\TestCase;
-use ProxyManager\Proxy\ProxyInterface;
 
 /**
  * @group functional

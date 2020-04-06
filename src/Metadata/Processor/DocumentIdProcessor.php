@@ -2,12 +2,12 @@
 
 namespace Refugis\ODM\Elastica\Metadata\Processor;
 
-use Refugis\ODM\Elastica\Annotation\DocumentId;
-use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
-use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 use Kcs\Metadata\Loader\Processor\Annotation\Processor;
 use Kcs\Metadata\Loader\Processor\ProcessorInterface;
 use Kcs\Metadata\MetadataInterface;
+use Refugis\ODM\Elastica\Annotation\DocumentId;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 
 /**
  * @Processor(annotation=DocumentId::class)

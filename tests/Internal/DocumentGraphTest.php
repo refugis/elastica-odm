@@ -2,11 +2,11 @@
 
 namespace Refugis\ODM\Elastica\Tests\Internal;
 
+use PHPUnit\Framework\TestCase;
 use Refugis\ODM\Elastica\Internal\DocumentGraph;
 use Refugis\ODM\Elastica\Internal\DocumentGraphEdge;
 use Refugis\ODM\Elastica\Internal\DocumentGraphNode;
 use Refugis\ODM\Elastica\Tests\Fixtures\Document\Foo;
-use PHPUnit\Framework\TestCase;
 
 class DocumentGraphTest extends TestCase
 {

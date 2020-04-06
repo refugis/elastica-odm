@@ -126,7 +126,7 @@ class Coordinate implements CoordinateInterface
     public function setFromString($coordinates)
     {
         if (! \is_string($coordinates)) {
-            throw new \InvalidArgumentException('The given coordinates should be a string !');
+            throw new \InvalidArgumentException('The given coordinates should be a string!');
         }
 
         $inDecimalDegree = $this->toDecimalDegrees($coordinates);
@@ -199,9 +199,7 @@ class Coordinate implements CoordinateInterface
             ];
         }
 
-        throw new \InvalidArgumentException(
-            'It should be a valid and acceptable ways to write geographic coordinates !'
-        );
+        throw new \InvalidArgumentException('It should be a valid and acceptable ways to write geographic coordinates !');
     }
 
     /**

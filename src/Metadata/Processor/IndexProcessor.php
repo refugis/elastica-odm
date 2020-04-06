@@ -2,11 +2,11 @@
 
 namespace Refugis\ODM\Elastica\Metadata\Processor;
 
-use Refugis\ODM\Elastica\Annotation\Index;
-use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Kcs\Metadata\Loader\Processor\Annotation\Processor;
 use Kcs\Metadata\Loader\Processor\ProcessorInterface;
 use Kcs\Metadata\MetadataInterface;
+use Refugis\ODM\Elastica\Annotation\Index;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
 /**
  * @Processor(annotation=Index::class)

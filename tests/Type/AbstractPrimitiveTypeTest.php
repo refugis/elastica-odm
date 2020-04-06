@@ -2,8 +2,8 @@
 
 namespace Refugis\ODM\Elastica\Tests\Type;
 
-use Refugis\ODM\Elastica\Type\TypeInterface;
 use PHPUnit\Framework\TestCase;
+use Refugis\ODM\Elastica\Type\TypeInterface;
 
 abstract class AbstractPrimitiveTypeTest extends TestCase
 {

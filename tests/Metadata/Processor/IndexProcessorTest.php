@@ -3,6 +3,7 @@
 namespace Refugis\ODM\Elastica\Tests\Metadata\Processor;
 
 use Elastica\Type\Mapping;
+use PHPUnit\Framework\TestCase;
 use Refugis\ODM\Elastica\Annotation\Analyzer;
 use Refugis\ODM\Elastica\Annotation\Filter;
 use Refugis\ODM\Elastica\Annotation\Index;
@@ -11,7 +12,6 @@ use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Metadata\Processor\IndexProcessor;
 use Refugis\ODM\Elastica\Tests\Fixtures\Document\Foo;
 use Refugis\ODM\Elastica\Tests\Traits\DocumentManagerTestTrait;
-use PHPUnit\Framework\TestCase;
 
 class IndexProcessorTest extends TestCase
 {

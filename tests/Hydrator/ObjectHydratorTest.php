@@ -9,6 +9,10 @@ use Elastica\Query;
 use Elastica\Response;
 use Elastica\Result;
 use Elastica\ResultSet;
+use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
+use ProxyManager\Factory\LazyLoadingGhostFactory;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Hydrator\ObjectHydrator;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
@@ -17,10 +21,6 @@ use Refugis\ODM\Elastica\Tests\Fixtures\Hydrator\TestDocument;
 use Refugis\ODM\Elastica\Type\StringType;
 use Refugis\ODM\Elastica\Type\TypeManager;
 use Refugis\ODM\Elastica\UnitOfWork;
-use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
-use Prophecy\Prophecy\ObjectProphecy;
-use ProxyManager\Factory\LazyLoadingGhostFactory;
 
 class ObjectHydratorTest extends TestCase
 {

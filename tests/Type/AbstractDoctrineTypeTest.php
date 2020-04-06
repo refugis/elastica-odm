@@ -4,10 +4,10 @@ namespace Refugis\ODM\Elastica\Tests\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
-use Refugis\ODM\Elastica\Tests\Fixtures\Type\TestDoctrineType;
-use Refugis\ODM\Elastica\Type\TypeInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
+use Refugis\ODM\Elastica\Tests\Fixtures\Type\TestDoctrineType;
+use Refugis\ODM\Elastica\Type\TypeInterface;
 
 class AbstractDoctrineTypeTest extends TestCase implements TypeTestInterface
 {

@@ -4,9 +4,9 @@ namespace Refugis\ODM\Elastica\Tests\Type;
 
 use Elastica\Query;
 use Elastica\Query\Match;
+use PHPUnit\Framework\TestCase;
 use Refugis\ODM\Elastica\Type\PercolatorType;
 use Refugis\ODM\Elastica\Type\TypeInterface;
-use PHPUnit\Framework\TestCase;
 
 class PercolatorTypeTest extends TestCase
 {

@@ -96,7 +96,7 @@ interface CollectionInterface
      *      for the limitations of this method and the available parameters.
      *
      * @param Query\AbstractQuery $query
-     * @param array $params
+     * @param array               $params
      */
     public function deleteByQuery(Query\AbstractQuery $query, array $params = []): void;
 

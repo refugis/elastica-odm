@@ -19,10 +19,7 @@ final class AssignedIdGenerator extends AbstractIdGenerator
         $id = $class->getSingleIdentifier($document);
 
         if (null === $id) {
-            throw new InvalidIdentifierException(
-                'Document of type "'.$class->name.'" is missing an assigned ID.'.
-                'NONE generator strategy requires the ID field to be populated before persist is called.'
-            );
+            throw new InvalidIdentifierException('Document of type "'.$class->name.'" is missing an assigned ID.'.'NONE generator strategy requires the ID field to be populated before persist is called.');
         }
 
         return $id;

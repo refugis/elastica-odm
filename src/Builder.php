@@ -3,13 +3,13 @@
 namespace Refugis\ODM\Elastica;
 
 use Elastica\Client;
+use ProxyManager\Factory\LazyLoadingGhostFactory;
+use Psr\Log\LoggerInterface;
 use Refugis\ODM\Elastica\Collection\Database;
 use Refugis\ODM\Elastica\Metadata\Loader;
 use Refugis\ODM\Elastica\Metadata\MetadataFactory;
 use Refugis\ODM\Elastica\Type\TypeInterface;
 use Refugis\ODM\Elastica\Type\TypeManager;
-use ProxyManager\Factory\LazyLoadingGhostFactory;
-use Psr\Log\LoggerInterface;
 
 final class Builder
 {

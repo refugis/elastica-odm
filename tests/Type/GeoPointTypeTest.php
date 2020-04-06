@@ -2,10 +2,10 @@
 
 namespace Refugis\ODM\Elastica\Tests\Type;
 
+use PHPUnit\Framework\TestCase;
 use Refugis\ODM\Elastica\Geotools\Coordinate\Coordinate;
 use Refugis\ODM\Elastica\Type\GeoPointType;
 use Refugis\ODM\Elastica\Type\TypeInterface;
-use PHPUnit\Framework\TestCase;
 
 class GeoPointTypeTest extends TestCase
 {

@@ -2,8 +2,8 @@
 
 namespace Refugis\ODM\Elastica\Tests\Type;
 
-use Refugis\ODM\Elastica\Type\RawType;
 use PHPUnit\Framework\TestCase;
+use Refugis\ODM\Elastica\Type\RawType;
 
 class RawTypeTest extends TestCase
 {

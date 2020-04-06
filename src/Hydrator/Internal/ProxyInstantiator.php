@@ -3,10 +3,10 @@
 namespace Refugis\ODM\Elastica\Hydrator\Internal;
 
 use Doctrine\Instantiator\InstantiatorInterface;
+use ProxyManager\Proxy\GhostObjectInterface;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
-use ProxyManager\Proxy\GhostObjectInterface;
 
 class ProxyInstantiator implements InstantiatorInterface
 {

@@ -2,13 +2,13 @@
 
 namespace Refugis\ODM\Elastica\Tests\Metadata\Processor;
 
+use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
 use Refugis\ODM\Elastica\Annotation\DocumentId;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 use Refugis\ODM\Elastica\Metadata\Processor\DocumentIdProcessor;
 use Refugis\ODM\Elastica\Tests\Fixtures\Document\Foo;
-use PHPUnit\Framework\TestCase;
-use Prophecy\Prophecy\ObjectProphecy;
 
 class DocumentIdProcessorTest extends TestCase
 {

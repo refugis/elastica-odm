@@ -4,10 +4,10 @@ namespace Refugis\ODM\Elastica\Tests\Collection;
 
 use Elastica\Client;
 use Elastica\Index;
-use Refugis\ODM\Elastica\Collection\Database;
-use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
+use Refugis\ODM\Elastica\Collection\Database;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
 class DatabaseTest extends TestCase
 {

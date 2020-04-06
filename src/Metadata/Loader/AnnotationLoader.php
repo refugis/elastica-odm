@@ -2,12 +2,12 @@
 
 namespace Refugis\ODM\Elastica\Metadata\Loader;
 
-use Refugis\ODM\Elastica\Annotation\Document;
-use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 use Kcs\ClassFinder\Finder\RecursiveFinder;
 use Kcs\Metadata\ClassMetadataInterface;
 use Kcs\Metadata\Loader\AnnotationProcessorLoader;
 use Kcs\Metadata\Loader\Processor\ProcessorFactoryInterface;
+use Refugis\ODM\Elastica\Annotation\Document;
+use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 
 class AnnotationLoader extends AnnotationProcessorLoader implements LoaderInterface
 {

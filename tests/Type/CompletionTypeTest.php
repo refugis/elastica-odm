@@ -2,10 +2,10 @@
 
 namespace Refugis\ODM\Elastica\Tests\Type;
 
+use PHPUnit\Framework\TestCase;
 use Refugis\ODM\Elastica\Completion;
 use Refugis\ODM\Elastica\Type\CompletionType;
 use Refugis\ODM\Elastica\Type\TypeInterface;
-use PHPUnit\Framework\TestCase;
 
 class CompletionTypeTest extends TestCase
 {

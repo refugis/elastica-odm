@@ -2,15 +2,15 @@
 
 namespace Refugis\ODM\Elastica;
 
+use Kcs\Metadata\Factory\MetadataFactoryInterface;
+use ProxyManager\Factory\LazyLoadingGhostFactory;
+use Psr\Cache\CacheItemPoolInterface;
 use Refugis\ODM\Elastica\Exception\InvalidDocumentRepositoryException;
 use Refugis\ODM\Elastica\Repository\DefaultRepositoryFactory;
 use Refugis\ODM\Elastica\Repository\DocumentRepository;
 use Refugis\ODM\Elastica\Repository\DocumentRepositoryInterface;
 use Refugis\ODM\Elastica\Repository\RepositoryFactoryInterface;
 use Refugis\ODM\Elastica\Type\TypeManager;
-use Kcs\Metadata\Factory\MetadataFactoryInterface;
-use ProxyManager\Factory\LazyLoadingGhostFactory;
-use Psr\Cache\CacheItemPoolInterface;
 
 final class Configuration
 {

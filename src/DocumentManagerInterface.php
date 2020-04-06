@@ -4,13 +4,13 @@ namespace Refugis\ODM\Elastica;
 
 use Doctrine\Common\EventManager;
 use Doctrine\Common\Persistence\ObjectManager;
+use ProxyManager\Factory\LazyLoadingGhostFactory;
+use Psr\Cache\CacheItemPoolInterface;
 use Refugis\ODM\Elastica\Collection\CollectionInterface;
 use Refugis\ODM\Elastica\Collection\DatabaseInterface;
 use Refugis\ODM\Elastica\Hydrator\HydratorInterface;
 use Refugis\ODM\Elastica\Search\Search;
 use Refugis\ODM\Elastica\Type\TypeManager;
-use ProxyManager\Factory\LazyLoadingGhostFactory;
-use Psr\Cache\CacheItemPoolInterface;
 
 interface DocumentManagerInterface extends ObjectManager
 {
