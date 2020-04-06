@@ -1,5 +1,5 @@
 {
-    "name": "Refugis/elastica-odm",
+    "name": "refugis/elastica-odm",
     "minimum-stability": "stable",
     "description": "Doctrine like document manager for ElasticSearch, based on Elastica",
     "type": "library",
