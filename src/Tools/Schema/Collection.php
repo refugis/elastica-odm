@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tools\Schema;
+namespace Refugis\ODM\Elastica\Tools\Schema;
 
 use Elastica\Type\Mapping;
-use Fazland\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
 class Collection
 {

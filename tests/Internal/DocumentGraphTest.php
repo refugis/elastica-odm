@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tests\Internal;
+namespace Refugis\ODM\Elastica\Tests\Internal;
 
-use Fazland\ODM\Elastica\Internal\DocumentGraph;
-use Fazland\ODM\Elastica\Internal\DocumentGraphEdge;
-use Fazland\ODM\Elastica\Internal\DocumentGraphNode;
-use Fazland\ODM\Elastica\Tests\Fixtures\Document\Foo;
+use Refugis\ODM\Elastica\Internal\DocumentGraph;
+use Refugis\ODM\Elastica\Internal\DocumentGraphEdge;
+use Refugis\ODM\Elastica\Internal\DocumentGraphNode;
+use Refugis\ODM\Elastica\Tests\Fixtures\Document\Foo;
 use PHPUnit\Framework\TestCase;
 
 class DocumentGraphTest extends TestCase

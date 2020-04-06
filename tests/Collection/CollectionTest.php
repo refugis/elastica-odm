@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tests\Collection;
+namespace Refugis\ODM\Elastica\Tests\Collection;
 
 use Elastica\Index;
 use Elastica\Query;
@@ -10,15 +10,15 @@ use Elastica\Scroll as ElasticaScroll;
 use Elastica\Search as ElasticaSearch;
 use Elastica\Type;
 use Elasticsearch\Endpoints;
-use Fazland\ODM\Elastica\Collection\Collection;
-use Fazland\ODM\Elastica\Collection\CollectionInterface;
-use Fazland\ODM\Elastica\DocumentManagerInterface;
-use Fazland\ODM\Elastica\Exception\IndexNotFoundException;
-use Fazland\ODM\Elastica\Exception\RuntimeException;
-use Fazland\ODM\Elastica\Tests\Fixtures\Document\Foo;
-use Fazland\ODM\Elastica\Tests\Fixtures\Document\FooNoAutoCreate;
-use Fazland\ODM\Elastica\Tests\Traits\DocumentManagerTestTrait;
-use Fazland\ODM\Elastica\Tests\Traits\FixturesTestTrait;
+use Refugis\ODM\Elastica\Collection\Collection;
+use Refugis\ODM\Elastica\Collection\CollectionInterface;
+use Refugis\ODM\Elastica\DocumentManagerInterface;
+use Refugis\ODM\Elastica\Exception\IndexNotFoundException;
+use Refugis\ODM\Elastica\Exception\RuntimeException;
+use Refugis\ODM\Elastica\Tests\Fixtures\Document\Foo;
+use Refugis\ODM\Elastica\Tests\Fixtures\Document\FooNoAutoCreate;
+use Refugis\ODM\Elastica\Tests\Traits\DocumentManagerTestTrait;
+use Refugis\ODM\Elastica\Tests\Traits\FixturesTestTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 

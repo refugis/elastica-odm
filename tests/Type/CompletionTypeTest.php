@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tests\Type;
+namespace Refugis\ODM\Elastica\Tests\Type;
 
-use Fazland\ODM\Elastica\Completion;
-use Fazland\ODM\Elastica\Type\CompletionType;
-use Fazland\ODM\Elastica\Type\TypeInterface;
+use Refugis\ODM\Elastica\Completion;
+use Refugis\ODM\Elastica\Type\CompletionType;
+use Refugis\ODM\Elastica\Type\TypeInterface;
 use PHPUnit\Framework\TestCase;
 
 class CompletionTypeTest extends TestCase

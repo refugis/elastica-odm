@@ -1,15 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tests\Fixtures\Document;
+namespace Refugis\ODM\Elastica\Tests\Fixtures\Document;
 
-use Fazland\ODM\Elastica\Annotation\Analyzer;
-use Fazland\ODM\Elastica\Annotation\Document;
-use Fazland\ODM\Elastica\Annotation\DocumentId;
-use Fazland\ODM\Elastica\Annotation\Field;
-use Fazland\ODM\Elastica\Annotation\Filter;
-use Fazland\ODM\Elastica\Annotation\Index;
-use Fazland\ODM\Elastica\Annotation\Tokenizer;
-use Fazland\ODM\Elastica\Geotools\Coordinate\CoordinateInterface;
+use Refugis\ODM\Elastica\Annotation\Analyzer;
+use Refugis\ODM\Elastica\Annotation\Document;
+use Refugis\ODM\Elastica\Annotation\DocumentId;
+use Refugis\ODM\Elastica\Annotation\Field;
+use Refugis\ODM\Elastica\Annotation\Filter;
+use Refugis\ODM\Elastica\Annotation\Index;
+use Refugis\ODM\Elastica\Annotation\Tokenizer;
+use Refugis\ODM\Elastica\Geotools\Coordinate\CoordinateInterface;
 
 /**
  * @Document(type="foo_index_no_auto_create/foo_type")

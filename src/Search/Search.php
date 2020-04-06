@@ -1,12 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Search;
+namespace Refugis\ODM\Elastica\Search;
 
 use Elastica\Query;
 use Elastica\ResultSet;
-use Fazland\ODM\Elastica\DocumentManagerInterface;
-use Fazland\ODM\Elastica\Hydrator\HydratorInterface;
-use Fazland\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\DocumentManagerInterface;
+use Refugis\ODM\Elastica\Hydrator\HydratorInterface;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
 class Search implements \IteratorAggregate
 {

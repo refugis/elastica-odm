@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Repository;
+namespace Refugis\ODM\Elastica\Repository;
 
-use Fazland\ODM\Elastica\DocumentManagerInterface;
-use Fazland\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\DocumentManagerInterface;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
 final class DefaultRepositoryFactory extends AbstractRepositoryFactory
 {

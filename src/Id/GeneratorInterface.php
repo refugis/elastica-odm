@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Id;
+namespace Refugis\ODM\Elastica\Id;
 
-use Fazland\ODM\Elastica\DocumentManagerInterface;
-use Fazland\ODM\Elastica\Exception\InvalidIdentifierException;
+use Refugis\ODM\Elastica\DocumentManagerInterface;
+use Refugis\ODM\Elastica\Exception\InvalidIdentifierException;
 
 interface GeneratorInterface
 {

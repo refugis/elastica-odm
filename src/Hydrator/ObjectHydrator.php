@@ -1,14 +1,14 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Hydrator;
+namespace Refugis\ODM\Elastica\Hydrator;
 
 use Doctrine\Instantiator\Instantiator;
 use Elastica\Document;
 use Elastica\Exception\InvalidException;
 use Elastica\ResultSet;
-use Fazland\ODM\Elastica\DocumentManagerInterface;
-use Fazland\ODM\Elastica\Hydrator\Internal\ProxyInstantiator;
-use Fazland\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\DocumentManagerInterface;
+use Refugis\ODM\Elastica\Hydrator\Internal\ProxyInstantiator;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
 class ObjectHydrator implements HydratorInterface
 {

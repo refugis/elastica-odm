@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Util;
+namespace Refugis\ODM\Elastica\Util;
 
 use Doctrine\Common\Persistence\Proxy;
 use ProxyManager\Proxy\ProxyInterface;

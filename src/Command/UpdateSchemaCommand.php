@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Command;
+namespace Refugis\ODM\Elastica\Command;
 
-use Fazland\ODM\Elastica\DocumentManagerInterface;
-use Fazland\ODM\Elastica\Tools\SchemaGenerator;
+use Refugis\ODM\Elastica\DocumentManagerInterface;
+use Refugis\ODM\Elastica\Tools\SchemaGenerator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;

@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Type;
+namespace Refugis\ODM\Elastica\Type;
 
-use Fazland\ODM\Elastica\Exception\ConversionFailedException;
-use Fazland\ODM\Elastica\Geotools\Coordinate\Coordinate;
-use Fazland\ODM\Elastica\Geotools\Coordinate\CoordinateInterface;
-use Fazland\ODM\Elastica\Geotools\Geohash\Geohash;
+use Refugis\ODM\Elastica\Exception\ConversionFailedException;
+use Refugis\ODM\Elastica\Geotools\Coordinate\Coordinate;
+use Refugis\ODM\Elastica\Geotools\Coordinate\CoordinateInterface;
+use Refugis\ODM\Elastica\Geotools\Geohash\Geohash;
 
 final class GeoPointType extends AbstractType
 {

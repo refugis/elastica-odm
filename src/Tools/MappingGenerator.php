@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tools;
+namespace Refugis\ODM\Elastica\Tools;
 
 use Elastica\Type\Mapping;
-use Fazland\ODM\Elastica\Metadata\DocumentMetadata;
-use Fazland\ODM\Elastica\Metadata\FieldMetadata;
-use Fazland\ODM\Elastica\Type\TypeManager;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\Metadata\FieldMetadata;
+use Refugis\ODM\Elastica\Type\TypeManager;
 
 final class MappingGenerator
 {

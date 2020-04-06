@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Events;
+namespace Refugis\ODM\Elastica\Events;
 
 use Doctrine\Common\EventManager;
-use Fazland\ODM\Elastica\Events;
-use Fazland\ODM\Elastica\Metadata\DocumentMetadata;
-use Fazland\ODM\Elastica\UnitOfWork;
+use Refugis\ODM\Elastica\Events;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\UnitOfWork;
 
 class LifecycleEventManager
 {

@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Repository;
+namespace Refugis\ODM\Elastica\Repository;
 
 use Doctrine\Common\Collections\Selectable;
 use Doctrine\Common\Persistence\ObjectRepository;
-use Fazland\ODM\Elastica\Search\Search;
+use Refugis\ODM\Elastica\Search\Search;
 
 interface DocumentRepositoryInterface extends ObjectRepository, Selectable
 {

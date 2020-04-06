@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Metadata\Loader;
+namespace Refugis\ODM\Elastica\Metadata\Loader;
 
 use Kcs\Metadata\ClassMetadataInterface;
 

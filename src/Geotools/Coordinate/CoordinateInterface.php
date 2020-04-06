@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Geotools\Coordinate;
+namespace Refugis\ODM\Elastica\Geotools\Coordinate;
 
 use Doctrine\Common\Comparable;
 use Elastica\ArrayableInterface;

@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Collection;
+namespace Refugis\ODM\Elastica\Collection;
 
 use Elastica\Client;
-use Fazland\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
 interface DatabaseInterface
 {

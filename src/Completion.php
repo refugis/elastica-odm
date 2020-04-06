@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica;
+namespace Refugis\ODM\Elastica;
 
 use Elastica\ArrayableInterface;
 

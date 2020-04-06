@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Geotools\Shape;
+namespace Refugis\ODM\Elastica\Geotools\Shape;
 
-use Fazland\ODM\Elastica\Geotools\Coordinate\Coordinate;
+use Refugis\ODM\Elastica\Geotools\Coordinate\Coordinate;
 
 abstract class Geoshape implements GeoshapeInterface
 {

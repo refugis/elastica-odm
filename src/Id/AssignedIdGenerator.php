@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Id;
+namespace Refugis\ODM\Elastica\Id;
 
-use Fazland\ODM\Elastica\DocumentManagerInterface;
-use Fazland\ODM\Elastica\Exception\InvalidIdentifierException;
-use Fazland\ODM\Elastica\Metadata\DocumentMetadata;
-use Fazland\ODM\Elastica\Util\ClassUtil;
+use Refugis\ODM\Elastica\DocumentManagerInterface;
+use Refugis\ODM\Elastica\Exception\InvalidIdentifierException;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\Util\ClassUtil;
 
 final class AssignedIdGenerator extends AbstractIdGenerator
 {

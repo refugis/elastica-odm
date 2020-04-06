@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tests\Type;
+namespace Refugis\ODM\Elastica\Tests\Type;
 
-use Fazland\ODM\Elastica\Type\DateTimeImmutableType;
-use Fazland\ODM\Elastica\Type\TypeInterface;
+use Refugis\ODM\Elastica\Type\DateTimeImmutableType;
+use Refugis\ODM\Elastica\Type\TypeInterface;
 
 class DateTimeImmutableTypeTest extends AbstractDateTimeTypeTest
 {

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tools\Schema;
+namespace Refugis\ODM\Elastica\Tools\Schema;
 
 /**
  * Holds the informations about the schema of collections.

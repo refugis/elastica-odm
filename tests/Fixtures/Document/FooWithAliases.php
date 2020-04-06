@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tests\Fixtures\Document;
+namespace Refugis\ODM\Elastica\Tests\Fixtures\Document;
 
-use Fazland\ODM\Elastica\Annotation\Document;
-use Fazland\ODM\Elastica\Annotation\DocumentId;
-use Fazland\ODM\Elastica\Annotation\Field;
+use Refugis\ODM\Elastica\Annotation\Document;
+use Refugis\ODM\Elastica\Annotation\DocumentId;
+use Refugis\ODM\Elastica\Annotation\Field;
 
 /**
  * @Document(type="foo_with_aliases_index/foo_type")

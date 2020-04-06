@@ -1,12 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tests\Metadata\Processor;
+namespace Refugis\ODM\Elastica\Tests\Metadata\Processor;
 
-use Fazland\ODM\Elastica\Annotation\DocumentId;
-use Fazland\ODM\Elastica\Metadata\DocumentMetadata;
-use Fazland\ODM\Elastica\Metadata\FieldMetadata;
-use Fazland\ODM\Elastica\Metadata\Processor\DocumentIdProcessor;
-use Fazland\ODM\Elastica\Tests\Fixtures\Document\Foo;
+use Refugis\ODM\Elastica\Annotation\DocumentId;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\Metadata\FieldMetadata;
+use Refugis\ODM\Elastica\Metadata\Processor\DocumentIdProcessor;
+use Refugis\ODM\Elastica\Tests\Fixtures\Document\Foo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 

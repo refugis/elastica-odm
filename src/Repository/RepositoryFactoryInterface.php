@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Repository;
+namespace Refugis\ODM\Elastica\Repository;
 
-use Fazland\ODM\Elastica\DocumentManagerInterface;
+use Refugis\ODM\Elastica\DocumentManagerInterface;
 
 interface RepositoryFactoryInterface
 {

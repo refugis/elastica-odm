@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tests\Type;
+namespace Refugis\ODM\Elastica\Tests\Type;
 
 use PHPUnit\Framework\TestCase;
 

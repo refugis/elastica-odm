@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Metadata;
+namespace Refugis\ODM\Elastica\Metadata;
 
 use Kcs\Metadata\PropertyMetadata;
 

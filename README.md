@@ -1,8 +1,9 @@
-Fazland - Elastica ODM
+Refugis - Elastica ODM
 =============================
-[![Build Status](https://travis-ci.org/fazland/elastica-odm.svg?branch=master)](https://travis-ci.org/fazland/elastica-odm)
+[![Build Status](https://travis-ci.org/refugis/elastica-odm.svg?branch=master)](https://travis-ci.org/refugis/elastica-odm)
 
-Doctrine like document manager for ElasticSearch, based on [Elastica](https://www.github.com/ruflin/elastica)
+Doctrine like document manager for ElasticSearch, based on [Elastica](https://www.github.com/ruflin/elastica).
+Originally written by [Fazland team](https://www.github.com/fazland/elastica-odm).
 
 Requirements
 ------------
@@ -21,7 +22,7 @@ Installation
 The suggested installation method is via [composer](https://getcomposer.org/):
 
 ```sh
-$ composer require fazland/elastica-odm
+$ composer require refugis/elastica-odm
 ```
 
 Using Elastica ODM
@@ -42,4 +43,4 @@ Contributions are welcome. Feel free to open a PR or file an issue here on GitHu
 
 License
 -------
-Elastica ODM is licensed under the MIT License - see the [LICENSE](https://github.com/fazland/elastica-odm/blob/master/LICENSE) file for details.
+Elastica ODM is licensed under the MIT License - see the [LICENSE](https://github.com/refugis/elastica-odm/blob/master/LICENSE) file for details.

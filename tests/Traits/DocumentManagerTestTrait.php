@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tests\Traits;
+namespace Refugis\ODM\Elastica\Tests\Traits;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Fazland\ODM\Elastica\Builder;
-use Fazland\ODM\Elastica\DocumentManagerInterface;
-use Fazland\ODM\Elastica\Metadata\Loader\AnnotationLoader;
+use Refugis\ODM\Elastica\Builder;
+use Refugis\ODM\Elastica\DocumentManagerInterface;
+use Refugis\ODM\Elastica\Metadata\Loader\AnnotationLoader;
 use Kcs\Metadata\Loader\Processor\ProcessorFactory;
 
 trait DocumentManagerTestTrait

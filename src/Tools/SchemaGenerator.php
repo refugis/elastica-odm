@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tools;
+namespace Refugis\ODM\Elastica\Tools;
 
-use Fazland\ODM\Elastica\DocumentManagerInterface;
-use Fazland\ODM\Elastica\Metadata\DocumentMetadata;
-use Fazland\ODM\Elastica\Tools\Schema\Collection;
-use Fazland\ODM\Elastica\Tools\Schema\Schema;
+use Refugis\ODM\Elastica\DocumentManagerInterface;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\Tools\Schema\Collection;
+use Refugis\ODM\Elastica\Tools\Schema\Schema;
 
 final class SchemaGenerator
 {

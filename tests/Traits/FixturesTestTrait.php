@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tests\Traits;
+namespace Refugis\ODM\Elastica\Tests\Traits;
 
 use Elastica\Cluster\Settings;
 use Elastica\Type\Mapping;
 use Elasticsearch\Endpoints;
-use Fazland\ODM\Elastica\DocumentManagerInterface;
+use Refugis\ODM\Elastica\DocumentManagerInterface;
 
 trait FixturesTestTrait
 {

@@ -1,18 +1,18 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Persister;
+namespace Refugis\ODM\Elastica\Persister;
 
 use Elastica\Query;
-use Fazland\ODM\Elastica\Collection\CollectionInterface;
-use Fazland\ODM\Elastica\DocumentManagerInterface;
-use Fazland\ODM\Elastica\Exception\ConversionFailedException;
-use Fazland\ODM\Elastica\Exception\IndexNotFoundException;
-use Fazland\ODM\Elastica\Hydrator\HydratorInterface;
-use Fazland\ODM\Elastica\Id\PostInsertId;
-use Fazland\ODM\Elastica\Metadata\DocumentMetadata;
-use Fazland\ODM\Elastica\Metadata\FieldMetadata;
-use Fazland\ODM\Elastica\Tools\SchemaGenerator;
-use Fazland\ODM\Elastica\Util\ClassUtil;
+use Refugis\ODM\Elastica\Collection\CollectionInterface;
+use Refugis\ODM\Elastica\DocumentManagerInterface;
+use Refugis\ODM\Elastica\Exception\ConversionFailedException;
+use Refugis\ODM\Elastica\Exception\IndexNotFoundException;
+use Refugis\ODM\Elastica\Hydrator\HydratorInterface;
+use Refugis\ODM\Elastica\Id\PostInsertId;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\Metadata\FieldMetadata;
+use Refugis\ODM\Elastica\Tools\SchemaGenerator;
+use Refugis\ODM\Elastica\Util\ClassUtil;
 
 class DocumentPersister
 {

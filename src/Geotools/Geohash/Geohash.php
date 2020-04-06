@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Geotools\Geohash;
+namespace Refugis\ODM\Elastica\Geotools\Geohash;
 
-use Fazland\ODM\Elastica\Geotools\Coordinate\Coordinate;
-use Fazland\ODM\Elastica\Geotools\Coordinate\CoordinateInterface;
+use Refugis\ODM\Elastica\Geotools\Coordinate\Coordinate;
+use Refugis\ODM\Elastica\Geotools\Coordinate\CoordinateInterface;
 
 class Geohash
 {

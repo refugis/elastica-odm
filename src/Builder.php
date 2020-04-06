@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica;
+namespace Refugis\ODM\Elastica;
 
 use Elastica\Client;
-use Fazland\ODM\Elastica\Collection\Database;
-use Fazland\ODM\Elastica\Metadata\Loader;
-use Fazland\ODM\Elastica\Metadata\MetadataFactory;
-use Fazland\ODM\Elastica\Type\TypeInterface;
-use Fazland\ODM\Elastica\Type\TypeManager;
+use Refugis\ODM\Elastica\Collection\Database;
+use Refugis\ODM\Elastica\Metadata\Loader;
+use Refugis\ODM\Elastica\Metadata\MetadataFactory;
+use Refugis\ODM\Elastica\Type\TypeInterface;
+use Refugis\ODM\Elastica\Type\TypeManager;
 use ProxyManager\Factory\LazyLoadingGhostFactory;
 use Psr\Log\LoggerInterface;
 

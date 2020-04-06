@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tests\Type;
+namespace Refugis\ODM\Elastica\Tests\Type;
 
-use Fazland\ODM\Elastica\Geotools\Coordinate\Coordinate;
-use Fazland\ODM\Elastica\Type\GeoPointType;
-use Fazland\ODM\Elastica\Type\TypeInterface;
+use Refugis\ODM\Elastica\Geotools\Coordinate\Coordinate;
+use Refugis\ODM\Elastica\Type\GeoPointType;
+use Refugis\ODM\Elastica\Type\TypeInterface;
 use PHPUnit\Framework\TestCase;
 
 class GeoPointTypeTest extends TestCase

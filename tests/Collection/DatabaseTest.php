@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tests\Collection;
+namespace Refugis\ODM\Elastica\Tests\Collection;
 
 use Elastica\Client;
 use Elastica\Index;
-use Fazland\ODM\Elastica\Collection\Database;
-use Fazland\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\Collection\Database;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 

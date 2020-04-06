@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Exception;
+namespace Refugis\ODM\Elastica\Exception;
 
-use Fazland\ODM\Elastica\Repository\DocumentRepositoryInterface;
+use Refugis\ODM\Elastica\Repository\DocumentRepositoryInterface;
 
 class InvalidDocumentRepositoryException extends \Exception implements ExceptionInterface
 {

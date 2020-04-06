@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Metadata\Loader;
+namespace Refugis\ODM\Elastica\Metadata\Loader;
 
-use Fazland\ODM\Elastica\Annotation\Document;
-use Fazland\ODM\Elastica\Metadata\FieldMetadata;
+use Refugis\ODM\Elastica\Annotation\Document;
+use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 use Kcs\ClassFinder\Finder\RecursiveFinder;
 use Kcs\Metadata\ClassMetadataInterface;
 use Kcs\Metadata\Loader\AnnotationProcessorLoader;

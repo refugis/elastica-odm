@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tests\Type;
+namespace Refugis\ODM\Elastica\Tests\Type;
 
-use Fazland\ODM\Elastica\Exception\NoSuchTypeException;
-use Fazland\ODM\Elastica\Type\TypeInterface;
-use Fazland\ODM\Elastica\Type\TypeManager;
+use Refugis\ODM\Elastica\Exception\NoSuchTypeException;
+use Refugis\ODM\Elastica\Type\TypeInterface;
+use Refugis\ODM\Elastica\Type\TypeManager;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 

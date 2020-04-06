@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Geotools\Shape;
+namespace Refugis\ODM\Elastica\Geotools\Shape;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Fazland\ODM\Elastica\Geotools\Coordinate\CoordinateInterface;
+use Refugis\ODM\Elastica\Geotools\Coordinate\CoordinateInterface;
 
 /**
  * Represents a polygon geo_shape.

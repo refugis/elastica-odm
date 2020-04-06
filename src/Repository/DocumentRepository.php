@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Repository;
+namespace Refugis\ODM\Elastica\Repository;
 
 use Doctrine\Common\Collections\Criteria;
-use Fazland\ODM\Elastica\DocumentManagerInterface;
-use Fazland\ODM\Elastica\Metadata\DocumentMetadata;
-use Fazland\ODM\Elastica\Persister\DocumentPersister;
-use Fazland\ODM\Elastica\Search\Search;
-use Fazland\ODM\Elastica\UnitOfWork;
+use Refugis\ODM\Elastica\DocumentManagerInterface;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\Persister\DocumentPersister;
+use Refugis\ODM\Elastica\Search\Search;
+use Refugis\ODM\Elastica\UnitOfWork;
 
 class DocumentRepository implements DocumentRepositoryInterface
 {

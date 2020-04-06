@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tests\Type;
+namespace Refugis\ODM\Elastica\Tests\Type;
 
-use Fazland\ODM\Elastica\Type\IntegerType;
-use Fazland\ODM\Elastica\Type\TypeInterface;
+use Refugis\ODM\Elastica\Type\IntegerType;
+use Refugis\ODM\Elastica\Type\TypeInterface;
 
 class IntegerTypeTest extends AbstractPrimitiveTypeTest
 {

@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tests\Type;
+namespace Refugis\ODM\Elastica\Tests\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
-use Fazland\ODM\Elastica\Tests\Fixtures\Type\TestDoctrineType;
-use Fazland\ODM\Elastica\Type\TypeInterface;
+use Refugis\ODM\Elastica\Tests\Fixtures\Type\TestDoctrineType;
+use Refugis\ODM\Elastica\Type\TypeInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 

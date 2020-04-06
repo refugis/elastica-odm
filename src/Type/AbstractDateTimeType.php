@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Type;
+namespace Refugis\ODM\Elastica\Type;
 
-use Fazland\ODM\Elastica\Exception\ConversionFailedException;
+use Refugis\ODM\Elastica\Exception\ConversionFailedException;
 
 abstract class AbstractDateTimeType extends AbstractType
 {

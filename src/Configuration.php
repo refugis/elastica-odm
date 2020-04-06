@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica;
+namespace Refugis\ODM\Elastica;
 
-use Fazland\ODM\Elastica\Exception\InvalidDocumentRepositoryException;
-use Fazland\ODM\Elastica\Repository\DefaultRepositoryFactory;
-use Fazland\ODM\Elastica\Repository\DocumentRepository;
-use Fazland\ODM\Elastica\Repository\DocumentRepositoryInterface;
-use Fazland\ODM\Elastica\Repository\RepositoryFactoryInterface;
-use Fazland\ODM\Elastica\Type\TypeManager;
+use Refugis\ODM\Elastica\Exception\InvalidDocumentRepositoryException;
+use Refugis\ODM\Elastica\Repository\DefaultRepositoryFactory;
+use Refugis\ODM\Elastica\Repository\DocumentRepository;
+use Refugis\ODM\Elastica\Repository\DocumentRepositoryInterface;
+use Refugis\ODM\Elastica\Repository\RepositoryFactoryInterface;
+use Refugis\ODM\Elastica\Type\TypeManager;
 use Kcs\Metadata\Factory\MetadataFactoryInterface;
 use ProxyManager\Factory\LazyLoadingGhostFactory;
 use Psr\Cache\CacheItemPoolInterface;

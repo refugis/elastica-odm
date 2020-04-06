@@ -1,23 +1,23 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica;
+namespace Refugis\ODM\Elastica;
 
 use Doctrine\Common\Comparable;
 use Doctrine\Common\EventManager;
 use Doctrine\Common\Persistence\ObjectManagerAware;
 use Elastica\Document;
-use Fazland\ODM\Elastica\Events\LifecycleEventManager;
-use Fazland\ODM\Elastica\Events\PreFlushEventArgs;
-use Fazland\ODM\Elastica\Exception\IndexNotFoundException;
-use Fazland\ODM\Elastica\Exception\InvalidIdentifierException;
-use Fazland\ODM\Elastica\Id\AssignedIdGenerator;
-use Fazland\ODM\Elastica\Id\GeneratorInterface;
-use Fazland\ODM\Elastica\Id\IdentityGenerator;
-use Fazland\ODM\Elastica\Internal\CommitOrderCalculator;
-use Fazland\ODM\Elastica\Metadata\DocumentMetadata;
-use Fazland\ODM\Elastica\Metadata\FieldMetadata;
-use Fazland\ODM\Elastica\Persister\DocumentPersister;
-use Fazland\ODM\Elastica\Util\ClassUtil;
+use Refugis\ODM\Elastica\Events\LifecycleEventManager;
+use Refugis\ODM\Elastica\Events\PreFlushEventArgs;
+use Refugis\ODM\Elastica\Exception\IndexNotFoundException;
+use Refugis\ODM\Elastica\Exception\InvalidIdentifierException;
+use Refugis\ODM\Elastica\Id\AssignedIdGenerator;
+use Refugis\ODM\Elastica\Id\GeneratorInterface;
+use Refugis\ODM\Elastica\Id\IdentityGenerator;
+use Refugis\ODM\Elastica\Internal\CommitOrderCalculator;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\Metadata\FieldMetadata;
+use Refugis\ODM\Elastica\Persister\DocumentPersister;
+use Refugis\ODM\Elastica\Util\ClassUtil;
 use ProxyManager\Proxy\LazyLoadingInterface;
 
 final class UnitOfWork

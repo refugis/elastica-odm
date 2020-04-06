@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Type;
+namespace Refugis\ODM\Elastica\Type;
 
 final class DateTimeType extends AbstractDateTimeType
 {

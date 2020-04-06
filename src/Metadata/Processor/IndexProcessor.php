@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Metadata\Processor;
+namespace Refugis\ODM\Elastica\Metadata\Processor;
 
-use Fazland\ODM\Elastica\Annotation\Index;
-use Fazland\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\Annotation\Index;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Kcs\Metadata\Loader\Processor\Annotation\Processor;
 use Kcs\Metadata\Loader\Processor\ProcessorInterface;
 use Kcs\Metadata\MetadataInterface;

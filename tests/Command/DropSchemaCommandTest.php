@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tests\Command;
+namespace Refugis\ODM\Elastica\Tests\Command;
 
-use Fazland\ODM\Elastica\Command\DropSchemaCommand;
-use Fazland\ODM\Elastica\Tests\Traits\DocumentManagerTestTrait;
-use Fazland\ODM\Elastica\Tests\Traits\FixturesTestTrait;
+use Refugis\ODM\Elastica\Command\DropSchemaCommand;
+use Refugis\ODM\Elastica\Tests\Traits\DocumentManagerTestTrait;
+use Refugis\ODM\Elastica\Tests\Traits\FixturesTestTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 

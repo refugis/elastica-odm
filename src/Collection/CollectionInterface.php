@@ -1,14 +1,14 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Collection;
+namespace Refugis\ODM\Elastica\Collection;
 
 use Elastica\Query;
 use Elastica\Response;
 use Elastica\ResultSet;
 use Elastica\Scroll;
 use Elastica\Type\Mapping;
-use Fazland\ODM\Elastica\DocumentManagerInterface;
-use Fazland\ODM\Elastica\Search\Search;
+use Refugis\ODM\Elastica\DocumentManagerInterface;
+use Refugis\ODM\Elastica\Search\Search;
 
 interface CollectionInterface
 {

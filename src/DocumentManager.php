@@ -1,21 +1,21 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica;
+namespace Refugis\ODM\Elastica;
 
 use Doctrine\Common\EventManager;
 use Elastica\Query;
-use Fazland\ODM\Elastica\Collection\CollectionInterface;
-use Fazland\ODM\Elastica\Collection\DatabaseInterface;
-use Fazland\ODM\Elastica\Hydrator\HydratorInterface;
-use Fazland\ODM\Elastica\Hydrator\Internal\ProxyInstantiator;
-use Fazland\ODM\Elastica\Metadata\DocumentMetadata;
-use Fazland\ODM\Elastica\Metadata\MetadataFactory;
-use Fazland\ODM\Elastica\Persister\Hints;
-use Fazland\ODM\Elastica\Repository\DocumentRepositoryInterface;
-use Fazland\ODM\Elastica\Repository\RepositoryFactoryInterface;
-use Fazland\ODM\Elastica\Search\Search;
-use Fazland\ODM\Elastica\Type\TypeManager;
-use Fazland\ODM\Elastica\Util\ClassUtil;
+use Refugis\ODM\Elastica\Collection\CollectionInterface;
+use Refugis\ODM\Elastica\Collection\DatabaseInterface;
+use Refugis\ODM\Elastica\Hydrator\HydratorInterface;
+use Refugis\ODM\Elastica\Hydrator\Internal\ProxyInstantiator;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\Metadata\MetadataFactory;
+use Refugis\ODM\Elastica\Persister\Hints;
+use Refugis\ODM\Elastica\Repository\DocumentRepositoryInterface;
+use Refugis\ODM\Elastica\Repository\RepositoryFactoryInterface;
+use Refugis\ODM\Elastica\Search\Search;
+use Refugis\ODM\Elastica\Type\TypeManager;
+use Refugis\ODM\Elastica\Util\ClassUtil;
 use Kcs\Metadata\Factory\MetadataFactoryInterface;
 use ProxyManager\Factory\LazyLoadingGhostFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;

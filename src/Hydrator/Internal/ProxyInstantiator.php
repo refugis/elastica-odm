@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Hydrator\Internal;
+namespace Refugis\ODM\Elastica\Hydrator\Internal;
 
 use Doctrine\Instantiator\InstantiatorInterface;
-use Fazland\ODM\Elastica\DocumentManagerInterface;
-use Fazland\ODM\Elastica\Metadata\DocumentMetadata;
-use Fazland\ODM\Elastica\Metadata\FieldMetadata;
+use Refugis\ODM\Elastica\DocumentManagerInterface;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 use ProxyManager\Proxy\GhostObjectInterface;
 
 class ProxyInstantiator implements InstantiatorInterface

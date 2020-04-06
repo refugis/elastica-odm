@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tests\Type;
+namespace Refugis\ODM\Elastica\Tests\Type;
 
 use Elastica\Query;
 use Elastica\Query\Match;
-use Fazland\ODM\Elastica\Type\PercolatorType;
-use Fazland\ODM\Elastica\Type\TypeInterface;
+use Refugis\ODM\Elastica\Type\PercolatorType;
+use Refugis\ODM\Elastica\Type\TypeInterface;
 use PHPUnit\Framework\TestCase;
 
 class PercolatorTypeTest extends TestCase

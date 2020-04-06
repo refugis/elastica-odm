@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Internal;
+namespace Refugis\ODM\Elastica\Internal;
 
-use Fazland\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
 final class CommitOrderCalculator
 {

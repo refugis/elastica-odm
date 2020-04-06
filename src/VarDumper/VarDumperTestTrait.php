@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\VarDumper;
+namespace Refugis\ODM\Elastica\VarDumper;
 
 use ProxyManager\Proxy\ProxyInterface;
 use Symfony\Component\VarDumper\Cloner\VarCloner;

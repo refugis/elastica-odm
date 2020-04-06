@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Collection;
+namespace Refugis\ODM\Elastica\Collection;
 
 use Elastica\Exception\ResponseException;
 use Elastica\Index;
@@ -12,11 +12,11 @@ use Elastica\SearchableInterface;
 use Elastica\Type;
 use Elastica\Type\Mapping;
 use Elasticsearch\Endpoints;
-use Fazland\ODM\Elastica\DocumentManagerInterface;
-use Fazland\ODM\Elastica\Exception\CannotDropAnAliasException;
-use Fazland\ODM\Elastica\Exception\IndexNotFoundException;
-use Fazland\ODM\Elastica\Exception\RuntimeException;
-use Fazland\ODM\Elastica\Search\Search;
+use Refugis\ODM\Elastica\DocumentManagerInterface;
+use Refugis\ODM\Elastica\Exception\CannotDropAnAliasException;
+use Refugis\ODM\Elastica\Exception\IndexNotFoundException;
+use Refugis\ODM\Elastica\Exception\RuntimeException;
+use Refugis\ODM\Elastica\Search\Search;
 
 class Collection implements CollectionInterface
 {

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Internal;
+namespace Refugis\ODM\Elastica\Internal;
 
 /**
  * Represents a document dependency graph.

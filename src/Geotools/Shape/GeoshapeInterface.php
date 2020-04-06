@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Geotools\Shape;
+namespace Refugis\ODM\Elastica\Geotools\Shape;
 
 use Elastica\ArrayableInterface;
 

@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Type;
+namespace Refugis\ODM\Elastica\Type;
 
-use Fazland\ODM\Elastica\Exception\ConversionFailedException;
-use Fazland\ODM\Elastica\Geotools\Shape\Geoshape;
+use Refugis\ODM\Elastica\Exception\ConversionFailedException;
+use Refugis\ODM\Elastica\Geotools\Shape\Geoshape;
 
 final class GeoShapeType extends AbstractType
 {

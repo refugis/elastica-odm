@@ -1,10 +1,18 @@
 {
-    "name": "fazland/elastica-odm",
+    "name": "Refugis/elastica-odm",
     "minimum-stability": "stable",
     "description": "Doctrine like document manager for ElasticSearch, based on Elastica",
     "type": "library",
     "license": "MIT",
     "authors": [
+        {
+            "name": "Massimiliano Braglia",
+            "email": "massimiliano.braglia@gmail.com"
+        },
+        {
+            "name": "Alessadro Chitolina",
+            "email": "alekitto@gmail.com"
+        },
         {
             "name": "Fazland DevTeam",
             "email": "devs@fazland.com"
@@ -31,12 +39,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Fazland\\ODM\\Elastica\\": "src/"
+            "Refugis\\ODM\\Elastica\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Fazland\\ODM\\Elastica\\Tests\\": "tests/"
+            "Refugis\\ODM\\Elastica\\Tests\\": "tests/"
         }
     },
     "config": {

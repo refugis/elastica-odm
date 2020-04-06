@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Type;
+namespace Refugis\ODM\Elastica\Type;
 
-use Fazland\ODM\Elastica\DocumentManagerInterface;
+use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 

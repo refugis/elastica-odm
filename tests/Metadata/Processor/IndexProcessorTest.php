@@ -1,16 +1,16 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tests\Metadata\Processor;
+namespace Refugis\ODM\Elastica\Tests\Metadata\Processor;
 
 use Elastica\Type\Mapping;
-use Fazland\ODM\Elastica\Annotation\Analyzer;
-use Fazland\ODM\Elastica\Annotation\Filter;
-use Fazland\ODM\Elastica\Annotation\Index;
-use Fazland\ODM\Elastica\Annotation\Tokenizer;
-use Fazland\ODM\Elastica\Metadata\DocumentMetadata;
-use Fazland\ODM\Elastica\Metadata\Processor\IndexProcessor;
-use Fazland\ODM\Elastica\Tests\Fixtures\Document\Foo;
-use Fazland\ODM\Elastica\Tests\Traits\DocumentManagerTestTrait;
+use Refugis\ODM\Elastica\Annotation\Analyzer;
+use Refugis\ODM\Elastica\Annotation\Filter;
+use Refugis\ODM\Elastica\Annotation\Index;
+use Refugis\ODM\Elastica\Annotation\Tokenizer;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\Metadata\Processor\IndexProcessor;
+use Refugis\ODM\Elastica\Tests\Fixtures\Document\Foo;
+use Refugis\ODM\Elastica\Tests\Traits\DocumentManagerTestTrait;
 use PHPUnit\Framework\TestCase;
 
 class IndexProcessorTest extends TestCase

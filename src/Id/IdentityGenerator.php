@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Id;
+namespace Refugis\ODM\Elastica\Id;
 
-use Fazland\ODM\Elastica\DocumentManagerInterface;
-use Fazland\ODM\Elastica\Util\ClassUtil;
+use Refugis\ODM\Elastica\DocumentManagerInterface;
+use Refugis\ODM\Elastica\Util\ClassUtil;
 
 final class IdentityGenerator extends AbstractIdGenerator
 {

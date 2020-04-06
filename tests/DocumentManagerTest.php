@@ -1,17 +1,17 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tests;
+namespace Refugis\ODM\Elastica\Tests;
 
 use Elastica\Index;
 use Elastica\Type;
-use Fazland\ODM\Elastica\DocumentManager;
-use Fazland\ODM\Elastica\Geotools\Coordinate\Coordinate;
-use Fazland\ODM\Elastica\Tests\Fixtures\Document\Foo;
-use Fazland\ODM\Elastica\Tests\Fixtures\Document\FooNoAutoCreate;
-use Fazland\ODM\Elastica\Tests\Fixtures\Document\FooWithLazyField;
-use Fazland\ODM\Elastica\Tests\Traits\DocumentManagerTestTrait;
-use Fazland\ODM\Elastica\Tests\Traits\FixturesTestTrait;
-use Fazland\ODM\Elastica\VarDumper\VarDumperTestTrait;
+use Refugis\ODM\Elastica\DocumentManager;
+use Refugis\ODM\Elastica\Geotools\Coordinate\Coordinate;
+use Refugis\ODM\Elastica\Tests\Fixtures\Document\Foo;
+use Refugis\ODM\Elastica\Tests\Fixtures\Document\FooNoAutoCreate;
+use Refugis\ODM\Elastica\Tests\Fixtures\Document\FooWithLazyField;
+use Refugis\ODM\Elastica\Tests\Traits\DocumentManagerTestTrait;
+use Refugis\ODM\Elastica\Tests\Traits\FixturesTestTrait;
+use Refugis\ODM\Elastica\VarDumper\VarDumperTestTrait;
 use PHPUnit\Framework\TestCase;
 use ProxyManager\Proxy\ProxyInterface;
 
@@ -61,7 +61,7 @@ class DocumentManagerTest extends TestCase
 
         self::assertCount(1, $result);
         $this->assertDumpEquals(<<<EOF
-Fazland\ODM\Elastica\Tests\Fixtures\Document\FooWithLazyField (proxy) {
+Refugis\ODM\Elastica\Tests\Fixtures\Document\FooWithLazyField (proxy) {
   +id: "foo_test_document"
   +stringField: "bazbaz"
 }

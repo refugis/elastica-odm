@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Fazland\ODM\Elastica\Tests\Fixtures\Type;
+namespace Refugis\ODM\Elastica\Tests\Fixtures\Type;
 
-use Fazland\ODM\Elastica\Type\AbstractDoctrineType;
+use Refugis\ODM\Elastica\Type\AbstractDoctrineType;
 
 class TestDoctrineType extends AbstractDoctrineType
 {
