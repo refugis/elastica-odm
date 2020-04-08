@@ -2,6 +2,8 @@
 
 namespace Refugis\ODM\Elastica\Metadata\Processor;
 
+use Doctrine\Common\Inflector\Inflector;
+use Elastica\Type;
 use Kcs\Metadata\Loader\Processor\Annotation\Processor;
 use Kcs\Metadata\Loader\Processor\ProcessorInterface;
 use Kcs\Metadata\MetadataInterface;
@@ -22,7 +24,29 @@ class DocumentProcessor implements ProcessorInterface
     public function process(MetadataInterface $metadata, $subject): void
     {
         $metadata->document = true;
-        $metadata->collectionName = $subject->type;
+
+        $metadata->collectionName = $subject->type ?? $this->calculateType($metadata->name);
+        if (\class_exists(Type::class) && false === \strpos($metadata->collectionName, '/')) {
+            $metadata->collectionName .= '/'.$metadata->collectionName;
+        }
+
         $metadata->customRepositoryClassName = $subject->repositoryClass;
+    }
+
+    /**
+     * Build a collection name from class name.
+     *
+     * @param string $name
+     *
+     * @return string
+     */
+    private function calculateType(string $name): string
+    {
+        $indexName = Inflector::tableize($name);
+        if (\class_exists(Type::class)) {
+            return "$indexName/$indexName";
+        }
+
+        return $indexName;
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Refugis\ODM\Elastica\Annotation;
 
-use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
@@ -15,8 +14,6 @@ final class Document
      * The elastica index/type name.
      *
      * @var string
-     *
-     * @Required()
      */
     public $type;
 

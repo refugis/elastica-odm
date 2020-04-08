@@ -9,8 +9,11 @@ use Elastica\Document;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Refugis\ODM\Elastica\Events\LifecycleEventManager;
 use Refugis\ODM\Elastica\Events\PreFlushEventArgs;
+use Refugis\ODM\Elastica\Exception\DocumentNotManagedException;
 use Refugis\ODM\Elastica\Exception\IndexNotFoundException;
+use Refugis\ODM\Elastica\Exception\InvalidArgumentException;
 use Refugis\ODM\Elastica\Exception\InvalidIdentifierException;
+use Refugis\ODM\Elastica\Exception\UnexpectedDocumentStateException;
 use Refugis\ODM\Elastica\Id\AssignedIdGenerator;
 use Refugis\ODM\Elastica\Id\GeneratorInterface;
 use Refugis\ODM\Elastica\Id\IdentityGenerator;
@@ -149,7 +152,8 @@ final class UnitOfWork
             $this->readOnlyObjects =
             $this->originalDocumentData = [];
         } else {
-            throw new \Exception('Not implemented yet.');
+            $this->clearIdentityMapForDocumentClass($documentClass);
+            $this->clearEntityInsertionsForDocumentClass($documentClass);
         }
 
         if ($this->evm->hasListeners(Events::onClear)) {
@@ -313,9 +317,67 @@ final class UnitOfWork
         }
     }
 
-    public function recomputeSingleDocumentChangeset($document)
+    /**
+     * INTERNAL:
+     * Computes the changeset of an individual document, independently of the
+     * computeChangeSets() routine that is used at the beginning of a UnitOfWork#commit().
+     *
+     * The passed entity must be a managed entity. If the entity already has a change set
+     * because this method is invoked during a commit cycle then the change sets are added.
+     * whereby changes detected in this method prevail.
+     *
+     * @ignore
+     *
+     * @param object $document the entity for which to (re)calculate the change set
+     *
+     * @return void
+     *
+     * @throws InvalidArgumentException if the passed entity is not MANAGED
+     */
+    public function recomputeSingleDocumentChangeset(object $document): void
     {
-        // @todo
+        $oid = \spl_object_hash($document);
+        if (! isset($this->documentStates[$oid]) || self::STATE_MANAGED !== $this->documentStates[$oid]) {
+            throw new DocumentNotManagedException($document);
+        }
+
+        $class = $this->manager->getClassMetadata(ClassUtil::getClass($document));
+        \assert($class instanceof DocumentMetadata);
+
+        $actualData = [];
+        foreach ($class->attributesMetadata as $field) {
+            if (! $field instanceof FieldMetadata || ! $field->isStored()) {
+                continue;
+            }
+
+            $actualData[$field->fieldName] = $field->getValue($document);
+        }
+
+        if (! isset($this->originalDocumentData[$oid])) {
+            throw new \RuntimeException('Cannot call recomputeSingleDocumentChangeset before computeChangeSet on a document.');
+        }
+
+        $originalData = $this->originalDocumentData[$oid];
+        $changeSet = [];
+
+        foreach ($actualData as $propName => $actualValue) {
+            $orgValue = $originalData[$propName] ?? null;
+
+            if ($orgValue !== $actualValue) {
+                $changeSet[$propName] = [$orgValue, $actualValue];
+            }
+        }
+
+        if ($changeSet) {
+            if (isset($this->entityChangeSets[$oid])) {
+                $this->documentChangeSets[$oid] = \array_merge($this->documentChangeSets[$oid], $changeSet);
+            } elseif (! isset($this->entityInsertions[$oid])) {
+                $this->documentChangeSets[$oid] = $changeSet;
+                $this->documentUpdates[$oid] = $document;
+            }
+
+            $this->originalDocumentData[$oid] = $actualData;
+        }
     }
 
     /**
@@ -396,8 +458,9 @@ final class UnitOfWork
      */
     public function createDocument(Document $document, object $result, ?array $fields = null): void
     {
-        /** @var DocumentMetadata $class */
         $class = $this->manager->getClassMetadata(ClassUtil::getClass($result));
+        \assert($class instanceof DocumentMetadata);
+
         $typeManager = $this->manager->getTypeManager();
         $documentData = $document->getData();
 
@@ -499,6 +562,85 @@ final class UnitOfWork
     }
 
     /**
+     * Checks whether an entity is registered for insertion within this unit of work.
+     *
+     * @param object $document
+     *
+     * @return bool
+     */
+    public function isScheduledForInsert(object $document): bool
+    {
+        return isset($this->documentInsertions[\spl_object_hash($document)]);
+    }
+
+    /**
+     * Checks whether an entity is registered as removed/deleted with the unit
+     * of work.
+     *
+     * @param object $document
+     *
+     * @return bool
+     */
+    public function isScheduledForDelete(object $document): bool
+    {
+        return isset($this->documentDeletions[\spl_object_hash($document)]);
+    }
+
+    /**
+     * INTERNAL:
+     * Registers a document as managed.
+     *
+     * @param object $document the document
+     * @param array  $data     the original document data
+     *
+     * @return void
+     *
+     * @throws InvalidIdentifierException
+     */
+    public function registerManaged(object $document, array $data): void
+    {
+        $oid = \spl_object_hash($document);
+
+        $this->documentStates[$oid] = self::STATE_MANAGED;
+        $this->originalDocumentData[$oid] = $data;
+
+        $this->addToIdentityMap($document);
+    }
+
+    /**
+     * Clears the identity map for the given document class.
+     *
+     * @param string $entityName
+     */
+    private function clearIdentityMapForDocumentClass(string $documentClass): void
+    {
+        if (! isset($this->identityMap[$documentClass])) {
+            return;
+        }
+
+        $visited = [];
+
+        foreach ($this->identityMap[$documentClass] as $document) {
+            $this->doDetach($document, $visited);
+        }
+    }
+
+    /**
+     * Clears the document insertions for the given document class.
+     *
+     * @param string $entityName
+     */
+    private function clearEntityInsertionsForDocumentClass(string $documentClass): void
+    {
+        foreach ($this->documentInsertions as $hash => $document) {
+            // note: performance optimization - `instanceof` is much faster than a function call
+            if ($document instanceof $documentClass && \get_class($document) === $documentClass) {
+                unset($this->documentInsertions[$hash]);
+            }
+        }
+    }
+
+    /**
      * Computes the changes that happened to a single document.
      *
      * @param DocumentMetadata $class
@@ -581,10 +723,6 @@ final class UnitOfWork
     private function addToIdentityMap(object $object): void
     {
         $oid = \spl_object_hash($object);
-        if (isset($this->objects[$oid])) {
-            return;
-        }
-
         $class = $this->manager->getClassMetadata(ClassUtil::getClass($object));
         $id = $class->getSingleIdentifier($object);
 
@@ -645,6 +783,7 @@ final class UnitOfWork
 
             case self::STATE_REMOVED:
                 unset($this->documentDeletions[$oid]);
+                $this->addToIdentityMap($object);
                 $this->documentStates[$oid] = self::STATE_MANAGED;
 
                 break;
@@ -659,7 +798,7 @@ final class UnitOfWork
      * @param object $object
      * @param array  $visited
      *
-     * @throws \InvalidArgumentException if document state is equal to NEW
+     * @throws InvalidArgumentException if document state is equal to NEW
      */
     private function doRemove(object $object, array &$visited): void
     {
@@ -688,9 +827,9 @@ final class UnitOfWork
                 break;
 
             case self::STATE_DETACHED:
-                throw new \InvalidArgumentException('Detached document cannot be removed');
+                throw new InvalidArgumentException('Detached document cannot be removed');
             default:
-                throw new \InvalidArgumentException('Unexpected document state '.$documentState);
+                throw new UnexpectedDocumentStateException($documentState);
         }
     }
 
@@ -707,16 +846,14 @@ final class UnitOfWork
     private function doMerge(object $object, array &$visited): object
     {
         $oid = \spl_object_hash($object);
-
         if (isset($visited[$oid])) {
             return $visited[$oid];
         }
 
-        $visited[$oid] = $object;
-
-        /** @var DocumentMetadata $class */
         $class = $this->manager->getClassMetadata(ClassUtil::getClass($object));
-        $managedCopy = $object;
+        $managedCopy = $visited[$oid] = $object;
+
+        \assert($class instanceof DocumentMetadata);
 
         if (self::STATE_MANAGED !== $this->getDocumentState($object, self::STATE_DETACHED)) {
             $this->manager->initializeObject($object);
@@ -732,7 +869,7 @@ final class UnitOfWork
                 }
 
                 if (null !== $managedCopy && self::STATE_REMOVED === $this->getDocumentState($managedCopy)) {
-                    throw new \InvalidArgumentException('Removed document detected during merge.');
+                    throw new InvalidArgumentException('Removed document detected during merge.');
                 }
 
                 $this->manager->initializeObject($managedCopy);
@@ -902,14 +1039,14 @@ final class UnitOfWork
     private function executeInserts(string $className): void
     {
         foreach ($this->documentInsertions as $oid => $document) {
-            /** @var DocumentMetadata $class */
             $class = $this->manager->getClassMetadata(ClassUtil::getClass($document));
+            \assert($class instanceof DocumentMetadata);
+
             if ($className !== $class->name) {
                 continue;
             }
 
             $persister = $this->getDocumentPersister($class->name);
-
             $postInsertId = $persister->insert($document);
 
             if (null !== $postInsertId) {
@@ -929,8 +1066,9 @@ final class UnitOfWork
     private function executeUpdates(string $className): void
     {
         foreach ($this->documentUpdates as $oid => $document) {
-            /** @var DocumentMetadata $class */
             $class = $this->manager->getClassMetadata(ClassUtil::getClass($document));
+            \assert($class instanceof DocumentMetadata);
+
             if ($className !== $class->name) {
                 continue;
             }
@@ -950,8 +1088,9 @@ final class UnitOfWork
     private function executeDeletions(string $className): void
     {
         foreach ($this->documentDeletions as $oid => $document) {
-            /** @var DocumentMetadata $class */
             $class = $this->manager->getClassMetadata(ClassUtil::getClass($document));
+            \assert($class instanceof DocumentMetadata);
+
             if ($className !== $class->name) {
                 continue;
             }

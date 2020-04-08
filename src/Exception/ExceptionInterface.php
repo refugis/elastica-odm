@@ -2,6 +2,6 @@
 
 namespace Refugis\ODM\Elastica\Exception;
 
-interface ExceptionInterface
+interface ExceptionInterface extends \Throwable
 {
 }

@@ -17,6 +17,9 @@ final class IdentityGenerator extends AbstractIdGenerator
         return $collection->getLastInsertedId();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function isPostInsertGenerator(): bool
     {
         return true;

@@ -18,17 +18,23 @@ final class PostInsertId
      */
     private $id;
 
-    public function __construct($document, string $id)
+    public function __construct(object $document, string $id)
     {
         $this->document = $document;
         $this->id = $id;
     }
 
-    public function getDocument()
+    /**
+     * Gets the document for this id.
+     */
+    public function getDocument(): object
     {
         return $this->document;
     }
 
+    /**
+     * Returns the newly generated id.
+     */
     public function getId(): string
     {
         return $this->id;
