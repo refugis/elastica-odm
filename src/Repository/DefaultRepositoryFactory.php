@@ -10,8 +10,8 @@ final class DefaultRepositoryFactory extends AbstractRepositoryFactory
     protected function instantiateRepository(
         string $repositoryClassName,
         DocumentManagerInterface $documentManager,
-        DocumentMetadata $class
+        DocumentMetadata $metadata
     ): DocumentRepositoryInterface {
-        return new $repositoryClassName($documentManager, $class);
+        return new $repositoryClassName($documentManager, $metadata);
     }
 }

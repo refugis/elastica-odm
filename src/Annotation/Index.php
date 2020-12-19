@@ -9,6 +9,7 @@ use function Safe\sprintf;
  * @Annotation
  * @Target({"CLASS"})
  */
+#[\Attribute]
 final class Index
 {
     /**

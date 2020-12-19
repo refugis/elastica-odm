@@ -45,7 +45,7 @@ abstract class Geoshape implements GeoshapeInterface
     /**
      * Creates a Polygon object from coordinates array.
      *
-     * @param array $coordinates
+     * @param array<array|string> $coordinates
      *
      * @return Polygon
      */
@@ -53,8 +53,8 @@ abstract class Geoshape implements GeoshapeInterface
     {
         $polygon = \array_shift($coordinates);
 
-        return new Polygon(\array_map(Coordinate::class.'::create', $polygon), ...\array_map(static function (array $poly) {
-            return \array_map(Coordinate::class.'::create', $poly);
+        return new Polygon(\array_map([Coordinate::class, 'create'], $polygon), ...\array_map(static function (array $poly) {
+            return \array_map([Coordinate::class, 'create'], $poly);
         }, $coordinates));
     }
 }

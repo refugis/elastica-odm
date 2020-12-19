@@ -6,71 +6,30 @@ use Kcs\Metadata\PropertyMetadata;
 
 class FieldMetadata extends PropertyMetadata
 {
-    /**
-     * @var bool
-     */
-    public $identifier;
-
-    /**
-     * @var bool
-     */
-    public $field = false;
-
-    /**
-     * @var bool
-     */
-    public $indexName;
-
-    /**
-     * @var bool
-     */
-    public $typeName;
-
-    /**
-     * @var string
-     */
-    public $fieldName;
-
-    /**
-     * @var string
-     */
-    public $type;
-
-    /**
-     * @var bool
-     */
-    public $multiple = false;
-
-    /**
-     * @var array
-     */
-    public $options = [];
-
-    /**
-     * @var bool
-     */
-    public $lazy = false;
-
-    /**
-     * @var DocumentMetadata
-     */
-    public $documentMetadata;
-
-    /**
-     * @var \ReflectionProperty
-     */
-    private $reflectionProperty;
+    public bool $identifier = false;
+    public bool $field = false;
+    public bool $indexName = false;
+    public bool $typeName = false;
+    public string $fieldName;
+    public string $type;
+    public bool $multiple = false;
+    public array $options = [];
+    public bool $lazy = false;
+    public DocumentMetadata $documentMetadata;
+    private \ReflectionProperty $reflectionProperty;
 
     public function __construct(DocumentMetadata $class, string $name)
     {
         $this->documentMetadata = $class;
+        $this->fieldName = $name;
+        $this->type = 'raw';
 
         parent::__construct($class->name, $name);
     }
 
     public function getReflection(): \ReflectionProperty
     {
-        if (null === $this->reflectionProperty) {
+        if (! isset($this->reflectionProperty)) {
             $this->reflectionProperty = new \ReflectionProperty($this->class, $this->name);
             $this->reflectionProperty->setAccessible(true);
         }
@@ -83,7 +42,7 @@ class FieldMetadata extends PropertyMetadata
         return $this->getReflection()->getValue($object);
     }
 
-    public function setValue($object, $value)
+    public function setValue($object, $value): void
     {
         $reflection = $this->getReflection();
         $reflection->setValue($object, $value);

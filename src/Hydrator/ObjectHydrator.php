@@ -12,10 +12,7 @@ use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
 class ObjectHydrator implements HydratorInterface
 {
-    /**
-     * @var DocumentManagerInterface
-     */
-    private $manager;
+    private DocumentManagerInterface $manager;
 
     public function __construct(DocumentManagerInterface $manager)
     {

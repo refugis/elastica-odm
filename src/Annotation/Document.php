@@ -9,7 +9,7 @@ use function Safe\sprintf;
  * @Annotation
  * @Target({"CLASS"})
  */
-#[Attribute]
+#[\Attribute]
 final class Document
 {
     /**

@@ -10,19 +10,14 @@ interface GeneratorInterface
     /**
      * Generates a document identifier.
      *
-     * @param DocumentManagerInterface $dm
-     * @param $document
-     *
      * @return mixed
      *
      * @throws InvalidIdentifierException if id cannot be generated or invalid
      */
-    public function generate(DocumentManagerInterface $dm, $document);
+    public function generate(DocumentManagerInterface $dm, object $document);
 
     /**
      * Whether this generator must be called after the insert operation.
-     *
-     * @return bool
      */
     public function isPostInsertGenerator(): bool;
 }

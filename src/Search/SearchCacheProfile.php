@@ -4,15 +4,8 @@ namespace Refugis\ODM\Elastica\Search;
 
 final class SearchCacheProfile
 {
-    /**
-     * @var string
-     */
-    private $cacheKey;
-
-    /**
-     * @var int
-     */
-    private $ttl;
+    private string $cacheKey;
+    private int $ttl;
 
     public function __construct(string $cacheKey, int $ttl = 0)
     {
@@ -20,17 +13,11 @@ final class SearchCacheProfile
         $this->ttl = $ttl;
     }
 
-    /**
-     * @return string
-     */
     public function getCacheKey(): string
     {
         return $this->cacheKey;
     }
 
-    /**
-     * @return int
-     */
     public function getTtl(): int
     {
         return $this->ttl;

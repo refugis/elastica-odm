@@ -9,17 +9,11 @@ interface DatabaseInterface
 {
     /**
      * Gets the elastic search connection.
-     *
-     * @return Client
      */
     public function getConnection(): Client;
 
     /**
      * Retrieve a collection from class metadata.
-     *
-     * @param DocumentMetadata $class
-     *
-     * @return CollectionInterface
      */
     public function getCollection(DocumentMetadata $class): CollectionInterface;
 }

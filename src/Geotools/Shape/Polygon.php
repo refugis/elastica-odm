@@ -12,14 +12,14 @@ use Refugis\ODM\Elastica\Geotools\Coordinate\CoordinateInterface;
 final class Polygon extends Geoshape
 {
     /**
-     * @var Collection|CoordinateInterface[]
+     * @var Collection<CoordinateInterface>
      */
-    private $outer;
+    private Collection $outer;
 
     /**
-     * @var Collection[]|CoordinateInterface[][]
+     * @var Collection<CoordinateInterface[]>
      */
-    private $holes;
+    private Collection $holes;
 
     public function __construct(array $outer, array ...$holes)
     {

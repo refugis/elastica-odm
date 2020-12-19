@@ -11,7 +11,7 @@ use function Safe\sprintf;
  * @Annotation
  * @Target({"ANNOTATION"})
  */
-#[Attribute]
+#[\Attribute]
 final class Analyzer
 {
     /**

@@ -6,17 +6,13 @@ class Coordinate implements CoordinateInterface
 {
     /**
      * The latitude of the coordinate.
-     *
-     * @var float
      */
-    private $latitude;
+    private float $latitude;
 
     /**
      * The longitude of the coordinate.
-     *
-     * @var float
      */
-    private $longitude;
+    private float $longitude;
 
     /**
      * Set the latitude and the longitude of the coordinates into an selected ellipsoid.
@@ -52,9 +48,7 @@ class Coordinate implements CoordinateInterface
     /**
      * Creates a new coordinate object.
      *
-     * @param $coordinates
-     *
-     * @return self
+     * @param array|string $coordinates
      */
     public static function create($coordinates): self
     {
@@ -119,11 +113,9 @@ class Coordinate implements CoordinateInterface
     /**
      * Creates a valid and acceptable geographic coordinates.
      *
-     * @param string $coordinates
-     *
      * @throws \InvalidArgumentException
      */
-    public function setFromString($coordinates)
+    public function setFromString(string $coordinates): void
     {
         if (! \is_string($coordinates)) {
             throw new \InvalidArgumentException('The given coordinates should be a string!');
@@ -139,13 +131,13 @@ class Coordinate implements CoordinateInterface
      *
      * @param string $coordinates a valid and acceptable geographic coordinates
      *
-     * @return array an array of coordinate in decimal degree
+     * @return string[] an array of coordinate in decimal degree
      *
      * @throws \InvalidArgumentException
      *
      * @see http://en.wikipedia.org/wiki/Geographic_coordinate_conversion
      */
-    private function toDecimalDegrees($coordinates)
+    private function toDecimalDegrees(string $coordinates): array
     {
         // 40.446195, -79.948862
         if (\preg_match('/(\-?\d{1,2}\.?\d*)[, ] ?(\-?\d{1,3}\.?\d*)$/', $coordinates, $match)) {
@@ -205,7 +197,7 @@ class Coordinate implements CoordinateInterface
     /**
      * {@inheritdoc}
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [$this->longitude, $this->latitude];
     }
@@ -213,7 +205,7 @@ class Coordinate implements CoordinateInterface
     /**
      * {@inheritdoc}
      */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'lat' => $this->latitude,

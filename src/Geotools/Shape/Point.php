@@ -9,10 +9,7 @@ use Refugis\ODM\Elastica\Geotools\Coordinate\CoordinateInterface;
  */
 final class Point extends Geoshape
 {
-    /**
-     * @var CoordinateInterface
-     */
-    private $coordinate;
+    private CoordinateInterface $coordinate;
 
     public function __construct(CoordinateInterface $coordinate)
     {

@@ -3,6 +3,7 @@
 namespace Refugis\ODM\Elastica\Tests\Type;
 
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Refugis\ODM\Elastica\Exception\NoSuchTypeException;
 use Refugis\ODM\Elastica\Type\TypeInterface;
@@ -10,6 +11,8 @@ use Refugis\ODM\Elastica\Type\TypeManager;
 
 class TypeManagerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testGetTypeShouldThrowOnUnknownType(): void
     {
         $this->expectException(NoSuchTypeException::class);

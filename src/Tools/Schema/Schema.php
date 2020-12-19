@@ -7,14 +7,15 @@ namespace Refugis\ODM\Elastica\Tools\Schema;
  */
 class Schema
 {
-    private $collectionMapping = [];
+    /**
+     * @var array<string, Collection>
+     */
+    private array $collectionMapping = [];
 
     /**
      * Adds a collection to the schema.
-     *
-     * @param Collection $collection
      */
-    public function addCollection(Collection $collection)
+    public function addCollection(Collection $collection): void
     {
         $metadata = $collection->getDocumentMetadata();
         $this->collectionMapping[$metadata->getName()] = $collection;
@@ -23,7 +24,7 @@ class Schema
     /**
      * Gets the collection mappings.
      *
-     * @return Collection[]
+     * @return array<string, Collection>
      */
     public function getMapping(): array
     {

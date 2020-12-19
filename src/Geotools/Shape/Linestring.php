@@ -12,9 +12,9 @@ use Refugis\ODM\Elastica\Geotools\Coordinate\CoordinateInterface;
 final class Linestring extends Geoshape
 {
     /**
-     * @var Collection|CoordinateInterface[]
+     * @var Collection<CoordinateInterface>
      */
-    private $coordinates;
+    private Collection $coordinates;
 
     public function __construct(CoordinateInterface ...$coordinates)
     {

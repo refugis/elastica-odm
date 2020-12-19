@@ -13,18 +13,12 @@ interface HydratorInterface
     /**
      * Hydrates all the documents in the result set.
      *
-     * @param ResultSet $resultSet
-     * @param string    $className
-     *
-     * @return array
+     * @return object[]
      */
     public function hydrateAll(ResultSet $resultSet, string $className): array;
 
     /**
      * Hydrates only one document.
-     *
-     * @param Document $document
-     * @param string   $className
      *
      * @return mixed
      */

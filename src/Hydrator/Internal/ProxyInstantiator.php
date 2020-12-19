@@ -13,12 +13,8 @@ class ProxyInstantiator implements InstantiatorInterface
     /**
      * @var string[]
      */
-    private $fields;
-
-    /**
-     * @var DocumentManagerInterface
-     */
-    private $manager;
+    private array $fields;
+    private DocumentManagerInterface $manager;
 
     public function __construct(array $fields, DocumentManagerInterface $manager)
     {

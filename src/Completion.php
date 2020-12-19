@@ -10,11 +10,7 @@ final class Completion implements ArrayableInterface
      * @var string|string[]
      */
     public $input;
-
-    /**
-     * @var int
-     */
-    public $weight;
+    public ?int $weight = null;
 
     public function toArray(): ?array
     {

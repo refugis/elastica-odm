@@ -16,20 +16,9 @@ use Refugis\ODM\Elastica\Util\ClassUtil;
 
 class DocumentPersister
 {
-    /**
-     * @var DocumentManagerInterface
-     */
-    private $dm;
-
-    /**
-     * @var DocumentMetadata
-     */
-    private $class;
-
-    /**
-     * @var CollectionInterface
-     */
-    private $collection;
+    private DocumentManagerInterface $dm;
+    private DocumentMetadata $class;
+    private CollectionInterface $collection;
 
     public function __construct(DocumentManagerInterface $dm, DocumentMetadata $class)
     {
@@ -50,13 +39,13 @@ class DocumentPersister
     /**
      * Finds a document by a set of criteria.
      *
-     * @param array  $criteria query criteria
-     * @param array  $hints
+     * @param array<string, mixed> $criteria query criteria
+     * @param array<string, mixed> $hints
      * @param object $document The document to load data into. If not given, a new document will be created.
      *
      * @return object|null the loaded and managed document instance or null if no document was found
      */
-    public function load(array $criteria, array $hints = [], $document = null)
+    public function load(array $criteria, array $hints = [], $document = null): ?object
     {
         $query = $this->prepareQuery($criteria);
         if ($hints[Hints::HINT_REFRESH] ?? false) {
@@ -107,9 +96,7 @@ class DocumentPersister
     /**
      * Checks whether a document matching criteria exists in collection.
      *
-     * @param array $criteria
-     *
-     * @return bool
+     * @param array<string, mixed> $criteria
      */
     public function exists(array $criteria): bool
     {
@@ -122,12 +109,8 @@ class DocumentPersister
 
     /**
      * Insert a document in the collection.
-     *
-     * @param object $document
-     *
-     * @return PostInsertId|null
      */
-    public function insert($document): ?PostInsertId
+    public function insert(object $document): ?PostInsertId
     {
         /** @var DocumentMetadata $class */
         $class = $this->dm->getClassMetadata(ClassUtil::getClass($document));
@@ -177,10 +160,8 @@ class DocumentPersister
 
     /**
      * Updates a managed document.
-     *
-     * @param object $document
      */
-    public function update($document): void
+    public function update(object $document): void
     {
         $class = $this->dm->getClassMetadata(ClassUtil::getClass($document));
         $data = $this->prepareUpdateData($document);
@@ -191,10 +172,8 @@ class DocumentPersister
 
     /**
      * Deletes a managed document.
-     *
-     * @param object $document
      */
-    public function delete($document): void
+    public function delete(object $document): void
     {
         $class = $this->dm->getClassMetadata(ClassUtil::getClass($document));
         $id = $class->getSingleIdentifier($document);
@@ -224,15 +203,13 @@ class DocumentPersister
      * INTERNAL:
      * Prepares data for an update operation.
      *
-     * @param object $document
-     *
-     * @return array
+     * @return array<string, mixed>
      *
      * @internal
      *
      * @throws ConversionFailedException
      */
-    public function prepareUpdateData($document): array
+    public function prepareUpdateData(object $document): array
     {
         $script = [];
         $body = [];

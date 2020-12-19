@@ -10,6 +10,7 @@ use Refugis\ODM\Elastica\Collection\DatabaseInterface;
 use Refugis\ODM\Elastica\Configuration;
 use Refugis\ODM\Elastica\DocumentManager;
 use Refugis\ODM\Elastica\Metadata\Loader\AnnotationLoader;
+use Refugis\ODM\Elastica\Metadata\Loader\AttributesLoader;
 use Refugis\ODM\Elastica\Metadata\MetadataFactory;
 use Refugis\ODM\Elastica\UnitOfWork;
 
@@ -68,8 +69,12 @@ class DocumentManagerMock extends DocumentManager
             $processorFactory = new ProcessorFactory();
             $processorFactory->registerProcessors(__DIR__.'/../../src/Metadata/Processor');
 
-            $loader = new AnnotationLoader($processorFactory, __DIR__.'/../Fixtures/Document');
-            $loader->setReader(new AnnotationReader());
+            if (PHP_VERSION_ID >= 80000) {
+                $loader = new AnnotationLoader($processorFactory, __DIR__.'/../Fixtures/Document');
+                $loader->setReader(new AnnotationReader());
+            } else {
+                $loader = new AttributesLoader($processorFactory, __DIR__.'/../Fixtures/Document');
+            }
 
             $config = new Configuration();
             $config->setProxyFactory(new LazyLoadingGhostFactory());

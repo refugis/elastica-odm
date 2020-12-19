@@ -10,17 +10,14 @@ use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
  */
 abstract class AbstractRepositoryFactory implements RepositoryFactoryInterface
 {
-    /**
-     * @var string
-     */
-    private $defaultRepositoryClassName;
+    private string $defaultRepositoryClassName;
 
     /**
      * The list of DocumentRepository instances.
      *
      * @var DocumentRepositoryInterface[]
      */
-    private $repositoryList = [];
+    private array $repositoryList = [];
 
     /**
      * {@inheritdoc}
@@ -50,11 +47,6 @@ abstract class AbstractRepositoryFactory implements RepositoryFactoryInterface
 
     /**
      * Create a new repository instance for a document class.
-     *
-     * @param DocumentManagerInterface $documentManager
-     * @param string                   $documentName
-     *
-     * @return DocumentRepositoryInterface
      */
     protected function createRepository(DocumentManagerInterface $documentManager, string $documentName): DocumentRepositoryInterface
     {
@@ -66,12 +58,6 @@ abstract class AbstractRepositoryFactory implements RepositoryFactoryInterface
 
     /**
      * Instantiates requested repository.
-     *
-     * @param string                   $repositoryClassName
-     * @param DocumentManagerInterface $documentManager
-     * @param DocumentMetadata         $metadata
-     *
-     * @return DocumentRepositoryInterface
      */
     abstract protected function instantiateRepository(
         string $repositoryClassName,

@@ -9,15 +9,8 @@ use Refugis\ODM\Elastica\UnitOfWork;
 
 class LifecycleEventManager
 {
-    /**
-     * @var UnitOfWork
-     */
-    private $uow;
-
-    /**
-     * @var EventManager
-     */
-    private $evm;
+    private UnitOfWork $uow;
+    private EventManager $evm;
 
     public function __construct(UnitOfWork $uow, EventManager $evm)
     {

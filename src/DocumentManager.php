@@ -24,45 +24,14 @@ use Refugis\ODM\Elastica\Util\ClassUtil;
 
 class DocumentManager implements DocumentManagerInterface
 {
-    /**
-     * @var DatabaseInterface
-     */
-    private $database;
-
-    /**
-     * @var MetadataFactory
-     */
-    private $metadataFactory;
-
-    /**
-     * @var LazyLoadingGhostFactory
-     */
-    private $proxyFactory;
-
-    /**
-     * @var TypeManager
-     */
-    private $typeManager;
-
-    /**
-     * @var UnitOfWork
-     */
-    private $unitOfWork;
-
-    /**
-     * @var EventManager
-     */
-    private $eventManager;
-
-    /**
-     * @var RepositoryFactoryInterface
-     */
-    private $repositoryFactory;
-
-    /**
-     * @var CacheItemPoolInterface|null
-     */
-    private $resultCache;
+    private DatabaseInterface $database;
+    private MetadataFactory $metadataFactory;
+    private LazyLoadingGhostFactory $proxyFactory;
+    private TypeManager $typeManager;
+    private UnitOfWork $unitOfWork;
+    private EventManager $eventManager;
+    private RepositoryFactoryInterface $repositoryFactory;
+    private ?CacheItemPoolInterface $resultCache;
 
     public function __construct(DatabaseInterface $database, Configuration $configuration, EventManager $eventManager = null)
     {
@@ -82,7 +51,7 @@ class DocumentManager implements DocumentManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function find($className, $id)
+    public function find($className, $id): ?object
     {
         $class = $this->getClassMetadata($className);
         if ($document = $this->unitOfWork->tryGetById($id, $class)) {
@@ -139,7 +108,7 @@ class DocumentManager implements DocumentManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function merge($object)
+    public function merge($object): object
     {
         if (! \is_object($object)) {
             throw new \InvalidArgumentException('Expected object, '.\gettype($object).' given.');

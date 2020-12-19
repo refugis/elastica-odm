@@ -13,55 +13,16 @@ use Refugis\ODM\Elastica\Type\TypeManager;
 
 final class Builder
 {
-    /**
-     * @var Client
-     */
-    private $client;
-
-    /**
-     * @var string
-     */
-    private $connectionUrl;
-
-    /**
-     * @var int
-     */
-    private $timeout;
-
-    /**
-     * @var int
-     */
-    private $connectTimeout;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var LazyLoadingGhostFactory
-     */
-    private $proxyFactory;
-
-    /**
-     * @var MetadataFactory
-     */
-    private $metadataFactory;
-
-    /**
-     * @var TypeManager
-     */
-    private $typeManager;
-
-    /**
-     * @var bool
-     */
-    private $addDefaultTypes = true;
-
-    /**
-     * @var Loader\LoaderInterface
-     */
-    private $metadataLoader;
+    private ?Client $client = null;
+    private string $connectionUrl;
+    private int $timeout;
+    private int $connectTimeout;
+    private ?LoggerInterface $logger = null;
+    private ?LazyLoadingGhostFactory $proxyFactory = null;
+    private ?MetadataFactory $metadataFactory = null;
+    private TypeManager $typeManager;
+    private bool $addDefaultTypes = true;
+    private ?Loader\LoaderInterface $metadataLoader = null;
 
     public static function create(): self
     {

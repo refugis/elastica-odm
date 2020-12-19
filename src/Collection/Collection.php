@@ -20,42 +20,27 @@ use Refugis\ODM\Elastica\Search\Search;
 
 class Collection implements CollectionInterface
 {
-    /**
-     * @var string
-     */
-    private $documentClass;
+    private string $documentClass;
+    private SearchableInterface $searchable;
+    private ?string $_lastInsertId;
+    private string $name;
 
     /**
-     * @var SearchableInterface|Type
+     * @var array<string, mixed>
      */
-    private $searchable;
+    private array $dynamicSettings;
 
     /**
-     * @var string|null
+     * @var array<string, mixed>
      */
-    private $_lastInsertId;
+    private array $staticSettings;
 
     /**
-     * @var array
-     */
-    private $dynamicSettings;
-
-    /**
-     * @var array
-     */
-    private $staticSettings;
-
-    /**
-     * @var array
+     * @var array<string, mixed>
      *
      * @deprecated
      */
-    private $indexParams;
-
-    /**
-     * @var string
-     */
-    private $name;
+    private array $indexParams;
 
     public function __construct(string $documentClass, SearchableInterface $searchable)
     {
@@ -83,7 +68,7 @@ class Collection implements CollectionInterface
     /**
      * Sets the index params used when the index is created.
      *
-     * @param array $indexParams
+     * @param array<string, mixed> $indexParams
      *
      * @deprecated Index params are deprecated and will be removed in 2.0. Please use setDynamicSettings/setStaticSettings instead.
      */
@@ -95,7 +80,7 @@ class Collection implements CollectionInterface
     /**
      * Sets the index dynamic settings.
      *
-     * @param array $dynamicSettings
+     * @param array<string, mixed> $dynamicSettings
      */
     public function setDynamicSettings(array $dynamicSettings): void
     {
@@ -105,7 +90,7 @@ class Collection implements CollectionInterface
     /**
      * Sets the index static settings.
      *
-     * @param array $staticSettings
+     * @param array<string, mixed> $staticSettings
      */
     public function setStaticSettings(array $staticSettings): void
     {

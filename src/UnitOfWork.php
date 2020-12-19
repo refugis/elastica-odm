@@ -35,96 +35,90 @@ final class UnitOfWork
      *
      * @var object[]
      */
-    private $identityMap = [];
+    private array $identityMap = [];
 
     /**
      * Map of all attached documents by object hash.
      *
      * @var object[]
      */
-    private $objects = [];
+    private array $objects = [];
 
     /**
      * Map of the original document data of managed documents.
      * Keys are object hash. This is used for calculating changesets at commit time.
      *
-     * @var array
+     * @var array<string, mixed>
      */
-    private $originalDocumentData = [];
+    private array $originalDocumentData = [];
 
     /**
      * Map of the document states.
      * Keys are object hash. Note that only MANAGED and REMOVED states are known,
      * as DETACHED documents can be gc'd and the associated hashes can be re-used.
      *
-     * @var array
+     * @var array<string, int>
      */
-    private $documentStates = [];
+    private array $documentStates = [];
 
     /**
      * Map of document persister by class name.
      *
      * @var DocumentPersister[]
      */
-    private $documentPersisters = [];
+    private array $documentPersisters = [];
 
     /**
      * The document manager associated with this unit of work.
-     *
-     * @var DocumentManagerInterface
      */
-    private $manager;
+    private DocumentManagerInterface $manager;
 
     /**
      * The current event manager.
-     *
-     * @var EventManager
      */
-    private $evm;
+    private EventManager $evm;
 
     /**
      * The current lifecycle event manager.
-     *
-     * @var LifecycleEventManager
      */
-    private $lifecycleEventManager;
+    private LifecycleEventManager $lifecycleEventManager;
 
     /**
      * Map of pending document deletions.
      *
-     * @var array
+     * @var array<string, object>
      */
-    private $documentDeletions = [];
+    private array $documentDeletions = [];
 
     /**
      * Map of pending document insertions.
      *
-     * @var array
+     * @var array<string, object>
      */
-    private $documentInsertions = [];
+    private array $documentInsertions = [];
 
     /**
      * Map of pending document updates.
      *
-     * @var array
+     * @var array<string, object>
      */
-    private $documentUpdates = [];
+    private array $documentUpdates = [];
 
     /**
      * Map of read-only document.
      * Keys are the object hash.
      *
-     * @var array
+     * @var array<string, object>
      */
-    private $readOnlyObjects = [];
+    private array $readOnlyObjects = [];
 
     /**
      * Maps of document change sets.
      * Keys are the object hash.
      *
-     * @var array
+     * @var array<string, mixed>
      */
-    private $documentChangeSets;
+    private array $documentChangeSets = [];
 
     public function __construct(DocumentManagerInterface $manager)
     {
@@ -163,28 +157,17 @@ final class UnitOfWork
 
     /**
      * Gets the document persister for a given document class.
-     *
-     * @param string $documentClass
-     *
-     * @return DocumentPersister
      */
     public function getDocumentPersister(string $documentClass): DocumentPersister
     {
-        if (isset($this->documentPersisters[$documentClass])) {
-            return $this->documentPersisters[$documentClass];
-        }
-
-        return $this->documentPersisters[$documentClass] = new DocumentPersister($this->manager, $this->manager->getClassMetadata($documentClass));
+        return $this->documentPersisters[$documentClass] ??= new DocumentPersister($this->manager, $this->manager->getClassMetadata($documentClass));
     }
 
     /**
      * Searches for a document in the identity map and returns it if found.
      * Returns null otherwise.
      *
-     * @param mixed            $id
-     * @param DocumentMetadata $class
-     *
-     * @return object|null
+     * @param mixed $id
      */
     public function tryGetById($id, DocumentMetadata $class): ?object
     {
@@ -193,10 +176,6 @@ final class UnitOfWork
 
     /**
      * Checks if a document is attached to this unit of work.
-     *
-     * @param $object
-     *
-     * @return bool
      */
     public function isInIdentityMap(object $object): bool
     {
@@ -217,11 +196,6 @@ final class UnitOfWork
 
     /**
      * Gets the document state.
-     *
-     * @param object   $document
-     * @param int|null $assume
-     *
-     * @return int
      */
     public function getDocumentState(object $document, ?int $assume = null): int
     {
@@ -330,8 +304,6 @@ final class UnitOfWork
      *
      * @param object $document the entity for which to (re)calculate the change set
      *
-     * @return void
-     *
      * @throws InvalidArgumentException if the passed entity is not MANAGED
      */
     public function recomputeSingleDocumentChangeset(object $document): void
@@ -383,9 +355,7 @@ final class UnitOfWork
     /**
      * Retrieve the computed changeset for a given document.
      *
-     * @param object $document
-     *
-     * @return array
+     * @return array<string, mixed>
      */
     public function &getDocumentChangeSet(object $document): array
     {
@@ -401,8 +371,6 @@ final class UnitOfWork
 
     /**
      * Detaches a document from the unit of work.
-     *
-     * @param object $object
      */
     public function detach(object $object): void
     {
@@ -412,8 +380,6 @@ final class UnitOfWork
 
     /**
      * Persists a document as part of this unit of work.
-     *
-     * @param object $object
      */
     public function persist(object $object): void
     {
@@ -423,8 +389,6 @@ final class UnitOfWork
 
     /**
      * Removes a document as part of this unit of work.
-     *
-     * @param object $object
      */
     public function remove(object $object): void
     {
@@ -434,10 +398,7 @@ final class UnitOfWork
 
     /**
      * Merges the given document with the managed one.
-     *
-     * @param object $object
-     *
-     * @return object the managed copy of the document
+     * Returns the managed copy of the document
      */
     public function merge(object $object): object
     {
@@ -532,10 +493,6 @@ final class UnitOfWork
      * INTERNAL:
      * Gets an id generator for the given type.
      *
-     * @param int $generatorType
-     *
-     * @return GeneratorInterface
-     *
      * @internal
      */
     public function getIdGenerator(int $generatorType): GeneratorInterface
@@ -563,10 +520,6 @@ final class UnitOfWork
 
     /**
      * Checks whether an entity is registered for insertion within this unit of work.
-     *
-     * @param object $document
-     *
-     * @return bool
      */
     public function isScheduledForInsert(object $document): bool
     {
@@ -576,10 +529,6 @@ final class UnitOfWork
     /**
      * Checks whether an entity is registered as removed/deleted with the unit
      * of work.
-     *
-     * @param object $document
-     *
-     * @return bool
      */
     public function isScheduledForDelete(object $document): bool
     {
@@ -589,11 +538,6 @@ final class UnitOfWork
     /**
      * INTERNAL:
      * Registers a document as managed.
-     *
-     * @param object $document the document
-     * @param array  $data     the original document data
-     *
-     * @return void
      *
      * @throws InvalidIdentifierException
      */
@@ -609,8 +553,6 @@ final class UnitOfWork
 
     /**
      * Clears the identity map for the given document class.
-     *
-     * @param string $entityName
      */
     private function clearIdentityMapForDocumentClass(string $documentClass): void
     {
@@ -627,8 +569,6 @@ final class UnitOfWork
 
     /**
      * Clears the document insertions for the given document class.
-     *
-     * @param string $entityName
      */
     private function clearEntityInsertionsForDocumentClass(string $documentClass): void
     {
@@ -642,9 +582,6 @@ final class UnitOfWork
 
     /**
      * Computes the changes that happened to a single document.
-     *
-     * @param DocumentMetadata $class
-     * @param object           $document
      */
     private function computeChangeSet(DocumentMetadata $class, object $document): void
     {
@@ -716,8 +653,6 @@ final class UnitOfWork
      * The identifier MUST be set before trying to add the document or
      * this method will throw an InvalidIdentifierException.
      *
-     * @param object $object
-     *
      * @throws InvalidIdentifierException
      */
     private function addToIdentityMap(object $object): void
@@ -738,8 +673,6 @@ final class UnitOfWork
     /**
      * Removes an object from identity map.
      *
-     * @param object $object
-     *
      * @throws InvalidIdentifierException
      */
     private function removeFromIdentityMap(object $object): void
@@ -756,9 +689,6 @@ final class UnitOfWork
 
     /**
      * Executes a persist operation.
-     *
-     * @param object $object
-     * @param array  $visited
      *
      * @throws \InvalidArgumentException if document state is equal to NEW
      */
@@ -794,9 +724,6 @@ final class UnitOfWork
 
     /**
      * Executes a remove operation.
-     *
-     * @param object $object
-     * @param array  $visited
      *
      * @throws InvalidArgumentException if document state is equal to NEW
      */
@@ -835,11 +762,6 @@ final class UnitOfWork
 
     /**
      * Executes a merge operation on a document.
-     *
-     * @param object $object
-     * @param array  $visited
-     *
-     * @return object the managed copy of the document
      *
      * @throws \InvalidArgumentException if document state is equal to NEW
      */
@@ -907,12 +829,9 @@ final class UnitOfWork
     /**
      * Execute detach operation.
      *
-     * @param object $object
-     * @param array  $visited
-     *
      * @throws InvalidIdentifierException
      */
-    private function doDetach($object, array &$visited): void
+    private function doDetach(object $object, array &$visited): void
     {
         $oid = \spl_object_hash($object);
         if (isset($visited[$oid])) {
@@ -979,8 +898,6 @@ final class UnitOfWork
      * Schedule a document for insertion.
      * If the document already has an identifier it will be added to the identity map.
      *
-     * @param object $object
-     *
      * @throws InvalidIdentifierException
      */
     private function scheduleForInsert(object $object): void
@@ -997,8 +914,6 @@ final class UnitOfWork
 
     /**
      * Schedule a document for deletion.
-     *
-     * @param object $object
      *
      * @throws InvalidIdentifierException
      */
@@ -1126,10 +1041,6 @@ final class UnitOfWork
 
     /**
      * Creates a new instance of given class and inject object manager if needed.
-     *
-     * @param DocumentMetadata $class
-     *
-     * @return object
      */
     private function newInstance(DocumentMetadata $class): object
     {
@@ -1147,7 +1058,7 @@ final class UnitOfWork
      * Calculates the commit order, based on associations
      * on document metadata.
      *
-     * @return array
+     * @return string[]
      */
     private function getCommitOrder(): array
     {

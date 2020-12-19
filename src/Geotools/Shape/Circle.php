@@ -9,15 +9,8 @@ use Refugis\ODM\Elastica\Geotools\Coordinate\CoordinateInterface;
  */
 final class Circle extends Geoshape
 {
-    /**
-     * @var CoordinateInterface
-     */
-    private $center;
-
-    /**
-     * @var string
-     */
-    private $radius;
+    private CoordinateInterface $center;
+    private string $radius;
 
     public function __construct(CoordinateInterface $center, string $radius)
     {

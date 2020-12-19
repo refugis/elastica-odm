@@ -5,21 +5,20 @@ namespace Refugis\ODM\Elastica\Tests\Collection;
 use Elastica\Client;
 use Elastica\Index;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Refugis\ODM\Elastica\Collection\Database;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
 class DatabaseTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @var Client|ObjectProphecy
      */
-    private $client;
-
-    /**
-     * @var Database
-     */
-    private $database;
+    private ObjectProphecy $client;
+    private Database $database;
 
     /**
      * {@inheritdoc}

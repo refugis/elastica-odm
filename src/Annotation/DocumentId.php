@@ -8,7 +8,7 @@ use function Safe\sprintf;
  * @Annotation
  * @Target({"PROPERTY"})
  */
-#[Attribute]
+#[\Attribute]
 final class DocumentId
 {
     /**

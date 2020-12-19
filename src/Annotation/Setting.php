@@ -4,28 +4,28 @@ namespace Refugis\ODM\Elastica\Annotation;
 
 use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
+use function Safe\sprintf;
 
 /**
  * @Annotation
  * @Target({"CLASS"})
  */
+#[\Attribute]
 final class Setting
 {
     /**
      * Id generator strategy.
      *
-     * @var string
      * @Enum({"auto", "static", "dynamic"})
      */
-    public $type = 'auto';
+    public string $type;
 
     /**
      * The setting key.
      *
-     * @var string
      * @Required()
      */
-    public $key;
+    public string $key;
 
     /**
      * The setting value.
@@ -35,4 +35,23 @@ final class Setting
      * @var mixed
      */
     public $value;
+
+    public function __construct($type = 'auto', ?string $key = null, $value = null)
+    {
+        if (is_string($type)) {
+            $data = [ 'type' => $type ];
+        } elseif (is_array($type)) {
+            $data = $type;
+        } else {
+            throw new \TypeError(sprintf('Argument #1 passed to %s must be a string. %s passed', __METHOD__, get_debug_type($type)));
+        }
+
+        $this->type = $data['type'] ?? $type;
+        $this->key = $data['key'] ?? null;
+        $this->value = $data['value'] ?? $value;
+
+        if (! \in_array($this->type, ['auto', 'static', 'dynamic'], true)) {
+            throw new \TypeError(sprintf('Setting type must be one of "auto", "static" or "dynamic". "%s" given', $type));
+        }
+    }
 }

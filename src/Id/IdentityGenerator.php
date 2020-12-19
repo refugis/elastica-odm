@@ -10,7 +10,7 @@ final class IdentityGenerator extends AbstractIdGenerator
     /**
      * {@inheritdoc}
      */
-    public function generate(DocumentManagerInterface $dm, $document)
+    public function generate(DocumentManagerInterface $dm, object $document): ?string
     {
         $collection = $dm->getCollection(ClassUtil::getClass($document));
 

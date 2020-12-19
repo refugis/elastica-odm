@@ -11,9 +11,9 @@ use Doctrine\Common\Collections\Collection;
 final class GeometryCollection extends Geoshape
 {
     /**
-     * @var Collection|Geoshape[]
+     * @var Collection<Geoshape>
      */
-    private $geometries;
+    private Collection $geometries;
 
     public function __construct(Geoshape ...$geoshapes)
     {

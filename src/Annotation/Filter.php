@@ -10,6 +10,7 @@ use function Safe\sprintf;
  * @Annotation
  * @Target({"ANNOTATION"})
  */
+#[\Attribute]
 final class Filter
 {
     /**

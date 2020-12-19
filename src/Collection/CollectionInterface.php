@@ -16,46 +16,26 @@ interface CollectionInterface
     /**
      * Gets the name of the collection (could be index/type or just index name
      * in case the ES version does not support types any more).
-     *
-     * @return string
      */
     public function getName(): string;
 
     /**
      * Executes a search.
-     *
-     * @param Query $query
-     *
-     * @return ResultSet
      */
     public function search(Query $query): ResultSet;
 
     /**
      * Executes a scroll search.
-     *
-     * @param Query  $query
-     * @param string $expiryTime
-     *
-     * @return Scroll
      */
     public function scroll(Query $query, string $expiryTime = '1m'): Scroll;
 
     /**
      * Creates a search object.
-     *
-     * @param DocumentManagerInterface $documentManager
-     * @param Query                    $query
-     *
-     * @return Search
      */
     public function createSearch(DocumentManagerInterface $documentManager, Query $query): Search;
 
     /**
      * Counts document matching query.
-     *
-     * @param Query $query
-     *
-     * @return int
      */
     public function count(Query $query): int;
 
@@ -66,27 +46,16 @@ interface CollectionInterface
 
     /**
      * Request the index of a document.
-     *
-     * @param string|null $id
-     * @param array       $body
-     *
-     * @return Response
      */
     public function create(?string $id, array $body): Response;
 
     /**
      * Updates a document.
-     *
-     * @param string $id
-     * @param array  $body
-     * @param string $script
      */
     public function update(string $id, array $body, string $script = ''): void;
 
     /**
      * Request the deletion of a document.
-     *
-     * @param string $id
      */
     public function delete(string $id): void;
 
@@ -96,15 +65,12 @@ interface CollectionInterface
      * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete-by-query.html
      *      for the limitations of this method and the available parameters.
      *
-     * @param Query\AbstractQuery $query
-     * @param array               $params
+     * @param array<string, mixed> $params
      */
     public function deleteByQuery(Query\AbstractQuery $query, array $params = []): void;
 
     /**
      * Returns the last inserted identifier as string.
-     *
-     * @return string
      */
     public function getLastInsertedId(): ?string;
 

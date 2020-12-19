@@ -79,13 +79,7 @@ class IndexProcessorTest extends TestCase
     {
         $index = new Index();
 
-        $tokenizer = new Tokenizer();
-        $tokenizer->name = 'foo_name';
-        $tokenizer->type = 'ngram';
-        $tokenizer->options = [
-            'min_gram' => 3,
-        ];
-
+        $tokenizer = new Tokenizer('foo_name', 'ngram', ['min_gram' => 3]);
         $index->tokenizers = [$tokenizer];
 
         $this->processor->process($this->documentMetadata, $index);

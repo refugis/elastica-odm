@@ -6,10 +6,6 @@ class InvalidArgumentException extends \InvalidArgumentException implements Exce
 {
     /**
      * Helper method to show an object as string.
-     *
-     * @param object $obj
-     *
-     * @return string
      */
     protected static function objToStr(object $obj): string
     {

@@ -7,17 +7,14 @@ use Refugis\ODM\Elastica\DocumentManagerInterface;
 
 class PreFlushEventArgs extends EventArgs
 {
-    /**
-     * @var DocumentManagerInterface
-     */
-    private $dm;
+    private DocumentManagerInterface $dm;
 
     public function __construct(DocumentManagerInterface $dm)
     {
         $this->dm = $dm;
     }
 
-    public function getDocumentManager()
+    public function getDocumentManager(): DocumentManagerInterface
     {
         return $this->dm;
     }

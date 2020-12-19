@@ -8,6 +8,7 @@ use Doctrine\Common\Annotations\Annotation\Target;
  * @Annotation
  * @Target({"PROPERTY"})
  */
+#[\Attribute]
 final class TypeName
 {
 }

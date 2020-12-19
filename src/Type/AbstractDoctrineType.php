@@ -6,10 +6,7 @@ use Doctrine\Persistence\ManagerRegistry;
 
 abstract class AbstractDoctrineType extends AbstractType
 {
-    /**
-     * @var ManagerRegistry
-     */
-    private $registry;
+    private ManagerRegistry $registry;
 
     public function __construct(ManagerRegistry $registry)
     {
@@ -19,7 +16,7 @@ abstract class AbstractDoctrineType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function toPHP($value, array $options = [])
+    public function toPHP($value, array $options = []): ?object
     {
         if (null === $value) {
             return null;
@@ -30,6 +27,9 @@ abstract class AbstractDoctrineType extends AbstractType
         }
 
         $om = $this->registry->getManagerForClass($options['class']);
+        if (null === $om) {
+            throw new \InvalidArgumentException(\sprintf('%s is not used in any registered object manager.', $options['class']));
+        }
 
         return $om->find($options['class'], $value['identifier']);
     }
@@ -37,7 +37,7 @@ abstract class AbstractDoctrineType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value, array $options = [])
+    public function toDatabase($value, array $options = []): ?array
     {
         if (null === $value) {
             return null;
@@ -48,8 +48,11 @@ abstract class AbstractDoctrineType extends AbstractType
         }
 
         $om = $this->registry->getManagerForClass($options['class']);
-        $class = $om->getClassMetadata($options['class']);
+        if (null === $om) {
+            throw new \InvalidArgumentException(\sprintf('%s is not used in any registered object manager.', $options['class']));
+        }
 
+        $class = $om->getClassMetadata($options['class']);
         if (1 === \count($class->getIdentifier())) {
             $id = \array_values($class->getIdentifierValues($value))[0];
         } else {

@@ -14,10 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class DropSchemaCommand extends Command
 {
-    /**
-     * @var DocumentManagerInterface
-     */
-    private $documentManager;
+    private DocumentManagerInterface $documentManager;
 
     public function __construct(DocumentManagerInterface $documentManager)
     {

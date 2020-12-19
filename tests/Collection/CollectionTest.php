@@ -12,6 +12,7 @@ use Elastica\SearchableInterface;
 use Elastica\Type;
 use Elasticsearch\Endpoints;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Refugis\ODM\Elastica\Collection\Collection;
 use Refugis\ODM\Elastica\Collection\CollectionInterface;
@@ -27,6 +28,7 @@ class CollectionTest extends TestCase
 {
     use DocumentManagerTestTrait;
     use FixturesTestTrait;
+    use ProphecyTrait;
 
     /**
      * @var SearchableInterface|ObjectProphecy

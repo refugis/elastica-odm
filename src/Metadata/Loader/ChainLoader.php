@@ -9,7 +9,7 @@ class ChainLoader implements LoaderInterface
     /**
      * @var LoaderInterface[]
      */
-    private $loaders;
+    private array $loaders;
 
     public function __construct(array $loaders)
     {
@@ -27,7 +27,7 @@ class ChainLoader implements LoaderInterface
     {
         $classes = [];
         foreach ($this->loaders as $loader) {
-            $classes = \array_merge($classes, $loader->getAllClassNames());
+            \array_push($classes, ...$loader->getAllClassNames());
         }
 
         return \array_unique($classes);

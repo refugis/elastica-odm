@@ -16,41 +16,26 @@ final class Configuration
 {
     /**
      * The document metadata factory.
-     *
-     * @var MetadataFactoryInterface
      */
-    private $metadataFactory;
+    private MetadataFactoryInterface $metadataFactory;
 
     /**
      * The document proxy factory.
-     *
-     * @var LazyLoadingGhostFactory
      */
-    private $proxyFactory;
+    private LazyLoadingGhostFactory $proxyFactory;
 
     /**
      * The result cache implementation.
-     *
-     * @var CacheItemPoolInterface
      */
-    private $resultCache;
+    private ?CacheItemPoolInterface $resultCache = null;
 
     /**
      * The type manager.
-     *
-     * @var TypeManager
      */
-    private $typeManager;
+    private TypeManager $typeManager;
 
-    /**
-     * @var RepositoryFactoryInterface|null
-     */
-    private $repositoryFactory;
-
-    /**
-     * @var string|null
-     */
-    private $defaultRepositoryClassName;
+    private ?RepositoryFactoryInterface $repositoryFactory = null;
+    private ?string $defaultRepositoryClassName = null;
 
     public function __construct()
     {
@@ -60,10 +45,7 @@ final class Configuration
     /**
      * Sets the document proxy factory.
      *
-     * @param LazyLoadingGhostFactory $proxyFactory
      * @required
-     *
-     * @return $this
      */
     public function setProxyFactory(LazyLoadingGhostFactory $proxyFactory): self
     {
@@ -75,10 +57,7 @@ final class Configuration
     /**
      * Sets the metadata factory.
      *
-     * @param MetadataFactoryInterface $metadataFactory
      * @required
-     *
-     * @return $this
      */
     public function setMetadataFactory(MetadataFactoryInterface $metadataFactory): self
     {
@@ -89,10 +68,6 @@ final class Configuration
 
     /**
      * Sets the result cache implementation.
-     *
-     * @param CacheItemPoolInterface $resultCache
-     *
-     * @return $this
      */
     public function setResultCache(?CacheItemPoolInterface $resultCache = null): self
     {
@@ -103,10 +78,6 @@ final class Configuration
 
     /**
      * Sets the type manager.
-     *
-     * @param TypeManager $typeManager
-     *
-     * @return $this
      */
     public function setTypeManager(TypeManager $typeManager): self
     {
@@ -117,10 +88,6 @@ final class Configuration
 
     /**
      * Sets the repository factory.
-     *
-     * @param RepositoryFactoryInterface|null $repositoryFactory
-     *
-     * @return $this
      */
     public function setRepositoryFactory(?RepositoryFactoryInterface $repositoryFactory): self
     {
@@ -132,14 +99,11 @@ final class Configuration
     /**
      * Sets default repository class.
      *
-     * @param string $className
-     *
      * @throws InvalidDocumentRepositoryException
      */
-    public function setDefaultRepositoryClassName($className): void
+    public function setDefaultRepositoryClassName(string $className): void
     {
         $reflectionClass = new \ReflectionClass($className);
-
         if (! $reflectionClass->implementsInterface(DocumentRepositoryInterface::class)) {
             throw new InvalidDocumentRepositoryException($className);
         }
@@ -149,8 +113,6 @@ final class Configuration
 
     /**
      * Gets the document proxy factory.
-     *
-     * @return LazyLoadingGhostFactory
      */
     public function getProxyFactory(): LazyLoadingGhostFactory
     {
@@ -159,8 +121,6 @@ final class Configuration
 
     /**
      * Sets the metadata factory.
-     *
-     * @return MetadataFactoryInterface
      */
     public function getMetadataFactory(): MetadataFactoryInterface
     {
@@ -169,8 +129,6 @@ final class Configuration
 
     /**
      * Gets the result cache implementation.
-     *
-     * @return CacheItemPoolInterface|null
      */
     public function getResultCache(): ?CacheItemPoolInterface
     {
@@ -179,8 +137,6 @@ final class Configuration
 
     /**
      * Gets the type manager.
-     *
-     * @return TypeManager
      */
     public function getTypeManager(): TypeManager
     {
@@ -189,8 +145,6 @@ final class Configuration
 
     /**
      * Sets the repository factory.
-     *
-     * @return RepositoryFactoryInterface
      */
     public function getRepositoryFactory(): RepositoryFactoryInterface
     {
@@ -206,8 +160,6 @@ final class Configuration
 
     /**
      * Get default repository class.
-     *
-     * @return string
      */
     public function getDefaultRepositoryClassName(): string
     {

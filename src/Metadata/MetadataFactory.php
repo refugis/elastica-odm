@@ -11,15 +11,8 @@ use Refugis\ODM\Elastica\Metadata\Loader\LoaderInterface;
 
 class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFactory
 {
-    /**
-     * @var LoaderInterface
-     */
-    private $loader;
-
-    /**
-     * @var EventManager
-     */
-    private $eventManager;
+    private LoaderInterface $loader;
+    private EventManager $eventManager;
 
     public function __construct(LoaderInterface $loader, $cache = null)
     {
@@ -30,8 +23,6 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
 
     /**
      * Sets the event manager for this metadata factory.
-     *
-     * @param EventManager $eventManager
      */
     public function setEventManager(EventManager $eventManager): void
     {

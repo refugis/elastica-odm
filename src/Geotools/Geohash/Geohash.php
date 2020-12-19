@@ -9,52 +9,46 @@ class Geohash
 {
     /**
      * The minimum length of the geo hash.
-     *
-     * @var int
      */
     public const MIN_LENGTH = 1;
 
     /**
      * The maximum length of the geo hash.
-     *
-     * @var int
      */
     public const MAX_LENGTH = 12;
 
     /**
      * The geo hash.
-     *
-     * @var string
      */
-    protected $geohash;
+    protected string $geohash;
 
     /**
      * The interval of latitudes in degrees.
      *
-     * @var array
+     * @var float[]
      */
-    protected $latitudeInterval = [-90.0, 90.0];
+    protected array $latitudeInterval = [-90.0, 90.0];
 
     /**
      * The interval of longitudes in degrees.
      *
-     * @var array
+     * @var float[]
      */
-    protected $longitudeInterval = [-180.0, 180.0];
+    protected array $longitudeInterval = [-180.0, 180.0];
 
     /**
      * The interval of bits.
      *
-     * @var array
+     * @var int[]
      */
-    protected $bits = [16, 8, 4, 2, 1];
+    protected array $bits = [16, 8, 4, 2, 1];
 
     /**
      * The array of chars in base 32.
      *
-     * @var array
+     * @var string[]
      */
-    protected $base32Chars = [
+    protected array $base32Chars = [
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'b', 'c', 'd', 'e', 'f', 'g',
         'h', 'j', 'k', 'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
     ];
@@ -64,7 +58,6 @@ class Geohash
      * You can pass a coordinate instance or a string hash.
      *
      * @param string|CoordinateInterface $hashOrCoordinates
-     * @param int                        $length
      */
     public function __construct($hashOrCoordinates, int $length = self::MAX_LENGTH)
     {
@@ -77,8 +70,6 @@ class Geohash
 
     /**
      * Returns the geo hash.
-     *
-     * @return string
      */
     public function getGeohash(): string
     {
@@ -87,8 +78,6 @@ class Geohash
 
     /**
      * Returns the decoded coordinate (The center of the bounding box).
-     *
-     * @return CoordinateInterface
      */
     public function getCoordinate(): CoordinateInterface
     {
@@ -103,7 +92,7 @@ class Geohash
      *
      * @return CoordinateInterface[]
      */
-    public function getBoundingBox()
+    public function getBoundingBox(): array
     {
         return [
             new Coordinate([
@@ -168,12 +157,8 @@ class Geohash
         $this->longitudeInterval = $longitudeInterval;
     }
 
-    private function decode($geohash): void
+    private function decode(string $geohash): void
     {
-        if (! \is_string($geohash)) {
-            throw new \InvalidArgumentException('The geo hash should be a string.');
-        }
-
         $length = \strlen($geohash);
         if ($length < self::MIN_LENGTH || $length > self::MAX_LENGTH) {
             throw new \InvalidArgumentException('The length of the geo hash should be between 1 and 12.');

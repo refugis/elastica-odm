@@ -11,6 +11,7 @@ use Elastica\Result;
 use Elastica\ResultSet;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use ProxyManager\Factory\LazyLoadingGhostFactory;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
@@ -24,30 +25,22 @@ use Refugis\ODM\Elastica\UnitOfWork;
 
 class ObjectHydratorTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @var EventManager|ObjectProphecy
      */
-    private $eventManager;
+    private ObjectProphecy $eventManager;
 
-    /**
-     * @var TypeManager
-     */
-    private $typeManager;
+    private TypeManager $typeManager;
 
     /**
      * @var DocumentManagerInterface|ObjectProphecy
      */
-    private $documentManager;
+    private ObjectProphecy $documentManager;
 
-    /**
-     * @var UnitOfWork
-     */
-    private $uow;
-
-    /**
-     * @var ObjectHydrator
-     */
-    private $hydrator;
+    private UnitOfWork $uow;
+    private ObjectHydrator $hydrator;
 
     protected function setUp(): void
     {

@@ -8,6 +8,7 @@ use Elastica\Response;
 use Elastica\Transport\AbstractTransport;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Refugis\ODM\Elastica\Collection\Database;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
@@ -22,6 +23,8 @@ use Refugis\ODM\Elastica\UnitOfWork;
 
 class UnitOfWorkTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @var AbstractTransport|ObjectProphecy
      */
@@ -120,7 +123,7 @@ class UnitOfWorkTest extends TestCase
     public function testRemovedAndRePersistedDocumentsAreInTheIdentityMapAndAreNotGarbageCollected(): void
     {
         $document = new ForumUser();
-        $document->id = 123;
+        $document->id = '123';
 
         $this->unitOfWork->registerManaged($document, []);
         self::assertTrue($this->unitOfWork->isInIdentityMap($document));
@@ -134,8 +137,8 @@ class UnitOfWorkTest extends TestCase
 
     public function testPersistedDocumentAndClearManager(): void
     {
-        $document1 = new City(123, 'London');
-        $document2 = new Country(456, 'United Kingdom');
+        $document1 = new City('123', 'London');
+        $document2 = new Country('456', 'United Kingdom');
 
         $this->unitOfWork->persist($document1);
         self::assertTrue($this->unitOfWork->isInIdentityMap($document1));

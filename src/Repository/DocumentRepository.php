@@ -2,6 +2,7 @@
 
 namespace Refugis\ODM\Elastica\Repository;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
@@ -11,25 +12,10 @@ use Refugis\ODM\Elastica\UnitOfWork;
 
 class DocumentRepository implements DocumentRepositoryInterface
 {
-    /**
-     * @var DocumentManagerInterface
-     */
-    protected $dm;
-
-    /**
-     * @var DocumentMetadata
-     */
-    protected $class;
-
-    /**
-     * @var string
-     */
-    protected $documentClass;
-
-    /**
-     * @var UnitOfWork
-     */
-    protected $uow;
+    protected DocumentManagerInterface $dm;
+    protected DocumentMetadata $class;
+    protected string $documentClass;
+    protected UnitOfWork $uow;
 
     public function __construct(DocumentManagerInterface $documentManager, DocumentMetadata $class)
     {
@@ -42,7 +28,7 @@ class DocumentRepository implements DocumentRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function find($id)
+    public function find($id): ?object
     {
         return $this->dm->find($this->documentClass, $id);
     }
@@ -50,7 +36,7 @@ class DocumentRepository implements DocumentRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function findAll()
+    public function findAll(): array
     {
         return $this->findBy([]);
     }
@@ -66,7 +52,7 @@ class DocumentRepository implements DocumentRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function findOneBy(array $criteria)
+    public function findOneBy(array $criteria): ?object
     {
         return $this->getDocumentPersister()->load($criteria);
     }
@@ -82,7 +68,7 @@ class DocumentRepository implements DocumentRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function matching(Criteria $criteria)
+    public function matching(Criteria $criteria): Collection
     {
         // TODO: Implement matching() method.
     }
@@ -97,8 +83,6 @@ class DocumentRepository implements DocumentRepositoryInterface
 
     /**
      * Gets the document persister for this document class.
-     *
-     * @return DocumentPersister
      */
     protected function getDocumentPersister(): DocumentPersister
     {

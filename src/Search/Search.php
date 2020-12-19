@@ -12,66 +12,50 @@ class Search implements \IteratorAggregate
 {
     /**
      * The target document class.
-     *
-     * @var string
      */
-    private $documentClass;
+    private string $documentClass;
 
     /**
      * Hydration mode.
-     *
-     * @var int
      */
-    private $hydrationMode;
+    private int $hydrationMode;
 
     /**
      * Search query.
-     *
-     * @var Query
      */
-    private $query;
+    private Query $query;
 
     /**
      * Result cache profile.
-     *
-     * @var SearchCacheProfile
      */
-    private $cacheProfile;
+    private ?SearchCacheProfile $cacheProfile = null;
 
     /**
      * Whether to execute a scroll search or not.
-     *
-     * @var bool
      */
-    private $scroll;
+    private bool $scroll;
 
     /**
      * Sort fields.
      *
-     * @var array
+     * @var string[]
      */
-    private $sort;
+    private ?array $sort = null;
 
     /**
      * Max returned results.
-     *
-     * @var int
      */
-    private $limit;
+    private ?int $limit = null;
 
     /**
      * Skipped documents.
-     *
-     * @var int
      */
-    private $offset;
+    private ?int $offset = null;
 
     /**
      * The document manager which this search is bound.
-     *
-     * @var DocumentManagerInterface
      */
-    private $documentManager;
+    private DocumentManagerInterface $documentManager;
 
     public function __construct(DocumentManagerInterface $documentManager, string $documentClass)
     {
@@ -85,8 +69,6 @@ class Search implements \IteratorAggregate
 
     /**
      * Gets the current document manager.
-     *
-     * @return DocumentManagerInterface
      */
     public function getDocumentManager(): DocumentManagerInterface
     {
@@ -95,8 +77,6 @@ class Search implements \IteratorAggregate
 
     /**
      * Gets the document class to retrieve.
-     *
-     * @return string
      */
     public function getDocumentClass(): string
     {
@@ -106,7 +86,7 @@ class Search implements \IteratorAggregate
     /**
      * Gets the query results.
      *
-     * @return array
+     * @return object[]
      */
     public function execute(): array
     {
@@ -115,8 +95,6 @@ class Search implements \IteratorAggregate
 
     /**
      * Get the total hits of the current query.
-     *
-     * @return int
      */
     public function count(): int
     {
@@ -127,8 +105,6 @@ class Search implements \IteratorAggregate
 
     /**
      * Iterate over the query results.
-     *
-     * @return \Iterator
      */
     public function getIterator(): \Iterator
     {
@@ -163,8 +139,6 @@ class Search implements \IteratorAggregate
      * Sets the search query.
      *
      * @param Query|string $query
-     *
-     * @return $this|self
      */
     public function setQuery($query): self
     {
@@ -175,10 +149,8 @@ class Search implements \IteratorAggregate
 
     /**
      * Gets the search query.
-     *
-     * @return Query
      */
-    public function getQuery()
+    public function getQuery(): Query
     {
         return $this->query;
     }
@@ -187,11 +159,8 @@ class Search implements \IteratorAggregate
      * Sets the sort fields and directions.
      *
      * @param array|string $fieldName
-     * @param string       $order
-     *
-     * @return Search
      */
-    public function setSort($fieldName, $order = 'asc'): self
+    public function setSort($fieldName, string $order = 'asc'): self
     {
         if (null !== $fieldName) {
             $sort = [];
@@ -211,8 +180,6 @@ class Search implements \IteratorAggregate
 
     /**
      * Gets the sort array.
-     *
-     * @return array
      */
     public function getSort(): ?array
     {
@@ -221,10 +188,6 @@ class Search implements \IteratorAggregate
 
     /**
      * Sets the query limit.
-     *
-     * @param int $limit
-     *
-     * @return $this
      */
     public function setLimit(?int $limit): self
     {
@@ -235,8 +198,6 @@ class Search implements \IteratorAggregate
 
     /**
      * Gets the max returned documents.
-     *
-     * @return int
      */
     public function getLimit(): ?int
     {
@@ -245,10 +206,6 @@ class Search implements \IteratorAggregate
 
     /**
      * Sets the query first result.
-     *
-     * @param int $offset
-     *
-     * @return $this
      */
     public function setOffset(?int $offset): self
     {
@@ -259,19 +216,12 @@ class Search implements \IteratorAggregate
 
     /**
      * Gets the query first result.
-     *
-     * @return int
      */
     public function getOffset(): ?int
     {
         return $this->offset;
     }
 
-    /**
-     * @param bool $scroll
-     *
-     * @return $this|self
-     */
     public function setScroll(bool $scroll = true): self
     {
         $this->scroll = $scroll;
@@ -279,9 +229,6 @@ class Search implements \IteratorAggregate
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isScroll(): bool
     {
         return null === $this->limit && null === $this->offset && $this->scroll;
@@ -289,11 +236,6 @@ class Search implements \IteratorAggregate
 
     /**
      * Instructs the executor to use a result cache.
-     *
-     * @param string $cacheKey
-     * @param int    $ttl
-     *
-     * @return $this|self
      */
     public function useResultCache(string $cacheKey = null, int $ttl = 0): self
     {
@@ -308,10 +250,8 @@ class Search implements \IteratorAggregate
 
     /**
      * Gets the cache profile (if set).
-     *
-     * @return SearchCacheProfile|null
      */
-    public function getCacheProfile()
+    public function getCacheProfile(): ?SearchCacheProfile
     {
         return $this->cacheProfile;
     }
@@ -319,9 +259,7 @@ class Search implements \IteratorAggregate
     /**
      * Executes the search action, yield all the result sets.
      *
-     * @param Query $query
-     *
-     * @return \Generator|ResultSet[]
+     * @return \Generator<ResultSet>
      */
     private function _doExecute(Query $query)
     {
@@ -341,9 +279,7 @@ class Search implements \IteratorAggregate
     /**
      * Executes a cached query.
      *
-     * @param Query $query
-     *
-     * @return \Generator|ResultSet[]
+     * @return \Generator<ResultSet>
      */
     private function _doExecuteCached(Query $query)
     {

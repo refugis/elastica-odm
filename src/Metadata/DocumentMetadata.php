@@ -14,74 +14,54 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
 
     /**
      * Whether this class is representing a document.
-     *
-     * @var bool
      */
-    public $document;
+    public bool $document;
 
     /**
      * The elastic index/type name.
-     *
-     * @var string
      */
-    public $collectionName;
+    public string $collectionName;
 
     /**
      * The identifier field name.
-     *
-     * @var FieldMetadata
      */
-    public $identifier;
+    public FieldMetadata $identifier;
 
     /**
      * Identifier generator type.
-     *
-     * @var int
      */
-    public $idGeneratorType;
+    public int $idGeneratorType;
 
     /**
      * The fully-qualified class name of the custom repository class.
      * Optional.
-     *
-     * @var string|null
      */
-    public $customRepositoryClassName;
+    public ?string $customRepositoryClassName = null;
 
     /**
      * An array containing all the non-lazy field names.
-     *
-     * @var string[]
      */
-    public $eagerFieldNames;
+    public array $eagerFieldNames;
 
     /**
      * An array containing all the field names.
-     *
-     * @var string[]
      */
-    public $fieldNames;
+    public array $fieldNames;
 
     /**
      * Gets the index dynamic settings.
-     *
-     * @var array
      */
-    public $dynamicSettings;
+    public ?array $dynamicSettings = null;
 
     /**
      * Gets the index static settings.
-     *
-     * @var array
      */
-    public $staticSettings;
+    public ?array $staticSettings = null;
 
     /**
      * The instantiator used to build new object instances.
-     *
-     * @var Instantiator
      */
-    private $instantiator;
+    private Instantiator $instantiator;
 
     public function __construct(\ReflectionClass $class)
     {
@@ -103,7 +83,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     {
         parent::addAttributeMetadata($metadata);
 
-        if ($metadata instanceof FieldMetadata && null !== $metadata->fieldName) {
+        if ($metadata instanceof FieldMetadata && isset($metadata->fieldName)) {
             $this->fieldNames[] = $metadata->fieldName;
             \sort($this->fieldNames);
 
@@ -134,10 +114,8 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
 
     /**
      * Returns a new object instance.
-     *
-     * @return object
      */
-    public function newInstance()
+    public function newInstance(): object
     {
         return $this->instantiator->instantiate($this->name);
     }
@@ -265,12 +243,12 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
         return [$this->identifier->fieldName => $property->getValue($object)];
     }
 
-    public function getSingleIdentifierFieldName()
+    public function getSingleIdentifierFieldName(): string
     {
         return $this->identifier->fieldName;
     }
 
-    public function getSingleIdentifier($object)
+    public function getSingleIdentifier($object): ?string
     {
         $id = $this->getIdentifierValues($object);
         if (empty($id)) {

@@ -10,7 +10,7 @@ interface TypeInterface
      * Converts the db stored value to PHP type.
      *
      * @param mixed $value
-     * @param array $options
+     * @param array<string, mixed> $options
      *
      * @return mixed
      */
@@ -20,7 +20,7 @@ interface TypeInterface
      * Converts the PHP value to the target database type.
      *
      * @param mixed $value
-     * @param array $options
+     * @param array<string, mixed> $options
      *
      * @return mixed
      *
@@ -30,17 +30,15 @@ interface TypeInterface
 
     /**
      * Returns the name of this type.
-     *
-     * @return string
      */
     public function getName(): string;
 
     /**
      * Gets the mapping type for the current field type.
      *
-     * @param array $options
+     * @param array<string, mixed> $options
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function getMappingDeclaration(array $options = []): array;
 }

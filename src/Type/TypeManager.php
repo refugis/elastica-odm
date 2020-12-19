@@ -9,7 +9,7 @@ final class TypeManager
     /**
      * @var TypeInterface[]
      */
-    private $types;
+    private array $types;
 
     public function __construct()
     {

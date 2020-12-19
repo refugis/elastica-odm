@@ -10,8 +10,6 @@ interface DocumentRepositoryInterface extends ObjectRepository, Selectable
 {
     /**
      * Creates a Search object for the current class.
-     *
-     * @return Search
      */
     public function createSearch(): Search;
 }

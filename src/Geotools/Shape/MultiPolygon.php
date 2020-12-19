@@ -11,9 +11,9 @@ use Doctrine\Common\Collections\Collection;
 final class MultiPolygon extends Geoshape
 {
     /**
-     * @var Collection|Polygon[]
+     * @var Collection<Polygon>
      */
-    private $polygons;
+    private Collection $polygons;
 
     public function __construct(Polygon ...$polygons)
     {
