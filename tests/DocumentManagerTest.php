@@ -175,7 +175,7 @@ EOF
         ];
 
         if (class_exists(Type::class)) {
-            self::assertEquals(['foo_type' => $mapping], (new Type($mapping, 'foo_type'))->getMapping());
+            self::assertEquals(['foo_index_no_auto_create' => $mapping], (new Type($index, 'foo_index_no_auto_create'))->getMapping());
         } else {
             self::assertEquals($mapping, $index->getMapping());
         }
@@ -202,7 +202,7 @@ EOF
         ];
 
         if (class_exists(Type::class)) {
-            self::assertEquals(['foo_type' => $mapping], (new Type($mapping, 'foo_type'))->getMapping());
+            self::assertEquals(['foo_index_no_auto_create' => $mapping], (new Type($index, 'foo_index_no_auto_create'))->getMapping());
         } else {
             self::assertEquals($mapping, $index->getMapping());
         }

@@ -21,7 +21,7 @@ class DropSchemaCommandTest extends TestCase
         }
 
         $tester = new CommandTester(new DropSchemaCommand($dm));
-        $collectionName = 'foo_with_aliases_index' . (\version_compare($dm->getDatabase()->getConnection()->getVersion(), '7.0.0', '>=') ? '' : '/foo_type');
+        $collectionName = 'foo_with_aliases_index' . (\version_compare($dm->getDatabase()->getConnection()->getVersion(), '7.0.0', '>=') ? '' : '/foo_with_aliases_index');
 
         $tester->execute([], ['interactive' => false]);
         self::assertEquals(<<<CMDLINE

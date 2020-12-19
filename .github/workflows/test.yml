@@ -1,0 +1,56 @@
+name: Tests
+on: [push, pull_request]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                es_version:
+                    # Disable until elastic/elastic-github-actions#16 is merged
+                    # - { engine: '5.6.16', lib: '^5.0' }
+                    - { engine: '6.8.13', lib: '^6.0' }
+                    - { engine: '7.10.1', lib: '^7.0' }
+
+                php_version:
+                    - '7.4'
+                    # Currently disabled as proxy-manager for php8 is not released yet.
+                    # - '8.0'
+
+        name: PHP ${{ matrix.php_version }} against ES ${{ matrix.es_version.engine }}
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Configure sysctl limits
+              run: |
+                  sudo swapoff -a
+                  sudo sysctl -w vm.swappiness=1
+                  sudo sysctl -w fs.file-max=262144
+                  sudo sysctl -w vm.max_map_count=262144
+
+            - name: Runs Elasticsearch
+              uses: elastic/elastic-github-actions/elasticsearch@master
+              with:
+                  stack-version: ${{ matrix.es_version.engine }}
+
+            - name: Setup PHP with pecl extension
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php_version }}
+                  extensions: :opcache
+            - name: Adding correct version of elastica to composer.json
+              run: composer require --no-update ruflin/elastica ${{ matrix.es_version.lib }}
+            - run: composer install
+
+            - name: Waiting for ES server to become available
+              run: ./wait-for-it.sh localhost:9200
+
+            - run: vendor/bin/phpunit --coverage-clover coverage.xml
+              env:
+                  ES_ENDPOINT: 'http://localhost:9200/'
+                  XDEBUG_MODE: coverage
+#            - name: Upload coverage to Codecov
+#              if: ${{ matrix.php_version == '8.0' }}
+#              uses: codecov/codecov-action@v1
+#              with:
+#                  file: ./coverage.xml
