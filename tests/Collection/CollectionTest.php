@@ -8,6 +8,7 @@ use Elastica\Response;
 use Elastica\ResultSet;
 use Elastica\Scroll as ElasticaScroll;
 use Elastica\Search as ElasticaSearch;
+use Elastica\SearchableInterface;
 use Elastica\Type;
 use Elasticsearch\Endpoints;
 use PHPUnit\Framework\TestCase;
@@ -28,33 +29,32 @@ class CollectionTest extends TestCase
     use FixturesTestTrait;
 
     /**
-     * @var Type|ObjectProphecy
+     * @var SearchableInterface|ObjectProphecy
      */
-    private $searchable;
+    private ObjectProphecy $searchable;
 
     /**
      * @var Query|ObjectProphecy
      */
-    private $query;
+    private ObjectProphecy $query;
 
-    /**
-     * @var string
-     */
-    private $documentClass;
-
-    /**
-     * @var CollectionInterface
-     */
-    private $collection;
+    private string $documentClass;
+    private CollectionInterface $collection;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp(): void
     {
-        $this->searchable = $this->prophesize(Type::class);
-        $this->searchable->getName()->willReturn('foo_type');
-        $this->searchable->getIndex()->willReturn($index = $this->prophesize(Index::class));
+        if (class_exists(Type::class)) {
+            $this->searchable = $this->prophesize(Type::class);
+            $this->searchable->getIndex()->willReturn($index = $this->prophesize(Index::class));
+            $this->searchable->getName()->willReturn('foo_type');
+        } else {
+            $this->searchable = $this->prophesize(Index::class);
+            $index = $this->searchable;
+        }
+
         $index->getName()->willReturn('foo_index');
 
         $this->query = $this->prophesize(Query::class);
@@ -177,7 +177,7 @@ class CollectionTest extends TestCase
 
     public function testGetNameShouldReturnTheNameOfTheIndexAndType(): void
     {
-        self::assertEquals('foo_index/foo_type', $this->collection->getName());
+        self::assertEquals(class_exists(Type::class) ? 'foo_index/foo_type' : 'foo_index', $this->collection->getName());
     }
 
     public function testGetNameShouldReturnTheNameOfTheIndexInCaseTypeDoesNotExists(): void

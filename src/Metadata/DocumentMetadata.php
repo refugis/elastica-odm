@@ -2,7 +2,7 @@
 
 namespace Refugis\ODM\Elastica\Metadata;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadata as ClassMetadataInterface;
+use Doctrine\Persistence\Mapping\ClassMetadata as ClassMetadataInterface;
 use Doctrine\Instantiator\Instantiator;
 use Kcs\Metadata\ClassMetadata;
 use Kcs\Metadata\MetadataInterface;
@@ -94,7 +94,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
         $this->staticSettings = [];
     }
 
-    public function __wakeup()
+    public function __wakeup(): void
     {
         $this->instantiator = new Instantiator();
     }

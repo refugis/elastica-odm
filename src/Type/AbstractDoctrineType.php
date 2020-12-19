@@ -2,7 +2,7 @@
 
 namespace Refugis\ODM\Elastica\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 abstract class AbstractDoctrineType extends AbstractType
 {

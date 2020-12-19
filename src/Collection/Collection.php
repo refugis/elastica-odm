@@ -314,7 +314,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function updateMapping(Mapping $mapping): void
+    public function updateMapping(object $mapping): void
     {
         $index = $this->searchable;
         if ($index instanceof Type) {

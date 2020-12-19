@@ -38,8 +38,10 @@ class DatabaseTest extends TestCase
 
         $this->client->getIndex($class->collectionName)
             ->shouldBeCalledTimes(1)
-            ->willReturn($this->prophesize(Index::class))
+            ->willReturn($index = $this->prophesize(Index::class))
         ;
+
+        $index->getName()->willReturn('type_name');
 
         $collection = $this->database->getCollection($class);
         $collection2 = $this->database->getCollection($class);

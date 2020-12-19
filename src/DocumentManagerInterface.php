@@ -3,7 +3,7 @@
 namespace Refugis\ODM\Elastica;
 
 use Doctrine\Common\EventManager;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use ProxyManager\Factory\LazyLoadingGhostFactory;
 use Psr\Cache\CacheItemPoolInterface;
 use Refugis\ODM\Elastica\Collection\CollectionInterface;

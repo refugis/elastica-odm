@@ -2,22 +2,20 @@
 
 namespace Refugis\ODM\Elastica\Tools\Schema;
 
-use Elastica\Type\Mapping;
+use Elastica\Mapping;
+use Elastica\Type\Mapping as TypeMapping;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
 class Collection
 {
-    /**
-     * @var DocumentMetadata
-     */
-    private $documentMetadata;
+    private DocumentMetadata $documentMetadata;
 
     /**
-     * @var Mapping
+     * @var TypeMapping|Mapping
      */
-    private $mapping;
+    private object $mapping;
 
-    public function __construct(DocumentMetadata $documentMetadata, Mapping $mapping)
+    public function __construct(DocumentMetadata $documentMetadata, object $mapping)
     {
         $this->documentMetadata = $documentMetadata;
         $this->mapping = $mapping;
@@ -32,9 +30,9 @@ class Collection
     }
 
     /**
-     * @return Mapping
+     * @return TypeMapping|Mapping
      */
-    public function getMapping(): Mapping
+    public function getMapping()
     {
         return $this->mapping;
     }

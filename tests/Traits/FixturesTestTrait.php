@@ -3,7 +3,8 @@
 namespace Refugis\ODM\Elastica\Tests\Traits;
 
 use Elastica\Cluster\Settings;
-use Elastica\Type\Mapping;
+use Elastica\Mapping;
+use Elastica\Type\Mapping as TypeMapping;
 use Elasticsearch\Endpoints;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
 
@@ -25,100 +26,106 @@ trait FixturesTestTrait
         $connection->requestEndpoint((new Endpoints\Indices\Create())->setIndex('foo_with_aliases_index_foo_alias'));
 
         $fooIndex = $connection->getIndex('foo_index');
-        $fooType = $fooIndex->getType('foo_type');
-        Mapping::create([
-            'stringField' => ['type' => 'text'],
-        ])
-            ->setType($fooType)
-            ->send()
-        ;
 
-        $connection->requestEndpoint(
-            (new Endpoints\Index())
-                ->setType($fooType->getName())
-                ->setIndex($fooIndex->getName())
-                ->setBody([
-                    'stringField' => 'foobar',
-                ])
-        );
+        if (class_exists(TypeMapping::class)) {
+            $fooType = $fooIndex->getType('foo_index');
+            TypeMapping::create([
+                'stringField' => ['type' => 'text'],
+            ])
+                ->setType($fooType)
+                ->send()
+            ;
 
-        $connection->requestEndpoint(
-            (new Endpoints\Index())
-                ->setType($fooType->getName())
-                ->setIndex($fooIndex->getName())
-                ->setBody([
-                    'stringField' => 'barbaz',
-                ])
-        );
+            $index = static fn (array $body) =>
+                (new Endpoints\Index())
+                    ->setType($fooType->getName())
+                    ->setIndex($fooIndex->getName())
+                    ->setBody($body);
+        } else {
+            Mapping::create([
+                'stringField' => ['type' => 'text'],
+            ])->send($fooIndex);
 
-        $connection->requestEndpoint(
-            (new Endpoints\Index())
-                ->setType($fooType->getName())
-                ->setIndex($fooIndex->getName())
-                ->setID('foo_test_document')
-                ->setBody([
-                    'stringField' => 'bazbaz',
-                ])
-        );
+            $index = static fn (array $body) =>
+                (new Endpoints\Index())
+                    ->setIndex($fooIndex->getName())
+                    ->setBody($body);
+        }
+
+        $connection->requestEndpoint($index([ 'stringField' => 'foobar' ]));
+        $connection->requestEndpoint($index([ 'stringField' => 'barbaz' ]));
+        $connection->requestEndpoint($index([ 'stringField' => 'bazbaz' ])->setId('foo_test_document'));
 
         $connection->requestEndpoint((new Endpoints\Indices\Refresh())->setIndex($fooIndex->getName()));
 
         $fooIndex = $connection->getIndex('foo_lazy_index');
-        $fooType = $fooIndex->getType('foo_type');
-        Mapping::create([
-            'stringField' => ['type' => 'text'],
-        ])
-            ->setType($fooType)
-            ->send()
-        ;
+        if (class_exists(TypeMapping::class)) {
+            $fooType = $fooIndex->getType('foo_lazy_index');
+            TypeMapping::create([
+                'stringField' => ['type' => 'text'],
+            ])
+                ->setType($fooType)
+                ->send()
+            ;
 
-        $connection->requestEndpoint(
-            (new Endpoints\Index())
-                ->setType($fooType->getName())
-                ->setIndex($fooIndex->getName())
-                ->setBody([
-                    'stringField' => 'foobar',
-                    'lazyField' => 'lazyFoo',
-                ])
-        );
+            $index = static fn (array $body) =>
+                (new Endpoints\Index())
+                    ->setType($fooType->getName())
+                    ->setIndex($fooIndex->getName())
+                    ->setBody($body);
+        } else {
+            Mapping::create([
+                'stringField' => ['type' => 'text'],
+            ])->send($fooIndex);
 
-        $connection->requestEndpoint(
-            (new Endpoints\Index())
-                ->setType($fooType->getName())
-                ->setIndex($fooIndex->getName())
-                ->setBody([
-                    'stringField' => 'barbaz',
-                    'lazyField' => 'lazyBar',
-                ])
-        );
+            $index = static fn (array $body) =>
+                (new Endpoints\Index())
+                    ->setIndex($fooIndex->getName())
+                    ->setBody($body);
+        }
 
-        $connection->requestEndpoint(
-            (new Endpoints\Index())
-                ->setType($fooType->getName())
-                ->setIndex($fooIndex->getName())
-                ->setID('foo_test_document')
-                ->setBody([
-                    'stringField' => 'bazbaz',
-                    'lazyField' => 'lazyBaz',
-                ])
-        );
+        $connection->requestEndpoint($index([
+            'stringField' => 'foobar',
+            'lazyField' => 'lazyFoo',
+        ]));
+        $connection->requestEndpoint($index([
+            'stringField' => 'barbaz',
+            'lazyField' => 'lazyBar',
+        ]));
+        $connection->requestEndpoint($index([
+            'stringField' => 'bazbaz',
+            'lazyField' => 'lazyBaz',
+        ])->setId('foo_test_document'));
 
         $connection->requestEndpoint((new Endpoints\Indices\Refresh())->setIndex($fooIndex->getName()));
 
         $fooIndex = $connection->getIndex('foo_with_aliases_index_foo_alias');
-        $fooType = $fooIndex->getType('foo_type');
-        Mapping::create([
-            'stringField' => ['type' => 'text'],
-        ])
-               ->setType($fooType)
-               ->send()
-        ;
+        if (class_exists(TypeMapping::class)) {
+            $fooType = $fooIndex->getType('foo_with_aliases_index_foo_alias');
+            TypeMapping::create([
+                'stringField' => ['type' => 'text'],
+            ])
+                       ->setType($fooType)
+                       ->send()
+            ;
 
-        $connection->requestEndpoint((new Endpoints\Indices\Refresh())->setIndex($fooIndex->getName()));
-        $connection->requestEndpoint(
-            (new Endpoints\Indices\Alias\Put())
-                ->setName('foo_with_aliases_index')
-                ->setIndex('foo_with_aliases_index_foo_alias')
-        );
+            $connection->requestEndpoint((new Endpoints\Indices\Refresh())->setIndex($fooIndex->getName()));
+            $connection->requestEndpoint(
+                (new Endpoints\Indices\Alias\Put())
+                    ->setName('foo_with_aliases_index')
+                    ->setIndex('foo_with_aliases_index_foo_alias')
+            );
+        } else {
+            Mapping::create([
+                'stringField' => ['type' => 'text'],
+            ])->send($fooIndex);
+
+            $connection->requestEndpoint((new Endpoints\Indices\Refresh())->setIndex($fooIndex->getName()));
+            $connection->requestEndpoint(
+                (new Endpoints\Indices\PutAlias())
+                    ->setName('foo_with_aliases_index')
+                    ->setIndex('foo_with_aliases_index_foo_alias')
+            );
+        }
     }
 }

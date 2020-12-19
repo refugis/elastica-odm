@@ -4,8 +4,10 @@ namespace Refugis\ODM\Elastica\Tests;
 
 use Doctrine\Common\EventManager;
 use Elastica\Client;
+use Elastica\Response;
 use Elastica\Transport\AbstractTransport;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Refugis\ODM\Elastica\Collection\Database;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
@@ -23,26 +25,20 @@ class UnitOfWorkTest extends TestCase
     /**
      * @var AbstractTransport|ObjectProphecy
      */
-    private $transport;
+    private ObjectProphecy $transport;
 
     /**
      * @var EventManager|ObjectProphecy
      */
-    private $eventManager;
+    private ObjectProphecy $eventManager;
 
-    /**
-     * @var DocumentManagerMock
-     */
-    private $dm;
-
-    /**
-     * @var UnitOfWork
-     */
-    private $unitOfWork;
+    private DocumentManagerMock $dm;
+    private UnitOfWork $unitOfWork;
 
     protected function setUp(): void
     {
         $this->transport = $this->prophesize(AbstractTransport::class);
+        $this->transport->setConnection(Argument::any())->willReturn($this->transport);
         $this->eventManager = $this->prophesize(EventManager::class);
 
         $database = new Database(new Client([
@@ -67,6 +63,11 @@ class UnitOfWorkTest extends TestCase
 
     public function testSavingSingleDocumentWithIdentityFieldForcesInsert(): void
     {
+        $this->transport->exec(Argument::cetera())->willReturn($this->prophesize(Response::class));
+        $this->transport->toArray()->will(function () {
+            return [];
+        });
+
         $persister = new DocumentPersisterMock($this->dm, $this->dm->getClassMetadata(ForumUser::class));
         $persister->setMockGeneratorType(DocumentMetadata::GENERATOR_TYPE_AUTO);
 

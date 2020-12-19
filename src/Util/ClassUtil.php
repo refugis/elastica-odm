@@ -2,7 +2,7 @@
 
 namespace Refugis\ODM\Elastica\Util;
 
-use Doctrine\Common\Persistence\Proxy;
+use Doctrine\Persistence\Proxy;
 use ProxyManager\Proxy\ProxyInterface;
 
 final class ClassUtil

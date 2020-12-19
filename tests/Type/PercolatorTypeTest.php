@@ -3,7 +3,6 @@
 namespace Refugis\ODM\Elastica\Tests\Type;
 
 use Elastica\Query;
-use Elastica\Query\Match;
 use PHPUnit\Framework\TestCase;
 use Refugis\ODM\Elastica\Type\PercolatorType;
 use Refugis\ODM\Elastica\Type\TypeInterface;
@@ -33,10 +32,10 @@ class PercolatorTypeTest extends TestCase
     public function testToDatabaseShouldWork(): void
     {
         $type = $this->getType();
-        $value = new Match('field', 'value');
+        $value = new Query\MatchPhrase('field', 'value');
 
-        self::assertEquals(['match' => ['field' => 'value']], $type->toDatabase($value));
-        self::assertEquals(['match' => ['field' => 'value']], $type->toDatabase(Query::create($value)));
+        self::assertEquals(['match_phrase' => ['field' => 'value']], $type->toDatabase($value));
+        self::assertEquals(['match_phrase' => ['field' => 'value']], $type->toDatabase(Query::create($value)));
     }
 
     public function getType(): TypeInterface

@@ -8,15 +8,12 @@ use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
 class Database implements DatabaseInterface
 {
-    /**
-     * @var Client
-     */
-    protected $elasticSearch;
+    protected Client $elasticSearch;
 
     /**
      * @var CollectionInterface[]
      */
-    private $collectionList;
+    private array $collectionList;
 
     public function __construct(Client $elasticSearch)
     {

@@ -11,7 +11,7 @@ use Refugis\ODM\Elastica\Annotation\Index;
 use Refugis\ODM\Elastica\Annotation\Tokenizer;
 
 /**
- * @Document(type="foo_lazy_index/foo_type")
+ * @Document(collection="foo_lazy_index")
  * @Index(analyzers={
  *     @Analyzer(name="foo_analyzer", tokenizer="foo_tokenizer", charFilters={"html_strip"}, filters={"lowercase", "english_stop", "english_stemmer"})
  * }, tokenizers={
