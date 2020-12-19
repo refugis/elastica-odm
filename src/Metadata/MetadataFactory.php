@@ -3,7 +3,7 @@
 namespace Refugis\ODM\Elastica\Metadata;
 
 use Doctrine\Common\EventManager;
-use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
+use Doctrine\Persistence\Mapping\ClassMetadataFactory;
 use Kcs\Metadata\ClassMetadataInterface;
 use Kcs\Metadata\Exception\InvalidMetadataException;
 use Kcs\Metadata\Factory\AbstractMetadataFactory;

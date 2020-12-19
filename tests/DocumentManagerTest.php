@@ -166,15 +166,19 @@ EOF
         $this->dm->persist($document);
         $this->dm->flush();
 
-        $type = new Type(new Index($this->dm->getDatabase()->getConnection(), 'foo_index_no_auto_create'), 'foo_type');
-        self::assertEquals([
-            'foo_type' => [
-                'properties' => [
-                    'stringField' => ['type' => 'text'],
-                    'coordinates' => ['type' => 'geo_point'],
-                ],
+        $index = new Index($this->dm->getDatabase()->getConnection(), 'foo_index_no_auto_create');
+        $mapping = [
+            'properties' => [
+                'stringField' => ['type' => 'text'],
+                'coordinates' => ['type' => 'geo_point'],
             ],
-        ], $type->getMapping());
+        ];
+
+        if (class_exists(Type::class)) {
+            self::assertEquals(['foo_index_no_auto_create' => $mapping], (new Type($index, 'foo_index_no_auto_create'))->getMapping());
+        } else {
+            self::assertEquals($mapping, $index->getMapping());
+        }
     }
 
     public function testShouldCreateIndexOnMergeIfNotAutocreating(): void
@@ -189,14 +193,18 @@ EOF
         $this->dm->merge($document);
         $this->dm->flush();
 
-        $type = new Type(new Index($this->dm->getDatabase()->getConnection(), 'foo_index_no_auto_create'), 'foo_type');
-        self::assertEquals([
-            'foo_type' => [
-                'properties' => [
-                    'stringField' => ['type' => 'text'],
-                    'coordinates' => ['type' => 'geo_point'],
-                ],
+        $index = new Index($this->dm->getDatabase()->getConnection(), 'foo_index_no_auto_create');
+        $mapping = [
+            'properties' => [
+                'stringField' => ['type' => 'text'],
+                'coordinates' => ['type' => 'geo_point'],
             ],
-        ], $type->getMapping());
+        ];
+
+        if (class_exists(Type::class)) {
+            self::assertEquals(['foo_index_no_auto_create' => $mapping], (new Type($index, 'foo_index_no_auto_create'))->getMapping());
+        } else {
+            self::assertEquals($mapping, $index->getMapping());
+        }
     }
 }

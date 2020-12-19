@@ -2,7 +2,8 @@
 
 namespace Refugis\ODM\Elastica\Tests\Metadata\Processor;
 
-use Elastica\Type\Mapping;
+use Elastica\Mapping;
+use Elastica\Type\Mapping as TypeMapping;
 use PHPUnit\Framework\TestCase;
 use Refugis\ODM\Elastica\Annotation\Analyzer;
 use Refugis\ODM\Elastica\Annotation\Filter;
@@ -37,10 +38,7 @@ class IndexProcessorTest extends TestCase
     {
         $index = new Index();
 
-        $analyzer = new Analyzer();
-        $analyzer->name = 'foo_name';
-        $analyzer->tokenizer = 'foo_tokenizer';
-
+        $analyzer = new Analyzer('foo_name', 'foo_tokenizer');
         $index->analyzers = [$analyzer];
 
         $this->processor->process($this->documentMetadata, $index);
@@ -60,13 +58,7 @@ class IndexProcessorTest extends TestCase
     {
         $index = new Index();
 
-        $filter = new Filter();
-        $filter->name = 'foo_name';
-        $filter->type = 'stop';
-        $filter->options = [
-            'stopwords' => '_english_',
-        ];
-
+        $filter = new Filter('foo_name', 'stop', [ 'stopwords' => '_english_' ]);
         $index->filters = [$filter];
 
         $this->processor->process($this->documentMetadata, $index);
@@ -117,11 +109,15 @@ class IndexProcessorTest extends TestCase
     {
         $dm = static::createDocumentManager();
 
+        $properties = [
+            'stringField' => ['type' => 'text'],
+        ];
+
+        $mapping = class_exists(TypeMapping::class) ? TypeMapping::create($properties) : Mapping::create($properties);
+
         $collection = $dm->getCollection(Foo::class);
         $collection->drop();
-        $collection->updateMapping($mapping = Mapping::create([
-            'stringField' => ['type' => 'text'],
-        ]));
+        $collection->updateMapping($mapping);
 
         $database = $dm->getDatabase();
         $connection = $database->getConnection();

@@ -21,6 +21,7 @@ class DropSchemaCommandTest extends TestCase
         }
 
         $tester = new CommandTester(new DropSchemaCommand($dm));
+        $collectionName = 'foo_with_aliases_index' . (\version_compare($dm->getDatabase()->getConnection()->getVersion(), '7.0.0', '>=') ? '' : '/foo_with_aliases_index');
 
         $tester->execute([], ['interactive' => false]);
         self::assertEquals(<<<CMDLINE
@@ -30,7 +31,7 @@ Elastica ODM - drop schema
 
  ! [CAUTION] This operation will drop all the indices defined in your mapping.
 
- [WARNING] foo_with_aliases_index/foo_type is an alias.
+ [WARNING] $collectionName is an alias.
 
            Pass --with-aliases option to drop the alias too.
 

@@ -2,7 +2,7 @@
 
 namespace Refugis\ODM\Elastica\Events;
 
-use Doctrine\Common\Persistence\Event\OnClearEventArgs as BaseEventArgs;
+use Doctrine\Persistence\Event\OnClearEventArgs as BaseEventArgs;
 
 class OnClearEventArgs extends BaseEventArgs
 {

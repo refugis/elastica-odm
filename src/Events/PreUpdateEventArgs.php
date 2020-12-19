@@ -2,7 +2,7 @@
 
 namespace Refugis\ODM\Elastica\Events;
 
-use Doctrine\Common\Persistence\Event\PreUpdateEventArgs as BaseEventArgs;
+use Doctrine\Persistence\Event\PreUpdateEventArgs as BaseEventArgs;
 
 class PreUpdateEventArgs extends BaseEventArgs
 {

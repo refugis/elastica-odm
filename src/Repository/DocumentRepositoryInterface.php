@@ -3,7 +3,7 @@
 namespace Refugis\ODM\Elastica\Repository;
 
 use Doctrine\Common\Collections\Selectable;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ObjectRepository;
 use Refugis\ODM\Elastica\Search\Search;
 
 interface DocumentRepositoryInterface extends ObjectRepository, Selectable

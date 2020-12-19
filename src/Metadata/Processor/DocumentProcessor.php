@@ -2,12 +2,13 @@
 
 namespace Refugis\ODM\Elastica\Metadata\Processor;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Elastica\Type;
 use Kcs\Metadata\Loader\Processor\Annotation\Processor;
 use Kcs\Metadata\Loader\Processor\ProcessorInterface;
 use Kcs\Metadata\MetadataInterface;
 use Refugis\ODM\Elastica\Annotation\Document;
+use Refugis\ODM\Elastica\Exception\InvalidArgumentException;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
 /**
@@ -24,10 +25,21 @@ class DocumentProcessor implements ProcessorInterface
     public function process(MetadataInterface $metadata, $subject): void
     {
         $metadata->document = true;
+        $metadata->collectionName = $subject->collection ?? $this->calculateType($metadata->getReflectionClass()->getShortName());
 
-        $metadata->collectionName = $subject->type ?? $this->calculateType($metadata->name);
-        if (\class_exists(Type::class) && false === \strpos($metadata->collectionName, '/')) {
+        $sepIdx = \strpos($metadata->collectionName, '/');
+        if ($sepIdx === false && \class_exists(Type::class)) {
             $metadata->collectionName .= '/'.$metadata->collectionName;
+        } elseif ($sepIdx !== false && ! \class_exists(Type::class)) {
+            $errorMessage = sprintf('Types are not supported in Elasticsearch 7. Please remove the type name from Document annotation or attribute on document class %s', $metadata->name);
+
+            [$index, $type] = \explode('/', $metadata->collectionName) + [null, null];
+            if ($index === $type) {
+                trigger_error($errorMessage, E_USER_DEPRECATED);
+                $metadata->collectionName = $index;
+            } else {
+                throw new InvalidArgumentException($errorMessage);
+            }
         }
 
         $metadata->customRepositoryClassName = $subject->repositoryClass;
@@ -35,14 +47,15 @@ class DocumentProcessor implements ProcessorInterface
 
     /**
      * Build a collection name from class name.
-     *
-     * @param string $name
-     *
-     * @return string
      */
     private function calculateType(string $name): string
     {
-        $indexName = Inflector::tableize($name);
+        static $inflector = null;
+        if ($inflector === null) {
+            $inflector = (new InflectorFactory())->build();
+        }
+
+        $indexName = $inflector->tableize($name);
         if (\class_exists(Type::class)) {
             return "$indexName/$indexName";
         }

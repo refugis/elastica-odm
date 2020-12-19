@@ -4,7 +4,7 @@ namespace Refugis\ODM\Elastica;
 
 use Doctrine\Common\Comparable;
 use Doctrine\Common\EventManager;
-use Doctrine\Common\Persistence\ObjectManagerAware;
+use Doctrine\Persistence\ObjectManagerAware;
 use Elastica\Document;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Refugis\ODM\Elastica\Events\LifecycleEventManager;

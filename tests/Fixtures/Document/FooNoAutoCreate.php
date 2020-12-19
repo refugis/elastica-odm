@@ -12,7 +12,7 @@ use Refugis\ODM\Elastica\Annotation\Tokenizer;
 use Refugis\ODM\Elastica\Geotools\Coordinate\CoordinateInterface;
 
 /**
- * @Document(type="foo_index_no_auto_create/foo_type")
+ * @Document(collection="foo_index_no_auto_create")
  * @Index(analyzers={
  *     @Analyzer(name="foo_analyzer", tokenizer="foo_tokenizer", charFilters={"html_strip"}, filters={"lowercase", "english_stop", "english_stemmer"})
  * }, tokenizers={

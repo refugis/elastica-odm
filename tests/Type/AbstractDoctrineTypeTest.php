@@ -2,8 +2,8 @@
 
 namespace Refugis\ODM\Elastica\Tests\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Refugis\ODM\Elastica\Tests\Fixtures\Type\TestDoctrineType;
@@ -14,7 +14,7 @@ class AbstractDoctrineTypeTest extends TestCase implements TypeTestInterface
     /**
      * @var ManagerRegistry|ObjectProphecy
      */
-    private $managerRegistry;
+    private ObjectProphecy $managerRegistry;
 
     protected function setUp(): void
     {

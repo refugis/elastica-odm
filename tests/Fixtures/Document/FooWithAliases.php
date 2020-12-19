@@ -7,7 +7,7 @@ use Refugis\ODM\Elastica\Annotation\DocumentId;
 use Refugis\ODM\Elastica\Annotation\Field;
 
 /**
- * @Document(type="foo_with_aliases_index/foo_type")
+ * @Document(collection="foo_with_aliases_index")
  */
 class FooWithAliases
 {
