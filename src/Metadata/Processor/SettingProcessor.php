@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Metadata\Processor;
 
@@ -7,6 +9,8 @@ use Kcs\Metadata\Loader\Processor\ProcessorInterface;
 use Kcs\Metadata\MetadataInterface;
 use Refugis\ODM\Elastica\Annotation\Setting;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
+
+use function preg_match;
 
 /**
  * @Processor(annotation=Setting::class)
@@ -73,15 +77,15 @@ class SettingProcessor implements ProcessorInterface
     public function process(MetadataInterface $metadata, $subject): void
     {
         $settingType = $subject->type;
-        if ('auto' === $settingType) {
-            if (isset(self::DYNAMIC_SETTINGS[$subject->key]) || \preg_match('/^index\.routing\.allocation\.(include|require|exclude)\..+/', $subject->key)) {
+        if ($settingType === 'auto') {
+            if (isset(self::DYNAMIC_SETTINGS[$subject->key]) || preg_match('/^index\.routing\.allocation\.(include|require|exclude)\..+/', $subject->key)) {
                 $settingType = 'dynamic';
             } else {
                 $settingType = 'static';
             }
         }
 
-        if ('static' === $settingType) {
+        if ($settingType === 'static') {
             $metadata->staticSettings[$subject->key] = $subject->value;
         } else {
             $metadata->dynamicSettings[$subject->key] = $subject->value;

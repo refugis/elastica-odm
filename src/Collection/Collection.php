@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Collection;
 
@@ -10,13 +12,18 @@ use Elastica\ResultSet;
 use Elastica\Scroll;
 use Elastica\SearchableInterface;
 use Elastica\Type;
-use Elastica\Type\Mapping;
 use Elasticsearch\Endpoints;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Exception\CannotDropAnAliasException;
 use Refugis\ODM\Elastica\Exception\IndexNotFoundException;
 use Refugis\ODM\Elastica\Exception\RuntimeException;
 use Refugis\ODM\Elastica\Search\Search;
+
+use function array_filter;
+use function array_merge;
+use function count;
+use function implode;
+use function Safe\preg_match;
 
 class Collection implements CollectionInterface
 {
@@ -25,20 +32,16 @@ class Collection implements CollectionInterface
     private ?string $_lastInsertId;
     private string $name;
 
-    /**
-     * @var array<string, mixed>
-     */
+    /** @var array<string, mixed> */
     private array $dynamicSettings;
 
-    /**
-     * @var array<string, mixed>
-     */
+    /** @var array<string, mixed> */
     private array $staticSettings;
 
     /**
-     * @var array<string, mixed>
-     *
      * @deprecated
+     *
+     * @var array<string, mixed>
      */
     private array $indexParams;
 
@@ -51,15 +54,12 @@ class Collection implements CollectionInterface
         $this->staticSettings = [];
 
         if ($searchable instanceof Type) {
-            $this->name = $searchable->getIndex()->getName().'/'.$searchable->getName();
+            $this->name = $searchable->getIndex()->getName() . '/' . $searchable->getName();
         } elseif ($searchable instanceof Index) {
             $this->name = $searchable->getName();
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return $this->name;
@@ -68,9 +68,9 @@ class Collection implements CollectionInterface
     /**
      * Sets the index params used when the index is created.
      *
-     * @param array<string, mixed> $indexParams
-     *
      * @deprecated Index params are deprecated and will be removed in 2.0. Please use setDynamicSettings/setStaticSettings instead.
+     *
+     * @param array<string, mixed> $indexParams
      */
     public function setIndexParams(array $indexParams = []): void
     {
@@ -97,9 +97,6 @@ class Collection implements CollectionInterface
         $this->staticSettings = $staticSettings;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function scroll(Query $query, string $expiryTime = '1m'): Scroll
     {
         // Scroll requests have optimizations that make them faster when the sort order is _doc.
@@ -114,16 +111,13 @@ class Collection implements CollectionInterface
             $response = $exception->getResponse();
         }
 
-        if (404 === $response->getStatus() && 'index_not_found_exception' === $response->getFullError()['type'] ?? null) {
-            throw new IndexNotFoundException('Index not found: '.$response->getErrorMessage());
+        if ($response->getStatus() === 404 && $response->getFullError()['type'] === 'index_not_found_exception' ?? null) {
+            throw new IndexNotFoundException('Index not found: ' . $response->getErrorMessage());
         }
 
-        throw new RuntimeException('Response not OK: '.$response->getErrorMessage());
+        throw new RuntimeException('Response not OK: ' . $response->getErrorMessage());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function search(Query $query): ResultSet
     {
         try {
@@ -132,16 +126,13 @@ class Collection implements CollectionInterface
             $response = $exception->getResponse();
         }
 
-        if (404 === $response->getStatus() && 'index_not_found_exception' === $response->getFullError()['type'] ?? null) {
-            throw new IndexNotFoundException('Index not found: '.$response->getErrorMessage());
+        if ($response->getStatus() === 404 && $response->getFullError()['type'] === 'index_not_found_exception' ?? null) {
+            throw new IndexNotFoundException('Index not found: ' . $response->getErrorMessage());
         }
 
-        throw new RuntimeException('Response not OK: '.$response->getErrorMessage());
+        throw new RuntimeException('Response not OK: ' . $response->getErrorMessage());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createSearch(DocumentManagerInterface $documentManager, Query $query): Search
     {
         $search = new Search($documentManager, $this->documentClass);
@@ -150,17 +141,11 @@ class Collection implements CollectionInterface
         return $search;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(Query $query): int
     {
         return $this->searchable->count($query);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function refresh(): void
     {
         $endpoint = new Endpoints\Indices\Refresh();
@@ -192,11 +177,11 @@ class Collection implements CollectionInterface
 
         $data = $response->getData();
         if (! $response->isOk()) {
-            if (404 === $response->getStatus() && 'index_not_found_exception' === $response->getFullError()['type'] ?? null) {
-                throw new IndexNotFoundException('Index not found: '.$response->getErrorMessage());
+            if ($response->getStatus() === 404 && $response->getFullError()['type'] === 'index_not_found_exception' ?? null) {
+                throw new IndexNotFoundException('Index not found: ' . $response->getErrorMessage());
             }
 
-            throw new RuntimeException('Response not OK: '.$response->getErrorMessage());
+            throw new RuntimeException('Response not OK: ' . $response->getErrorMessage());
         }
 
         $this->_lastInsertId = $data['_id'] ?? null;
@@ -209,27 +194,29 @@ class Collection implements CollectionInterface
      */
     public function update(string $id, array $body, string $script = ''): void
     {
-        $body = \array_filter([
+        $body = array_filter([
             'doc' => $body,
             'script' => $script,
         ]);
 
-        if (\count($body) > 1) {
+        if (count($body) > 1) {
             $tmp = [$script];
             $params = [];
 
             $i = 0;
             foreach ($body['doc'] as $idx => $value) {
-                $paramName = 'p_'.$idx.'_'.++$i;
-                $tmp[] = 'ctx._source.'.$idx.' = params.'.$paramName;
+                $paramName = 'p_' . $idx . '_' . ++$i;
+                $tmp[] = 'ctx._source.' . $idx . ' = params.' . $paramName;
                 $params[$paramName] = $value;
             }
 
-            $script = \implode('; ', $tmp).';';
-            $body = ['script' => [
-                'source' => $script,
-                'params' => $params,
-            ]];
+            $script = implode('; ', $tmp) . ';';
+            $body = [
+                'script' => [
+                    'source' => $script,
+                    'params' => $params,
+                ],
+            ];
         }
 
         $endpoint = new Endpoints\Update();
@@ -244,13 +231,10 @@ class Collection implements CollectionInterface
         }
 
         if (! $response->isOk()) {
-            throw new RuntimeException('Response not OK: '.$response->getErrorMessage());
+            throw new RuntimeException('Response not OK: ' . $response->getErrorMessage());
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete(string $id): void
     {
         $endpoint = new Endpoints\Delete();
@@ -263,7 +247,7 @@ class Collection implements CollectionInterface
         }
 
         if (! $response->isOk()) {
-            throw new \RuntimeException('Response not OK: '.$response->getErrorMessage());
+            throw new \RuntimeException('Response not OK: ' . $response->getErrorMessage());
         }
     }
 
@@ -284,21 +268,15 @@ class Collection implements CollectionInterface
         }
 
         if (! $response->isOk()) {
-            throw new \RuntimeException('Response not OK: '.$response->getErrorMessage());
+            throw new \RuntimeException('Response not OK: ' . $response->getErrorMessage());
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLastInsertedId(): ?string
     {
         return $this->_lastInsertId;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function updateMapping(object $mapping): void
     {
         $index = $this->searchable;
@@ -308,7 +286,7 @@ class Collection implements CollectionInterface
 
         if (! $index->exists()) {
             $indexParams = $this->indexParams ?? null;
-            $indexParams['settings'] = \array_merge($indexParams['settings'] ?? [], $this->staticSettings, $this->dynamicSettings);
+            $indexParams['settings'] = array_merge($indexParams['settings'] ?? [], $this->staticSettings, $this->dynamicSettings);
 
             $index->create($indexParams);
         } elseif (! empty($this->dynamicSettings)) {
@@ -322,13 +300,10 @@ class Collection implements CollectionInterface
         }
 
         if (! $response->isOk()) {
-            throw new \RuntimeException('Response not OK: '.$response->getErrorMessage());
+            throw new \RuntimeException('Response not OK: ' . $response->getErrorMessage());
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function drop(): void
     {
         $index = $this->searchable;
@@ -341,11 +316,11 @@ class Collection implements CollectionInterface
         } catch (ResponseException $exception) {
             $response = $exception->getResponse();
 
-            if (400 === $response->getStatus() && \preg_match('/The provided expression \[.+\] matches an alias/', $response->getErrorMessage())) {
+            if ($response->getStatus() === 400 && preg_match('/The provided expression \[.+\] matches an alias/', $response->getErrorMessage())) {
                 throw new CannotDropAnAliasException($index->getName(), $exception);
             }
 
-            if (404 !== $response->getStatus()) {
+            if ($response->getStatus() !== 404) {
                 throw $exception;
             }
         }

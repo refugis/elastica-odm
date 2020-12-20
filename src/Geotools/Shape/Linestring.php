@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Geotools\Shape;
 
@@ -11,9 +13,7 @@ use Refugis\ODM\Elastica\Geotools\Coordinate\CoordinateInterface;
  */
 final class Linestring extends Geoshape
 {
-    /**
-     * @var Collection<CoordinateInterface>
-     */
+    /** @var Collection<CoordinateInterface> */
     private Collection $coordinates;
 
     public function __construct(CoordinateInterface ...$coordinates)

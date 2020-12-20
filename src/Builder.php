@@ -1,8 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica;
 
 use Elastica\Client;
+use InvalidArgumentException;
 use ProxyManager\Factory\LazyLoadingGhostFactory;
 use Psr\Log\LoggerInterface;
 use Refugis\ODM\Elastica\Collection\Database;
@@ -103,13 +106,12 @@ final class Builder
             ->addType(new Type\IpType())
             ->addType(new Type\PercolatorType())
             ->addType(new Type\StringType())
-            ->addType(new Type\RawType())
-        ;
+            ->addType(new Type\RawType());
     }
 
     public function addMetadataLoader(Loader\LoaderInterface $loader): self
     {
-        if (null === $this->metadataLoader) {
+        if ($this->metadataLoader === null) {
             $this->metadataLoader = $loader;
         } elseif ($this->metadataLoader instanceof Loader\ChainLoader) {
             $this->metadataLoader->addLoader($loader);
@@ -122,7 +124,7 @@ final class Builder
 
     public function build(): DocumentManager
     {
-        if (null === $this->client) {
+        if ($this->client === null) {
             $this->client = new Client([
                 'url' => $this->connectionUrl,
                 'connectTimeout' => $this->connectTimeout,
@@ -130,13 +132,13 @@ final class Builder
             ], null, $this->logger);
         }
 
-        if (null === $this->proxyFactory) {
+        if ($this->proxyFactory === null) {
             $this->proxyFactory = new LazyLoadingGhostFactory();
         }
 
-        if (null === $this->metadataFactory) {
-            if (null === $this->metadataLoader) {
-                throw new \InvalidArgumentException('You must define at least one metadata loader');
+        if ($this->metadataFactory === null) {
+            if ($this->metadataLoader === null) {
+                throw new InvalidArgumentException('You must define at least one metadata loader');
             }
 
             $this->metadataFactory = new MetadataFactory($this->metadataLoader);

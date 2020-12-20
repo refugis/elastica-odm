@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Hydrator;
 
@@ -14,6 +16,8 @@ interface HydratorInterface
      * Hydrates all the documents in the result set.
      *
      * @return object[]
+     *
+     * @phpstan-param class-string $className
      */
     public function hydrateAll(ResultSet $resultSet, string $className): array;
 
@@ -21,6 +25,8 @@ interface HydratorInterface
      * Hydrates only one document.
      *
      * @return mixed
+     *
+     * @phpstan-param class-string $className
      */
     public function hydrateOne(Document $document, string $className);
 }

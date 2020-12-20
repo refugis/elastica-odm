@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Events;
 
@@ -42,10 +44,12 @@ class LifecycleEventManager
     {
         // @todo Check lifecycle callbacks
 
-        if ($this->evm->hasListeners(Events::preUpdate)) {
-            $this->evm->dispatchEvent(Events::preUpdate, $this->uow->getDocumentChangeSet($document));
-            $this->uow->recomputeSingleDocumentChangeset($class, $document);
+        if (! $this->evm->hasListeners(Events::preUpdate)) {
+            return;
         }
+
+        $this->evm->dispatchEvent(Events::preUpdate, new PreUpdateEventArgs($document, $this->uow->getObjectManager(), $this->uow->getDocumentChangeSet($document)));
+        $this->uow->recomputeSingleDocumentChangeset($document);
     }
 
     public function postUpdate(DocumentMetadata $class, $document)

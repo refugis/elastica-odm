@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Hydrator;
 
@@ -9,6 +11,9 @@ use Elastica\ResultSet;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Hydrator\Internal\ProxyInstantiator;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
+
+use function assert;
+use function Safe\sort;
 
 class ObjectHydrator implements HydratorInterface
 {
@@ -24,21 +29,21 @@ class ObjectHydrator implements HydratorInterface
      */
     public function hydrateAll(ResultSet $resultSet, string $className): array
     {
-        if (0 === $resultSet->count()) {
+        if ($resultSet->count() === 0) {
             return [];
         }
 
-        /** @var DocumentMetadata $class */
         $class = $this->manager->getClassMetadata($className);
+        assert($class instanceof DocumentMetadata);
         try {
             $source = $resultSet->getQuery()->getParam('_source');
-            \sort($source);
+            sort($source);
         } catch (InvalidException $ex) {
             $source = null;
         }
 
-        if (null !== $source && $source !== $class->fieldNames) {
-            $fields = false === $source ? [] : $source;
+        if ($source !== null && $source !== $class->fieldNames) {
+            $fields = $source === false ? [] : $source;
             $instantiator = new ProxyInstantiator($fields, $this->manager);
         } else {
             $instantiator = $this->getInstantiator();
@@ -50,7 +55,7 @@ class ObjectHydrator implements HydratorInterface
             $document = $result->getDocument();
             $object = $this->manager->getUnitOfWork()->tryGetById($document->getId(), $class);
 
-            if (null === $object) {
+            if ($object === null) {
                 $object = $instantiator->instantiate($className);
                 $this->manager->getUnitOfWork()->createDocument($document, $object);
             }
@@ -75,7 +80,7 @@ class ObjectHydrator implements HydratorInterface
     private function getInstantiator(): Instantiator
     {
         static $instantiator = null;
-        if (null === $instantiator) {
+        if ($instantiator === null) {
             $instantiator = new Instantiator();
         }
 

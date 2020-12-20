@@ -1,9 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Geotools\Geohash;
 
+use InvalidArgumentException;
 use Refugis\ODM\Elastica\Geotools\Coordinate\Coordinate;
 use Refugis\ODM\Elastica\Geotools\Coordinate\CoordinateInterface;
+use RuntimeException;
+
+use function count;
+use function strlen;
 
 class Geohash
 {
@@ -49,12 +56,41 @@ class Geohash
      * @var string[]
      */
     protected array $base32Chars = [
-        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'b', 'c', 'd', 'e', 'f', 'g',
-        'h', 'j', 'k', 'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+        '0',
+        '1',
+        '2',
+        '3',
+        '4',
+        '5',
+        '6',
+        '7',
+        '8',
+        '9',
+        'b',
+        'c',
+        'd',
+        'e',
+        'f',
+        'g',
+        'h',
+        'j',
+        'k',
+        'm',
+        'n',
+        'p',
+        'q',
+        'r',
+        's',
+        't',
+        'u',
+        'v',
+        'w',
+        'x',
+        'y',
+        'z',
     ];
 
     /**
-     * Geohash constructor.
      * You can pass a coordinate instance or a string hash.
      *
      * @param string|CoordinateInterface $hashOrCoordinates
@@ -110,10 +146,10 @@ class Geohash
      * @see http://en.wikipedia.org/wiki/Geohash
      * @see http://geohash.org/
      */
-    private function encode(CoordinateInterface $coordinate, $length = self::MAX_LENGTH): void
+    private function encode(CoordinateInterface $coordinate, int $length = self::MAX_LENGTH): void
     {
         if ((int) $length < self::MIN_LENGTH || (int) $length > self::MAX_LENGTH) {
-            throw new \InvalidArgumentException('The length should be between 1 and 12.');
+            throw new InvalidArgumentException('The length should be between 1 and 12.');
         }
 
         $latitudeInterval = $this->latitudeInterval;
@@ -123,7 +159,7 @@ class Geohash
         $charIndex = 0;
 
         $this->geohash = '';
-        while (\strlen($this->geohash) < $length) {
+        while (strlen($this->geohash) < $length) {
             if ($isEven) {
                 $middle = ($longitudeInterval[0] + $longitudeInterval[1]) / 2;
                 if ($coordinate->getLongitude() > $middle) {
@@ -159,13 +195,13 @@ class Geohash
 
     private function decode(string $geohash): void
     {
-        $length = \strlen($geohash);
+        $length = strlen($geohash);
         if ($length < self::MIN_LENGTH || $length > self::MAX_LENGTH) {
-            throw new \InvalidArgumentException('The length of the geo hash should be between 1 and 12.');
+            throw new InvalidArgumentException('The length of the geo hash should be between 1 and 12.');
         }
 
         $base32DecodeMap = [];
-        $base32CharsTotal = \count($this->base32Chars);
+        $base32CharsTotal = count($this->base32Chars);
         for ($i = 0; $i < $base32CharsTotal; ++$i) {
             $base32DecodeMap[$this->base32Chars[$i]] = $i;
         }
@@ -174,26 +210,26 @@ class Geohash
         $longitudeInterval = $this->longitudeInterval;
         $isEven = true;
 
-        $geohashLength = \strlen($geohash);
+        $geohashLength = strlen($geohash);
         for ($i = 0; $i < $geohashLength; ++$i) {
             if (! isset($base32DecodeMap[$geohash[$i]])) {
-                throw new \RuntimeException('This geo hash is invalid.');
+                throw new RuntimeException('This geo hash is invalid.');
             }
 
             $currentChar = $base32DecodeMap[$geohash[$i]];
 
-            $bitsTotal = \count($this->bits);
+            $bitsTotal = count($this->bits);
             for ($j = 0; $j < $bitsTotal; ++$j) {
                 $mask = $this->bits[$j];
 
                 if ($isEven) {
-                    if (0 !== ($currentChar & $mask)) {
+                    if (($currentChar & $mask) !== 0) {
                         $longitudeInterval[0] = ($longitudeInterval[0] + $longitudeInterval[1]) / 2;
                     } else {
                         $longitudeInterval[1] = ($longitudeInterval[0] + $longitudeInterval[1]) / 2;
                     }
                 } else {
-                    if (0 !== ($currentChar & $mask)) {
+                    if (($currentChar & $mask) !== 0) {
                         $latitudeInterval[0] = ($latitudeInterval[0] + $latitudeInterval[1]) / 2;
                     } else {
                         $latitudeInterval[1] = ($latitudeInterval[0] + $latitudeInterval[1]) / 2;

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Metadata;
 
@@ -7,14 +9,18 @@ use Doctrine\Persistence\Mapping\ClassMetadataFactory;
 use Kcs\Metadata\ClassMetadataInterface;
 use Kcs\Metadata\Exception\InvalidMetadataException;
 use Kcs\Metadata\Factory\AbstractMetadataFactory;
+use Psr\Cache\CacheItemPoolInterface;
+use ReflectionClass;
 use Refugis\ODM\Elastica\Metadata\Loader\LoaderInterface;
+
+use function array_filter;
 
 class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFactory
 {
     private LoaderInterface $loader;
     private EventManager $eventManager;
 
-    public function __construct(LoaderInterface $loader, $cache = null)
+    public function __construct(LoaderInterface $loader, ?CacheItemPoolInterface $cache = null)
     {
         $this->loader = $loader;
 
@@ -59,17 +65,11 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
         return $class instanceof DocumentMetadata && $class->document;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function dispatchClassMetadataLoadedEvent(ClassMetadataInterface $classMetadata): void
     {
         // @todo
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function validate(ClassMetadataInterface $classMetadata): void
     {
         if (! $classMetadata instanceof DocumentMetadata) {
@@ -86,7 +86,7 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
             }
 
             if ($attributesMetadata->identifier) {
-                if (null !== $identifier) {
+                if ($identifier !== null) {
                     throw new InvalidMetadataException('@DocumentId should be declared at most once per class.');
                 }
 
@@ -103,18 +103,15 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
             }
 
             if ($count > 1) {
-                throw new InvalidMetadataException('@DocumentId, @IndexName and @TypeName are mutually exclusive. Please select one for "'.$attributesMetadata->getName().'"');
+                throw new InvalidMetadataException('@DocumentId, @IndexName and @TypeName are mutually exclusive. Please select one for "' . $attributesMetadata->getName() . '"');
             }
         }
 
         $classMetadata->identifier = $identifier;
-        $classMetadata->eagerFieldNames = \array_filter($classMetadata->eagerFieldNames);
+        $classMetadata->eagerFieldNames = array_filter($classMetadata->eagerFieldNames);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function createMetadata(\ReflectionClass $class): ClassMetadataInterface
+    protected function createMetadata(ReflectionClass $class): ClassMetadataInterface
     {
         return new DocumentMetadata($class);
     }

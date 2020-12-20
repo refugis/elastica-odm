@@ -1,10 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica;
 
 use Kcs\Metadata\Factory\MetadataFactoryInterface;
 use ProxyManager\Factory\LazyLoadingGhostFactory;
 use Psr\Cache\CacheItemPoolInterface;
+use ReflectionClass;
 use Refugis\ODM\Elastica\Exception\InvalidDocumentRepositoryException;
 use Refugis\ODM\Elastica\Repository\DefaultRepositoryFactory;
 use Refugis\ODM\Elastica\Repository\DocumentRepository;
@@ -100,10 +103,12 @@ final class Configuration
      * Sets default repository class.
      *
      * @throws InvalidDocumentRepositoryException
+     *
+     * @phpstan-param class-string $className
      */
     public function setDefaultRepositoryClassName(string $className): void
     {
-        $reflectionClass = new \ReflectionClass($className);
+        $reflectionClass = new ReflectionClass($className);
         if (! $reflectionClass->implementsInterface(DocumentRepositoryInterface::class)) {
             throw new InvalidDocumentRepositoryException($className);
         }
@@ -148,7 +153,7 @@ final class Configuration
      */
     public function getRepositoryFactory(): RepositoryFactoryInterface
     {
-        if (null !== $this->repositoryFactory) {
+        if ($this->repositoryFactory !== null) {
             return $this->repositoryFactory;
         }
 

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Id;
 
@@ -7,19 +9,18 @@ use Refugis\ODM\Elastica\Exception\InvalidIdentifierException;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Util\ClassUtil;
 
+use function assert;
+
 final class AssignedIdGenerator extends AbstractIdGenerator
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function generate(DocumentManagerInterface $dm, $document)
+    public function generate(DocumentManagerInterface $dm, object $document): string
     {
-        /** @var DocumentMetadata $class */
         $class = $dm->getClassMetadata(ClassUtil::getClass($document));
+        assert($class instanceof DocumentMetadata);
         $id = $class->getSingleIdentifier($document);
 
-        if (null === $id) {
-            throw new InvalidIdentifierException('Document of type "'.$class->name.'" is missing an assigned ID.'.'NONE generator strategy requires the ID field to be populated before persist is called.');
+        if ($id === null) {
+            throw new InvalidIdentifierException('Document of type "' . $class->name . '" is missing an assigned ID.' . 'NONE generator strategy requires the ID field to be populated before persist is called.');
         }
 
         return $id;

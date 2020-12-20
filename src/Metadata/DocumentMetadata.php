@@ -1,11 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Metadata;
 
-use Doctrine\Persistence\Mapping\ClassMetadata as ClassMetadataInterface;
 use Doctrine\Instantiator\Instantiator;
+use Doctrine\Persistence\Mapping\ClassMetadata as ClassMetadataInterface;
+use InvalidArgumentException;
 use Kcs\Metadata\ClassMetadata;
 use Kcs\Metadata\MetadataInterface;
+use ReflectionClass;
+
+use function array_merge;
+use function array_unique;
+use function reset;
+use function Safe\sort;
 
 final class DocumentMetadata extends ClassMetadata implements ClassMetadataInterface
 {
@@ -63,7 +72,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
      */
     private Instantiator $instantiator;
 
-    public function __construct(\ReflectionClass $class)
+    public function __construct(ReflectionClass $class)
     {
         parent::__construct($class);
 
@@ -83,15 +92,19 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     {
         parent::addAttributeMetadata($metadata);
 
-        if ($metadata instanceof FieldMetadata && isset($metadata->fieldName)) {
-            $this->fieldNames[] = $metadata->fieldName;
-            \sort($this->fieldNames);
-
-            if (! $metadata->lazy) {
-                $this->eagerFieldNames[] = $metadata->fieldName;
-                \sort($this->eagerFieldNames);
-            }
+        if (! ($metadata instanceof FieldMetadata) || ! isset($metadata->fieldName)) {
+            return;
         }
+
+        $this->fieldNames[] = $metadata->fieldName;
+        sort($this->fieldNames);
+
+        if ($metadata->lazy) {
+            return;
+        }
+
+        $this->eagerFieldNames[] = $metadata->fieldName;
+        sort($this->eagerFieldNames);
     }
 
     /**
@@ -103,13 +116,13 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     {
         parent::merge($metadata);
 
-        $this->customRepositoryClassName = $this->customRepositoryClassName ?? $metadata->customRepositoryClassName;
-        $this->collectionName = $this->collectionName ?? $metadata->collectionName;
-        $this->identifier = $this->identifier ?? $metadata->identifier;
-        $this->idGeneratorType = $this->idGeneratorType ?? $metadata->idGeneratorType;
+        $this->customRepositoryClassName ??= $metadata->customRepositoryClassName;
+        $this->collectionName ??= $metadata->collectionName;
+        $this->identifier ??= $metadata->identifier;
+        $this->idGeneratorType ??= $metadata->idGeneratorType;
 
-        $this->eagerFieldNames = \array_unique(\array_merge($this->eagerFieldNames, $metadata->eagerFieldNames));
-        \sort($this->eagerFieldNames);
+        $this->eagerFieldNames = array_unique(array_merge($this->eagerFieldNames, $metadata->eagerFieldNames));
+        sort($this->eagerFieldNames);
     }
 
     /**
@@ -231,10 +244,10 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     {
         $class = $this->name;
         if (! $object instanceof $class) {
-            throw new \InvalidArgumentException('Unexpected object class');
+            throw new InvalidArgumentException('Unexpected object class');
         }
 
-        if (null === $this->identifier) {
+        if ($this->identifier === null) {
             return [];
         }
 
@@ -255,7 +268,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
             return null;
         }
 
-        return \reset($id);
+        return reset($id);
     }
 
     public function setIdentifierValue($object, $value): void

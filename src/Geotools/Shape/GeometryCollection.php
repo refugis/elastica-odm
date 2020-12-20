@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Geotools\Shape;
 
@@ -10,9 +12,7 @@ use Doctrine\Common\Collections\Collection;
  */
 final class GeometryCollection extends Geoshape
 {
-    /**
-     * @var Collection<Geoshape>
-     */
+    /** @var Collection<Geoshape> */
     private Collection $geometries;
 
     public function __construct(Geoshape ...$geoshapes)

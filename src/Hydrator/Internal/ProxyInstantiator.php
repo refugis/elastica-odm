@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Hydrator\Internal;
 
@@ -8,11 +10,14 @@ use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 
+use function array_map;
+use function assert;
+use function in_array;
+use function strtolower;
+
 class ProxyInstantiator implements InstantiatorInterface
 {
-    /**
-     * @var string[]
-     */
+    /** @var string[] */
     private array $fields;
     private DocumentManagerInterface $manager;
 
@@ -30,13 +35,16 @@ class ProxyInstantiator implements InstantiatorInterface
         return $this->createProxy($className, $this->fields);
     }
 
+    /**
+     * @phpstan-param class-string $className
+     */
     private function createProxy(string $className, array $fields): GhostObjectInterface
     {
-        /** @var DocumentMetadata $class */
         $class = $this->manager->getClassMetadata($className);
+        assert($class instanceof DocumentMetadata);
 
-        $allowedMethods = \array_map(static function (string $field) {
-            return \strtolower('get'.$field);
+        $allowedMethods = array_map(static function (string $field) {
+            return strtolower('get' . $field);
         }, $fields);
 
         $initializer = function (
@@ -44,12 +52,15 @@ class ProxyInstantiator implements InstantiatorInterface
             string $method,
             array $parameters,
             &$initializer
-        ) use ($fields, $allowedMethods): bool {
-            if (('__get' === $method || '__set' === $method) && \in_array($parameters['name'], $fields, true)) {
+        ) use (
+            $fields,
+            $allowedMethods
+): bool {
+            if (($method === '__get' || $method === '__set') && in_array($parameters['name'], $fields, true)) {
                 return false;
             }
 
-            if (\in_array(\strtolower($method), $allowedMethods, true)) {
+            if (in_array(strtolower($method), $allowedMethods, true)) {
                 return false;
             }
 
@@ -65,7 +76,7 @@ class ProxyInstantiator implements InstantiatorInterface
                 continue;
             }
 
-            if ($field->isStored() && ! \in_array($field->getName(), $fields, true)) {
+            if ($field->isStored() && ! in_array($field->getName(), $fields, true)) {
                 continue;
             }
 
@@ -80,9 +91,7 @@ class ProxyInstantiator implements InstantiatorInterface
             }
         }
 
-        $proxyOptions = [
-            'skippedProperties' => $skippedProperties,
-        ];
+        $proxyOptions = ['skippedProperties' => $skippedProperties];
 
         return $this->manager->getProxyFactory()->createProxy($className, $initializer, $proxyOptions);
     }

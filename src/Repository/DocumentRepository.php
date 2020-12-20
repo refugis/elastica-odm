@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Repository;
 
@@ -14,6 +16,8 @@ class DocumentRepository implements DocumentRepositoryInterface
 {
     protected DocumentManagerInterface $dm;
     protected DocumentMetadata $class;
+
+    /** @phpstan-var class-string */
     protected string $documentClass;
     protected UnitOfWork $uow;
 
@@ -44,7 +48,7 @@ class DocumentRepository implements DocumentRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null): array
+    public function findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null): array
     {
         return $this->getDocumentPersister()->loadAll($criteria, $orderBy, $limit, $offset);
     }
@@ -57,25 +61,16 @@ class DocumentRepository implements DocumentRepositoryInterface
         return $this->getDocumentPersister()->load($criteria);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getClassName(): string
     {
         return $this->documentClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function matching(Criteria $criteria): Collection
     {
         // TODO: Implement matching() method.
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createSearch(): Search
     {
         return $this->dm->createSearch($this->documentClass);

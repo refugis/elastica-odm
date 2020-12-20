@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Type;
 
@@ -30,9 +32,6 @@ final class IpType extends AbstractType
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return self::NAME;

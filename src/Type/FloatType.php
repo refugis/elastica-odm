@@ -1,8 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Type;
 
+use InvalidArgumentException;
 use Refugis\ODM\Elastica\Exception\ConversionFailedException;
+
+use function is_float;
 
 final class FloatType extends AbstractType
 {
@@ -13,7 +18,7 @@ final class FloatType extends AbstractType
      */
     public function toPHP($value, array $options = []): ?float
     {
-        if (null === $value) {
+        if ($value === null) {
             return null;
         }
 
@@ -25,20 +30,17 @@ final class FloatType extends AbstractType
      */
     public function toDatabase($value, array $options = []): ?float
     {
-        if (null === $value) {
+        if ($value === null) {
             return null;
         }
 
-        if (! \is_float($value)) {
+        if (! is_float($value)) {
             throw new ConversionFailedException($value, 'float');
         }
 
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return self::NAME;
@@ -59,7 +61,7 @@ final class FloatType extends AbstractType
                 break;
 
             default:
-                throw new \InvalidArgumentException('Invalid length for float field');
+                throw new InvalidArgumentException('Invalid length for float field');
         }
 
         return ['type' => $type];

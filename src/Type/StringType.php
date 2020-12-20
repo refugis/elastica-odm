@@ -1,8 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Type;
 
 use Refugis\ODM\Elastica\Exception\ConversionFailedException;
+
+use function array_filter;
+use function is_string;
 
 final class StringType extends AbstractType
 {
@@ -13,7 +18,7 @@ final class StringType extends AbstractType
      */
     public function toPHP($value, array $options = []): ?string
     {
-        if (null === $value) {
+        if ($value === null) {
             return null;
         }
 
@@ -25,20 +30,17 @@ final class StringType extends AbstractType
      */
     public function toDatabase($value, array $options = []): ?string
     {
-        if (null === $value) {
+        if ($value === null) {
             return null;
         }
 
-        if (! \is_string($value)) {
+        if (! is_string($value)) {
             throw new ConversionFailedException($value, 'string');
         }
 
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return self::NAME;
@@ -49,9 +51,9 @@ final class StringType extends AbstractType
      */
     public function getMappingDeclaration(array $options = []): array
     {
-        $type = ($options['analyzed'] ?? true) ? 'text' : 'keyword';
+        $type = $options['analyzed'] ?? true ? 'text' : 'keyword';
 
-        return \array_filter([
+        return array_filter([
             'type' => $type,
             'analyzer' => $options['analyzer'] ?? null,
             'search_analyzer' => $options['search_analyzer'] ?? null,

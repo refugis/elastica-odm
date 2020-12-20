@@ -1,24 +1,22 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Type;
+
+use DateTimeImmutable;
 
 final class DateTimeImmutableType extends AbstractDateTimeType
 {
     public const NAME = 'datetime_immutable';
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getClass(): string
     {
-        return \DateTimeImmutable::class;
+        return DateTimeImmutable::class;
     }
 }

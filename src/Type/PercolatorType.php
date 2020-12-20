@@ -1,9 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Type;
 
 use Elastica\Query;
 use Refugis\ODM\Elastica\Exception\ConversionFailedException;
+
+use function is_array;
 
 final class PercolatorType extends AbstractType
 {
@@ -14,11 +18,11 @@ final class PercolatorType extends AbstractType
      */
     public function toPHP($value, array $options = []): ?Query
     {
-        if (null === $value) {
+        if ($value === null) {
             return null;
         }
 
-        if (! \is_array($value) && ! $value instanceof Query) {
+        if (! is_array($value) && ! $value instanceof Query) {
             throw new ConversionFailedException($value, 'array');
         }
 
@@ -42,16 +46,13 @@ final class PercolatorType extends AbstractType
             return $value->toArray();
         }
 
-        if (\is_array($value)) {
+        if (is_array($value)) {
             return $value;
         }
 
         throw new ConversionFailedException($value, [Query::class, Query\AbstractQuery::class, 'array']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return self::NAME;

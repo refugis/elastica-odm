@@ -1,14 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Internal;
 
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
+use function array_filter;
+use function array_reverse;
+use function in_array;
+use function iterator_to_array;
+
 final class CommitOrderCalculator
 {
-    /**
-     * @var DocumentGraph
-     */
+    /** @var DocumentGraph */
     private $graph;
 
     public function __construct()
@@ -19,8 +24,6 @@ final class CommitOrderCalculator
     /**
      * Adds a document class to the dependency graph
      * and evaluates its associations.
-     *
-     * @param DocumentMetadata $metadata
      */
     public function addClass(DocumentMetadata $metadata): void
     {
@@ -43,12 +46,12 @@ final class CommitOrderCalculator
      */
     public function getOrder(array $classNames): array
     {
-        $elements = \array_filter(\iterator_to_array($this->graph), static function ($element) use ($classNames): bool {
+        $elements = array_filter(iterator_to_array($this->graph), static function ($element) use ($classNames): bool {
             [$node] = $element;
 
-            return \in_array($node->getClassName(), $classNames, true);
+            return in_array($node->getClassName(), $classNames, true);
         });
 
-        return \array_reverse($elements, false);
+        return array_reverse($elements, false);
     }
 }

@@ -1,6 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Type;
+
+use function base64_encode;
+use function Safe\base64_decode;
 
 final class BinaryType extends AbstractType
 {
@@ -15,7 +20,7 @@ final class BinaryType extends AbstractType
             return null;
         }
 
-        return \base64_decode($value, true);
+        return base64_decode($value, true);
     }
 
     /**
@@ -27,12 +32,9 @@ final class BinaryType extends AbstractType
             return null;
         }
 
-        return \base64_encode($value);
+        return base64_encode($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return self::NAME;

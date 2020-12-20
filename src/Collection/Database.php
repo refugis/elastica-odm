@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Collection;
 
@@ -6,13 +8,14 @@ use Elastica\Client;
 use Elastica\SearchableInterface;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
+use function assert;
+use function explode;
+
 class Database implements DatabaseInterface
 {
     protected Client $elasticSearch;
 
-    /**
-     * @var CollectionInterface[]
-     */
+    /** @var CollectionInterface[] */
     private array $collectionList;
 
     public function __construct(Client $elasticSearch)
@@ -21,17 +24,11 @@ class Database implements DatabaseInterface
         $this->collectionList = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getConnection(): Client
     {
         return $this->elasticSearch;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCollection(DocumentMetadata $class): CollectionInterface
     {
         if (isset($this->collectionList[$class->name])) {
@@ -47,10 +44,11 @@ class Database implements DatabaseInterface
 
     protected function getSearchable(DocumentMetadata $class): SearchableInterface
     {
-        [$indexName, $typeName] = \explode('/', $class->collectionName, 2) + [null, null];
+        [$indexName, $typeName] = explode('/', $class->collectionName, 2) + [null, null];
+        assert($indexName !== null);
 
         $searchable = $this->elasticSearch->getIndex($indexName);
-        if (null !== $typeName) {
+        if ($typeName !== null) {
             $searchable = $searchable->getType($typeName);
         }
 

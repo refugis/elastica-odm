@@ -1,8 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Type;
 
+use DateTime;
+use DateTimeInterface;
+use InvalidArgumentException;
 use Refugis\ODM\Elastica\Exception\ConversionFailedException;
+
+use function assert;
+use function preg_replace_callback;
+use function Safe\preg_match;
+use function Safe\substr;
 
 abstract class AbstractDateTimeType extends AbstractType
 {
@@ -17,8 +27,8 @@ abstract class AbstractDateTimeType extends AbstractType
             return null;
         }
 
-        if ($value instanceof \DateTimeInterface) {
-            $value = $value->format(\DateTime::ATOM);
+        if ($value instanceof DateTimeInterface) {
+            $value = $value->format(DateTime::ATOM);
         }
 
         $class = $this->getClass();
@@ -40,7 +50,9 @@ abstract class AbstractDateTimeType extends AbstractType
             throw new ConversionFailedException($value, $class);
         }
 
-        return $value->format($options['format'] ?? \DateTime::ATOM);
+        assert($value instanceof DateTimeInterface);
+
+        return $value->format($options['format'] ?? DateTime::ATOM);
     }
 
     /**
@@ -50,24 +62,22 @@ abstract class AbstractDateTimeType extends AbstractType
     {
         return [
             'type' => 'date',
-            'format' => $this->toJoda($options['format'] ?? \DateTime::ISO8601),
+            'format' => $this->toJoda($options['format'] ?? DateTime::ISO8601),
         ];
     }
 
     /**
      * Gets the target datetime class.
-     *
-     * @return string
      */
     abstract protected function getClass(): string;
 
     private function toJoda(string $format)
     {
-        if ('U' === $format) {
+        if ($format === 'U') {
             return 'epoch_second';
         }
 
-        return \preg_replace_callback('/(\\\\[a-z0-9]|.)/i', static function ($match): string {
+        return preg_replace_callback('/(\\\\[a-z0-9]|.)/i', static function ($match): string {
             $token = $match[1];
             switch ($token) {
                 case 'd':       // Day of the month, 2 digits with leading zeros
@@ -160,13 +170,14 @@ abstract class AbstractDateTimeType extends AbstractType
                 case 'Z':       // Timezone offset in seconds.
                 case 'U':       // UNIX timestamp.
                 case 'r':       // RFC 2822 formatted date
-                    throw new \InvalidArgumentException('Cannot convert token "'.$token.'" for date format');
+                    throw new InvalidArgumentException('Cannot convert token "' . $token . '" for date format');
+
                 default:
-                    if ('\\' === $token[0]) {
-                        $token = \substr($token, 1);
+                    if ($token[0] === '\\') {
+                        $token = substr($token, 1);
                     }
 
-                    if (\preg_match('/[a-z0-9]/i', $token)) {
+                    if (preg_match('/[a-z0-9]/i', $token)) {
                         return "'$token'";
                     }
 

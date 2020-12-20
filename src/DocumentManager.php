@@ -1,9 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica;
 
 use Doctrine\Common\EventManager;
 use Elastica\Query;
+use InvalidArgumentException;
 use Kcs\Metadata\Factory\MetadataFactoryInterface;
 use ProxyManager\Factory\LazyLoadingGhostFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
@@ -14,7 +17,6 @@ use Refugis\ODM\Elastica\Collection\DatabaseInterface;
 use Refugis\ODM\Elastica\Hydrator\HydratorInterface;
 use Refugis\ODM\Elastica\Hydrator\Internal\ProxyInstantiator;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
-use Refugis\ODM\Elastica\Metadata\MetadataFactory;
 use Refugis\ODM\Elastica\Persister\Hints;
 use Refugis\ODM\Elastica\Repository\DocumentRepositoryInterface;
 use Refugis\ODM\Elastica\Repository\RepositoryFactoryInterface;
@@ -22,10 +24,16 @@ use Refugis\ODM\Elastica\Search\Search;
 use Refugis\ODM\Elastica\Type\TypeManager;
 use Refugis\ODM\Elastica\Util\ClassUtil;
 
+use function assert;
+use function get_parent_class;
+use function gettype;
+use function is_object;
+use function is_subclass_of;
+
 class DocumentManager implements DocumentManagerInterface
 {
     private DatabaseInterface $database;
-    private MetadataFactory $metadataFactory;
+    private MetadataFactoryInterface $metadataFactory;
     private LazyLoadingGhostFactory $proxyFactory;
     private TypeManager $typeManager;
     private UnitOfWork $unitOfWork;
@@ -33,7 +41,7 @@ class DocumentManager implements DocumentManagerInterface
     private RepositoryFactoryInterface $repositoryFactory;
     private ?CacheItemPoolInterface $resultCache;
 
-    public function __construct(DatabaseInterface $database, Configuration $configuration, EventManager $eventManager = null)
+    public function __construct(DatabaseInterface $database, Configuration $configuration, ?EventManager $eventManager = null)
     {
         $this->database = $database;
         $this->eventManager = $eventManager ?: new EventManager();
@@ -66,7 +74,7 @@ class DocumentManager implements DocumentManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getReference($className, $id): object
+    public function getReference(string $className, $id): object
     {
         $class = $this->getClassMetadata($className);
         if ($document = $this->unitOfWork->tryGetById($id, $class)) {
@@ -86,8 +94,8 @@ class DocumentManager implements DocumentManagerInterface
      */
     public function persist($object): void
     {
-        if (! \is_object($object)) {
-            throw new \InvalidArgumentException('Expected object, '.\gettype($object).' given.');
+        if (! is_object($object)) {
+            throw new InvalidArgumentException('Expected object, ' . gettype($object) . ' given.');
         }
 
         $this->unitOfWork->persist($object);
@@ -98,8 +106,8 @@ class DocumentManager implements DocumentManagerInterface
      */
     public function remove($object): void
     {
-        if (! \is_object($object)) {
-            throw new \InvalidArgumentException('Expected object, '.\gettype($object).' given.');
+        if (! is_object($object)) {
+            throw new InvalidArgumentException('Expected object, ' . gettype($object) . ' given.');
         }
 
         $this->unitOfWork->remove($object);
@@ -110,8 +118,8 @@ class DocumentManager implements DocumentManagerInterface
      */
     public function merge($object): object
     {
-        if (! \is_object($object)) {
-            throw new \InvalidArgumentException('Expected object, '.\gettype($object).' given.');
+        if (! is_object($object)) {
+            throw new InvalidArgumentException('Expected object, ' . gettype($object) . ' given.');
         }
 
         return $this->unitOfWork->merge($object);
@@ -130,8 +138,8 @@ class DocumentManager implements DocumentManagerInterface
      */
     public function detach($object): void
     {
-        if (! \is_object($object)) {
-            throw new \InvalidArgumentException('Expected object, '.\gettype($object).' given.');
+        if (! is_object($object)) {
+            throw new InvalidArgumentException('Expected object, ' . gettype($object) . ' given.');
         }
 
         $this->unitOfWork->detach($object);
@@ -148,9 +156,6 @@ class DocumentManager implements DocumentManagerInterface
         $persister->load(['_id' => $class->getSingleIdentifier($object)], [Hints::HINT_REFRESH => true], $object);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function flush(): void
     {
         $this->unitOfWork->commit();
@@ -169,16 +174,16 @@ class DocumentManager implements DocumentManagerInterface
      */
     public function getClassMetadata($className): DocumentMetadata
     {
-        if (\is_subclass_of($className, ProxyInterface::class)) {
-            $className = \get_parent_class($className);
+        if (is_subclass_of($className, ProxyInterface::class)) {
+            $className = get_parent_class($className);
         }
 
-        return $this->metadataFactory->getMetadataFor($className);
+        $metadata = $this->metadataFactory->getMetadataFor($className);
+        assert($metadata instanceof DocumentMetadata);
+
+        return $metadata;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMetadataFactory(): MetadataFactoryInterface
     {
         return $this->metadataFactory;
@@ -189,9 +194,11 @@ class DocumentManager implements DocumentManagerInterface
      */
     public function initializeObject($obj): void
     {
-        if ($obj instanceof LazyLoadingInterface) {
-            $obj->initializeProxy();
+        if (! ($obj instanceof LazyLoadingInterface)) {
+            return;
         }
+
+        $obj->initializeProxy();
     }
 
     /**
@@ -199,56 +206,38 @@ class DocumentManager implements DocumentManagerInterface
      */
     public function contains($object): bool
     {
-        if (! \is_object($object)) {
-            throw new \InvalidArgumentException('Expected object, '.\gettype($object).' given.');
+        if (! is_object($object)) {
+            throw new InvalidArgumentException('Expected object, ' . gettype($object) . ' given.');
         }
 
         return $this->unitOfWork->isInIdentityMap($object);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getProxyFactory(): LazyLoadingGhostFactory
     {
         return $this->proxyFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDatabase(): DatabaseInterface
     {
         return $this->database;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEventManager(): EventManager
     {
         return $this->eventManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUnitOfWork(): UnitOfWork
     {
         return $this->unitOfWork;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTypeManager(): TypeManager
     {
         return $this->typeManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCollection(string $className): CollectionInterface
     {
         $class = $this->getClassMetadata($className);
@@ -256,17 +245,11 @@ class DocumentManager implements DocumentManagerInterface
         return $this->database->getCollection($class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResultCache(): ?CacheItemPoolInterface
     {
         return $this->resultCache;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function newHydrator(int $hydrationMode): HydratorInterface
     {
         switch ($hydrationMode) {
@@ -274,12 +257,9 @@ class DocumentManager implements DocumentManagerInterface
                 return new Hydrator\ObjectHydrator($this);
         }
 
-        throw new \InvalidArgumentException('Invalid hydration mode '.$hydrationMode);
+        throw new InvalidArgumentException('Invalid hydration mode ' . $hydrationMode);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createSearch(string $className): Search
     {
         $collection = $this->getCollection($className);

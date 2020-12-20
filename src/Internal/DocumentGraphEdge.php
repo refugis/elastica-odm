@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Internal;
 
@@ -9,14 +11,10 @@ namespace Refugis\ODM\Elastica\Internal;
  */
 final class DocumentGraphEdge
 {
-    /**
-     * @var DocumentGraphNode
-     */
+    /** @var DocumentGraphNode */
     private $source;
 
-    /**
-     * @var DocumentGraphNode
-     */
+    /** @var DocumentGraphNode */
     private $destination;
 
     public function __construct(DocumentGraphNode $source, DocumentGraphNode $destination)
@@ -25,17 +23,11 @@ final class DocumentGraphEdge
         $this->destination = $destination;
     }
 
-    /**
-     * @return DocumentGraphNode
-     */
     public function getSource(): DocumentGraphNode
     {
         return $this->source;
     }
 
-    /**
-     * @return DocumentGraphNode
-     */
     public function getDestination(): DocumentGraphNode
     {
         return $this->destination;

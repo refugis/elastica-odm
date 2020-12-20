@@ -1,12 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Metadata\Loader;
-
 
 use Kcs\ClassFinder\Finder\FinderInterface;
 use Kcs\Metadata\ClassMetadataInterface;
 use Kcs\Metadata\Loader\Processor\ProcessorFactoryInterface;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
+use TypeError;
+
+use function get_debug_type;
+use function Safe\sprintf;
 
 trait AnnotationLoaderTrait
 {
@@ -19,11 +25,12 @@ trait AnnotationLoaderTrait
         parent::__construct($processorFactory);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function loadClassMetadata(ClassMetadataInterface $classMetadata): bool
     {
+        if (! $classMetadata instanceof DocumentMetadata) {
+            throw new TypeError(sprintf('Argument #1 passed to %s must be an instance of %s, %s given', __METHOD__, DocumentMetadata::class, get_debug_type($classMetadata)));
+        }
+
         $reflectionClass = $classMetadata->getReflectionClass();
         $this->processClassDescriptors($classMetadata, $this->getClassDescriptors($reflectionClass));
 

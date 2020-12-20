@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Tools;
 
@@ -6,6 +8,8 @@ use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Tools\Schema\Collection;
 use Refugis\ODM\Elastica\Tools\Schema\Schema;
+
+use function assert;
 
 final class SchemaGenerator
 {
@@ -22,8 +26,8 @@ final class SchemaGenerator
         $mappingGenerator = new MappingGenerator($this->documentManager->getTypeManager());
         $factory = $this->documentManager->getMetadataFactory();
 
-        /** @var DocumentMetadata $metadata */
         foreach ($factory->getAllMetadata() as $metadata) {
+            assert($metadata instanceof DocumentMetadata);
             $mapping = $mappingGenerator->getMapping($metadata);
             $schema->addCollection(new Collection($metadata, $mapping));
         }

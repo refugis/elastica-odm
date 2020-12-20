@@ -1,8 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Type;
 
 use Doctrine\Persistence\ManagerRegistry;
+use InvalidArgumentException;
+
+use function array_values;
+use function count;
+use function Safe\sprintf;
 
 abstract class AbstractDoctrineType extends AbstractType
 {
@@ -18,17 +25,17 @@ abstract class AbstractDoctrineType extends AbstractType
      */
     public function toPHP($value, array $options = []): ?object
     {
-        if (null === $value) {
+        if ($value === null) {
             return null;
         }
 
         if (! isset($options['class'])) {
-            throw new \InvalidArgumentException('Missing object fully qualified name.');
+            throw new InvalidArgumentException('Missing object fully qualified name.');
         }
 
         $om = $this->registry->getManagerForClass($options['class']);
-        if (null === $om) {
-            throw new \InvalidArgumentException(\sprintf('%s is not used in any registered object manager.', $options['class']));
+        if ($om === null) {
+            throw new InvalidArgumentException(sprintf('%s is not used in any registered object manager.', $options['class']));
         }
 
         return $om->find($options['class'], $value['identifier']);
@@ -39,22 +46,22 @@ abstract class AbstractDoctrineType extends AbstractType
      */
     public function toDatabase($value, array $options = []): ?array
     {
-        if (null === $value) {
+        if ($value === null) {
             return null;
         }
 
         if (! isset($options['class'])) {
-            throw new \InvalidArgumentException('Missing object fully qualified name.');
+            throw new InvalidArgumentException('Missing object fully qualified name.');
         }
 
         $om = $this->registry->getManagerForClass($options['class']);
-        if (null === $om) {
-            throw new \InvalidArgumentException(\sprintf('%s is not used in any registered object manager.', $options['class']));
+        if ($om === null) {
+            throw new InvalidArgumentException(sprintf('%s is not used in any registered object manager.', $options['class']));
         }
 
         $class = $om->getClassMetadata($options['class']);
-        if (1 === \count($class->getIdentifier())) {
-            $id = \array_values($class->getIdentifierValues($value))[0];
+        if (count($class->getIdentifier()) === 1) {
+            $id = array_values($class->getIdentifierValues($value))[0];
         } else {
             $id = $class->getIdentifierValues($value);
         }
@@ -62,12 +69,10 @@ abstract class AbstractDoctrineType extends AbstractType
         return ['identifier' => $id];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
-        return static::NAME;
+        /* @phpstan-ignore-next-line */
+        return self::NAME;
     }
 
     /**

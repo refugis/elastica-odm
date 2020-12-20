@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Metadata\Processor;
 
@@ -24,7 +26,7 @@ class DocumentIdProcessor implements ProcessorInterface
     {
         $metadata->identifier = true;
 
-        if ('auto' === $subject->strategy) {
+        if ($subject->strategy === 'auto') {
             $metadata->documentMetadata->idGeneratorType = DocumentMetadata::GENERATOR_TYPE_AUTO;
         } else {
             $metadata->documentMetadata->idGeneratorType = DocumentMetadata::GENERATOR_TYPE_NONE;

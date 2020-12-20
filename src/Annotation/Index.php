@@ -1,35 +1,38 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Annotation;
 
 use Doctrine\Common\Annotations\Annotation\Target;
-use function Safe\sprintf;
+
+use const Attribute;
 
 /**
  * @Annotation
  * @Target({"CLASS"})
  */
-#[\Attribute]
+#[Attribute]
 final class Index
 {
     /**
      * The filters of this index.
      *
-     * @var \Refugis\ODM\Elastica\Annotation\Filter[]
+     * @var Filter[]
      */
     public array $filters;
 
     /**
      * The analyzers of this index.
      *
-     * @var \Refugis\ODM\Elastica\Annotation\Analyzer[]
+     * @var Analyzer[]
      */
     public array $analyzers;
 
     /**
      * The tokenizers of this index.
      *
-     * @var \Refugis\ODM\Elastica\Annotation\Tokenizer[]
+     * @var Tokenizer[]
      */
     public array $tokenizers;
 
@@ -38,7 +41,7 @@ final class Index
         if (isset($filters['filters']) || isset($filters['analyzers']) || isset($filters['tokenizers'])) {
             $data = $filters;
         } else {
-            $data = [ 'filters' => $filters ];
+            $data = ['filters' => $filters];
         }
 
         $this->filters = $data['filters'] ?? [];

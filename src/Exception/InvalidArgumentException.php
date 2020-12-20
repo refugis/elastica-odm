@@ -1,6 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Exception;
+
+use function get_class;
+use function method_exists;
+use function spl_object_hash;
 
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {
@@ -9,6 +15,6 @@ class InvalidArgumentException extends \InvalidArgumentException implements Exce
      */
     protected static function objToStr(object $obj): string
     {
-        return \method_exists($obj, '__toString') ? (string) $obj : \get_class($obj).'@'.\spl_object_hash($obj);
+        return method_exists($obj, '__toString') ? (string) $obj : get_class($obj) . '@' . spl_object_hash($obj);
     }
 }

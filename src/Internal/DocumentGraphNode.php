@@ -1,6 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Internal;
+
+use Countable;
+use Generator;
+use IteratorAggregate;
+
+use function count;
 
 /**
  * Represents a document dependency graph node.
@@ -9,21 +17,15 @@ namespace Refugis\ODM\Elastica\Internal;
  *
  * @internal
  */
-final class DocumentGraphNode implements \Countable, \IteratorAggregate
+final class DocumentGraphNode implements Countable, IteratorAggregate
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $className;
 
-    /**
-     * @var DocumentGraphEdge[]
-     */
+    /** @var DocumentGraphEdge[] */
     private $inEdges;
 
-    /**
-     * @var DocumentGraphEdge[]
-     */
+    /** @var DocumentGraphEdge[] */
     private $outEdges;
 
     public function __construct(string $className)
@@ -36,8 +38,6 @@ final class DocumentGraphNode implements \Countable, \IteratorAggregate
 
     /**
      * Adds an in edge to this node.
-     *
-     * @param DocumentGraphEdge $edge
      */
     public function addInEdge(DocumentGraphEdge $edge): void
     {
@@ -46,8 +46,6 @@ final class DocumentGraphNode implements \Countable, \IteratorAggregate
 
     /**
      * Adds an out edge from this node.
-     *
-     * @param DocumentGraphEdge $edge
      */
     public function addOutEdge(DocumentGraphEdge $edge): void
     {
@@ -56,8 +54,6 @@ final class DocumentGraphNode implements \Countable, \IteratorAggregate
 
     /**
      * Gets the document class name.
-     *
-     * @return string
      */
     public function getClassName(): string
     {
@@ -69,18 +65,15 @@ final class DocumentGraphNode implements \Countable, \IteratorAggregate
      *
      * Traverse the graph through the out edges.
      *
-     * @return \Generator|DocumentGraphEdge[]
+     * @return Generator|DocumentGraphEdge[]
      */
-    public function getIterator(): \Generator
+    public function getIterator(): Generator
     {
         yield from $this->outEdges;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(): int
     {
-        return \count($this->inEdges);
+        return count($this->inEdges);
     }
 }

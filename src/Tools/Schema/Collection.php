@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Tools\Schema;
 
@@ -10,9 +12,7 @@ class Collection
 {
     private DocumentMetadata $documentMetadata;
 
-    /**
-     * @var TypeMapping|Mapping
-     */
+    /** @var TypeMapping|Mapping */
     private object $mapping;
 
     public function __construct(DocumentMetadata $documentMetadata, object $mapping)
@@ -21,9 +21,6 @@ class Collection
         $this->mapping = $mapping;
     }
 
-    /**
-     * @return DocumentMetadata
-     */
     public function getDocumentMetadata(): DocumentMetadata
     {
         return $this->documentMetadata;

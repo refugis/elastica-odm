@@ -1,6 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Geotools\Coordinate;
+
+use InvalidArgumentException;
+
+use function count;
+use function fmod;
+use function is_array;
+use function is_string;
+use function max;
+use function min;
+use function Safe\preg_match;
+use function strtoupper;
 
 class Coordinate implements CoordinateInterface
 {
@@ -19,17 +32,17 @@ class Coordinate implements CoordinateInterface
      *
      * @param array|string $coordinates the coordinates
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function __construct($coordinates)
     {
-        if (\is_array($coordinates) && 2 === \count($coordinates)) {
+        if (is_array($coordinates) && count($coordinates) === 2) {
             $this->setLatitude($coordinates[0]);
             $this->setLongitude($coordinates[1]);
-        } elseif (\is_string($coordinates)) {
+        } elseif (is_string($coordinates)) {
             $this->setFromString($coordinates);
         } else {
-            throw new \InvalidArgumentException('It should be a string or an array');
+            throw new InvalidArgumentException('It should be a string or an array');
         }
     }
 
@@ -55,56 +68,38 @@ class Coordinate implements CoordinateInterface
         return new self($coordinates);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function normalizeLatitude(float $latitude): float
     {
-        return (float) \max(-90, \min(90, $latitude));
+        return (float) max(-90, min(90, $latitude));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function normalizeLongitude(float $longitude): float
     {
-        if (180 === $longitude % 360) {
+        if ($longitude % 360 === 180) {
             return 180.0;
         }
 
-        $mod = \fmod($longitude, 360);
+        $mod = fmod($longitude, 360);
         $longitude = $mod < -180 ? $mod + 360 : ($mod > 180 ? $mod - 360 : $mod);
 
         return (float) $longitude;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setLatitude(float $latitude): void
     {
         $this->latitude = $this->normalizeLatitude($latitude);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLatitude(): float
     {
         return $this->latitude;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setLongitude(float $longitude): void
     {
         $this->longitude = $this->normalizeLongitude($longitude);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLongitude(): float
     {
         return $this->longitude;
@@ -113,12 +108,12 @@ class Coordinate implements CoordinateInterface
     /**
      * Creates a valid and acceptable geographic coordinates.
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function setFromString(string $coordinates): void
     {
-        if (! \is_string($coordinates)) {
-            throw new \InvalidArgumentException('The given coordinates should be a string!');
+        if (! is_string($coordinates)) {
+            throw new InvalidArgumentException('The given coordinates should be a string!');
         }
 
         $inDecimalDegree = $this->toDecimalDegrees($coordinates);
@@ -129,24 +124,29 @@ class Coordinate implements CoordinateInterface
     /**
      * Converts a valid and acceptable geographic coordinates to decimal degrees coordinate.
      *
+     * @see http://en.wikipedia.org/wiki/Geographic_coordinate_conversion
+     *
      * @param string $coordinates a valid and acceptable geographic coordinates
      *
      * @return string[] an array of coordinate in decimal degree
      *
-     * @throws \InvalidArgumentException
-     *
-     * @see http://en.wikipedia.org/wiki/Geographic_coordinate_conversion
+     * @throws InvalidArgumentException
      */
     private function toDecimalDegrees(string $coordinates): array
     {
         // 40.446195, -79.948862
-        if (\preg_match('/(\-?\d{1,2}\.?\d*)[, ] ?(\-?\d{1,3}\.?\d*)$/', $coordinates, $match)) {
-            return [$match[1], $match[2]];
+        if (preg_match('/(\-?\d{1,2}\.?\d*)[, ] ?(\-?\d{1,3}\.?\d*)$/', $coordinates, $match)) {
+            return [(float) $match[1], (float) $match[2]];
         }
 
         // 40° 26.7717, -79° 56.93172
-        if (\preg_match('/(\-?\d{1,2})\D+(\d{1,2}\.?\d*)[, ] ?(\-?\d{1,3})\D+(\d{1,2}\.?\d*)$/',
-            $coordinates, $match)) {
+        if (
+            preg_match(
+                '/(\-?\d{1,2})\D+(\d{1,2}\.?\d*)[, ] ?(\-?\d{1,3})\D+(\d{1,2}\.?\d*)$/',
+                $coordinates,
+                $match
+            )
+        ) {
             return [
                 $match[1] + $match[2] / 60,
                 $match[3] < 0
@@ -156,23 +156,28 @@ class Coordinate implements CoordinateInterface
         }
 
         // 40.446195N 79.948862W
-        if (\preg_match('/(\d{1,2}\.?\d*)\D*([ns])[, ] ?(\d{1,3}\.?\d*)\D*([we])$/i', $coordinates, $match)) {
+        if (preg_match('/(\d{1,2}\.?\d*)\D*([ns])[, ] ?(\d{1,3}\.?\d*)\D*([we])$/i', $coordinates, $match)) {
             return [
-                'N' === \strtoupper($match[2]) ? $match[1] : -$match[1],
-                'E' === \strtoupper($match[4]) ? $match[3] : -$match[3],
+                (float) (strtoupper($match[2]) === 'N' ? $match[1] : -$match[1]),
+                (float) (strtoupper($match[4]) === 'E' ? $match[3] : -$match[3]),
             ];
         }
 
         // 40°26.7717S 79°56.93172E
         // 25°59.86′N,21°09.81′W
-        if (\preg_match('/(\d{1,2})\D+(\d{1,2}\.?\d*)\D*([ns])[, ] ?(\d{1,3})\D+(\d{1,2}\.?\d*)\D*([we])$/i',
-            $coordinates, $match)) {
+        if (
+            preg_match(
+                '/(\d{1,2})\D+(\d{1,2}\.?\d*)\D*([ns])[, ] ?(\d{1,3})\D+(\d{1,2}\.?\d*)\D*([we])$/i',
+                $coordinates,
+                $match
+            )
+        ) {
             $latitude = $match[1] + $match[2] / 60;
             $longitude = $match[4] + $match[5] / 60;
 
             return [
-                'N' === \strtoupper($match[3]) ? $latitude : -$latitude,
-                'E' === \strtoupper($match[6]) ? $longitude : -$longitude,
+                (float) (strtoupper($match[3]) === 'N' ? $latitude : -$latitude),
+                (float) (strtoupper($match[6]) === 'E' ? $longitude : -$longitude),
             ];
         }
 
@@ -180,18 +185,23 @@ class Coordinate implements CoordinateInterface
         // 40:26:46.302N 079:56:55.903W
         // 40°26′47″N 079°58′36″W
         // 40d 26′ 47″ N 079d 58′ 36″ W
-        if (\preg_match('/(\d{1,2})\D+(\d{1,2})\D+(\d{1,2}\.?\d*)\D*([ns])[, ] ?(\d{1,3})\D+(\d{1,2})\D+(\d{1,2}\.?\d*)\D*([we])$/i',
-            $coordinates, $match)) {
+        if (
+            preg_match(
+                '/(\d{1,2})\D+(\d{1,2})\D+(\d{1,2}\.?\d*)\D*([ns])[, ] ?(\d{1,3})\D+(\d{1,2})\D+(\d{1,2}\.?\d*)\D*([we])$/i',
+                $coordinates,
+                $match
+            )
+        ) {
             $latitude = $match[1] + ($match[2] * 60 + $match[3]) / 3600;
             $longitude = $match[5] + ($match[6] * 60 + $match[7]) / 3600;
 
             return [
-                'N' === \strtoupper($match[4]) ? $latitude : -$latitude,
-                'E' === \strtoupper($match[8]) ? $longitude : -$longitude,
+                (float) (strtoupper($match[4]) === 'N' ? $latitude : -$latitude),
+                (float) (strtoupper($match[8]) === 'E' ? $longitude : -$longitude),
             ];
         }
 
-        throw new \InvalidArgumentException('It should be a valid and acceptable ways to write geographic coordinates !');
+        throw new InvalidArgumentException('It should be a valid and acceptable ways to write geographic coordinates !');
     }
 
     /**

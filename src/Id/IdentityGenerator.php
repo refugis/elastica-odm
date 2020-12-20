@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Id;
 
@@ -7,9 +9,6 @@ use Refugis\ODM\Elastica\Util\ClassUtil;
 
 final class IdentityGenerator extends AbstractIdGenerator
 {
-    /**
-     * {@inheritdoc}
-     */
     public function generate(DocumentManagerInterface $dm, object $document): ?string
     {
         $collection = $dm->getCollection(ClassUtil::getClass($document));
@@ -17,9 +16,6 @@ final class IdentityGenerator extends AbstractIdGenerator
         return $collection->getLastInsertedId();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isPostInsertGenerator(): bool
     {
         return true;

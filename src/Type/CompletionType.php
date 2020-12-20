@@ -1,9 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Type;
 
 use Refugis\ODM\Elastica\Completion;
 use Refugis\ODM\Elastica\Exception\ConversionFailedException;
+
+use function array_filter;
+use function is_array;
+use function is_string;
 
 final class CompletionType extends AbstractType
 {
@@ -14,11 +20,11 @@ final class CompletionType extends AbstractType
      */
     public function toPHP($value, array $options = []): ?Completion
     {
-        if (null === $value) {
+        if ($value === null) {
             return null;
         }
 
-        if (\is_array($value) && isset($value['input'])) {
+        if (is_array($value) && isset($value['input'])) {
             $completion = new Completion();
             $completion->input = $value['input'];
             $completion->weight = $value['weight'] ?? null;
@@ -26,7 +32,7 @@ final class CompletionType extends AbstractType
             return $completion;
         }
 
-        if (! \is_string($value)) {
+        if (! is_string($value)) {
             throw new ConversionFailedException($value, Completion::class);
         }
 
@@ -41,7 +47,7 @@ final class CompletionType extends AbstractType
      */
     public function toDatabase($value, array $options = []): ?array
     {
-        if (null === $value) {
+        if ($value === null) {
             return null;
         }
 
@@ -52,9 +58,6 @@ final class CompletionType extends AbstractType
         return $value->toArray();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return self::NAME;
@@ -65,14 +68,14 @@ final class CompletionType extends AbstractType
      */
     public function getMappingDeclaration(array $options = []): array
     {
-        return \array_filter([
+        return array_filter([
             'type' => 'completion',
             'analyzer' => $options['analyzer'] ?? null,
             'search_analyzer' => $options['search_analyzer'] ?? null,
             'preserve_separators' => $options['preserve_separators'] ?? null,
             'preserve_position_increments' => $options['preserve_position_increments'] ?? null,
         ], static function ($value) {
-            return null !== $value;
+            return $value !== null;
         });
     }
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Type;
 
@@ -6,6 +8,10 @@ use Refugis\ODM\Elastica\Exception\ConversionFailedException;
 use Refugis\ODM\Elastica\Geotools\Coordinate\Coordinate;
 use Refugis\ODM\Elastica\Geotools\Coordinate\CoordinateInterface;
 use Refugis\ODM\Elastica\Geotools\Geohash\Geohash;
+
+use function is_array;
+use function is_string;
+use function strpos;
 
 final class GeoPointType extends AbstractType
 {
@@ -20,19 +26,19 @@ final class GeoPointType extends AbstractType
             return null;
         }
 
-        if (\is_array($value)) {
+        if (is_array($value)) {
             if (isset($value['lat'], $value['lon'])) {
                 $lat = $value['lat'];
                 $lon = $value['lon'];
             } else {
-                [ $lon, $lat ] = $value;
+                [$lon, $lat] = $value;
             }
 
             return new Coordinate([(float) $lat, (float) $lon]);
         }
 
-        if (\is_string($value)) {
-            if (false === \strpos($value, ',')) {
+        if (is_string($value)) {
+            if (strpos($value, ',') === false) {
                 return (new Geohash($value))->getCoordinate();
             }
 
@@ -58,9 +64,6 @@ final class GeoPointType extends AbstractType
         return $value->toArray();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return self::NAME;

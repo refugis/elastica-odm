@@ -1,8 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Type;
 
+use InvalidArgumentException;
 use Refugis\ODM\Elastica\Exception\ConversionFailedException;
+
+use function is_numeric;
 
 final class IntegerType extends AbstractType
 {
@@ -24,9 +29,6 @@ final class IntegerType extends AbstractType
         return $this->doConversion($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return self::NAME;
@@ -56,19 +58,22 @@ final class IntegerType extends AbstractType
                 break;
 
             default:
-                throw new \InvalidArgumentException('Invalid length '.$length.' for integer');
+                throw new InvalidArgumentException('Invalid length ' . $length . ' for integer');
         }
 
         return ['type' => $type];
     }
 
+    /**
+     * @param mixed $value
+     */
     private function doConversion($value): ?int
     {
-        if (null === $value) {
+        if ($value === null) {
             return null;
         }
 
-        if (! \is_numeric($value)) {
+        if (! is_numeric($value)) {
             throw new ConversionFailedException($value, self::NAME);
         }
 

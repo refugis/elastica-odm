@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Persister;
 
@@ -14,6 +16,12 @@ use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 use Refugis\ODM\Elastica\Tools\SchemaGenerator;
 use Refugis\ODM\Elastica\Util\ClassUtil;
 
+use function array_map;
+use function assert;
+use function count;
+use function implode;
+use function str_replace;
+
 class DocumentPersister
 {
     private DocumentManagerInterface $dm;
@@ -28,9 +36,6 @@ class DocumentPersister
         $this->collection = $dm->getCollection($class->name);
     }
 
-    /**
-     * @return DocumentMetadata
-     */
     public function getClassMetadata(): DocumentMetadata
     {
         return $this->class;
@@ -55,37 +60,36 @@ class DocumentPersister
         }
 
         $resultSet = $this->collection->search($query);
-        if (! \count($resultSet)) {
+        if (! count($resultSet)) {
             return null;
         }
 
         $esDoc = $resultSet[0]->getDocument();
 
-        if (null !== $document) {
+        if ($document !== null) {
             $this->dm->getUnitOfWork()->createDocument($esDoc, $document);
 
             return $document;
         }
 
         return $this->dm->newHydrator(HydratorInterface::HYDRATE_OBJECT)
-            ->hydrateOne($esDoc, $this->class->name)
-        ;
+            ->hydrateOne($esDoc, $this->class->name);
     }
 
-    public function loadAll(array $criteria = [], array $orderBy = null, $limit = null, $offset = null): array
+    public function loadAll(array $criteria = [], ?array $orderBy = null, ?int $limit = null, ?int $offset = null): array
     {
         $query = $this->prepareQuery($criteria);
         $search = $this->collection->createSearch($this->dm, $query);
         $search->setSort($orderBy);
 
-        if (null === $limit && null === $offset) {
+        if ($limit === null && $offset === null) {
             $search->setScroll(true);
         } else {
-            if (null !== $limit) {
+            if ($limit !== null) {
                 $search->setLimit($limit);
             }
 
-            if (null !== $offset) {
+            if ($offset !== null) {
                 $search->setOffset($offset);
             }
         }
@@ -112,8 +116,8 @@ class DocumentPersister
      */
     public function insert(object $document): ?PostInsertId
     {
-        /** @var DocumentMetadata $class */
         $class = $this->dm->getClassMetadata(ClassUtil::getClass($document));
+        assert($class instanceof DocumentMetadata);
         $idGenerator = $this->dm->getUnitOfWork()->getIdGenerator($class->idGeneratorType);
         $postIdGenerator = $idGenerator->isPostInsertGenerator();
 
@@ -126,7 +130,7 @@ class DocumentPersister
             $schemaGenerator = new SchemaGenerator($this->dm);
             $schema = $schemaGenerator->generateSchema()->getMapping()[$this->class->name] ?? null;
 
-            if (null === $schema) {
+            if ($schema === null) {
                 throw $e;
             }
 
@@ -145,9 +149,11 @@ class DocumentPersister
                 $field->setValue($document, $data['_index'] ?? null);
             }
 
-            if ($field->typeName) {
-                $field->setValue($document, $data['_type'] ?? null);
+            if (! $field->typeName) {
+                continue;
             }
+
+            $field->setValue($document, $data['_type'] ?? null);
         }
 
         $postInsertId = null;
@@ -203,9 +209,9 @@ class DocumentPersister
      * INTERNAL:
      * Prepares data for an update operation.
      *
-     * @return array<string, mixed>
-     *
      * @internal
+     *
+     * @return array<string, mixed>
      *
      * @throws ConversionFailedException
      */
@@ -223,19 +229,19 @@ class DocumentPersister
             $type = $typeManager->getType($field->type);
 
             if ($field->multiple) {
-                $body[$field->fieldName] = \array_map(static function ($item) use ($type, $field) {
+                $body[$field->fieldName] = array_map(static function ($item) use ($type, $field) {
                     return $type->toDatabase($item, $field->options);
                 }, (array) $value[1]);
-            } elseif (null !== $value[1]) {
+            } elseif ($value[1] !== null) {
                 $body[$field->fieldName] = $type->toDatabase($value[1], $field->options);
             } else {
-                $script[] = 'ctx._source.remove(\''.\str_replace('\'', '\\\'', $field->fieldName).'\')';
+                $script[] = 'ctx._source.remove(\'' . str_replace('\'', '\\\'', $field->fieldName) . '\')';
             }
         }
 
         return [
             'body' => $body,
-            'script' => \implode('; ', $script),
+            'script' => implode('; ', $script),
         ];
     }
 }

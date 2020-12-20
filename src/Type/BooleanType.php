@@ -1,8 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Type;
 
 use Refugis\ODM\Elastica\Exception\ConversionFailedException;
+
+use function is_bool;
 
 final class BooleanType extends AbstractType
 {
@@ -24,9 +28,6 @@ final class BooleanType extends AbstractType
         return $this->doConversion($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return self::NAME;
@@ -40,13 +41,16 @@ final class BooleanType extends AbstractType
         return ['type' => 'boolean'];
     }
 
+    /**
+     * @param mixed $value
+     */
     private function doConversion($value): ?bool
     {
-        if (null === $value) {
+        if ($value === null) {
             return null;
         }
 
-        if (! \is_bool($value)) {
+        if (! is_bool($value)) {
             throw new ConversionFailedException($value, 'bool');
         }
 

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Type;
 
@@ -35,9 +37,6 @@ final class GeoShapeType extends AbstractType
         return $value->toArray();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'geo_shape';

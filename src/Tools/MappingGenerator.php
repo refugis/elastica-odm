@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Tools;
 
@@ -7,6 +9,8 @@ use Elastica\Type\Mapping as TypeMapping;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 use Refugis\ODM\Elastica\Type\TypeManager;
+
+use function class_exists;
 
 final class MappingGenerator
 {
@@ -26,12 +30,7 @@ final class MappingGenerator
                 continue;
             }
 
-            if (null === $field->type) {
-                continue;
-            }
-
             $type = $this->typeManager->getType($field->type);
-
             $mapping = $type->getMappingDeclaration($field->options);
             if (isset($field->options['index'])) {
                 $mapping['index'] = $field->options['index'];

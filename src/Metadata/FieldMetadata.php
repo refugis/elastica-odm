@@ -1,8 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Metadata;
 
 use Kcs\Metadata\PropertyMetadata;
+use ReflectionProperty;
 
 class FieldMetadata extends PropertyMetadata
 {
@@ -16,7 +19,7 @@ class FieldMetadata extends PropertyMetadata
     public array $options = [];
     public bool $lazy = false;
     public DocumentMetadata $documentMetadata;
-    private \ReflectionProperty $reflectionProperty;
+    private ReflectionProperty $reflectionProperty;
 
     public function __construct(DocumentMetadata $class, string $name)
     {
@@ -27,22 +30,28 @@ class FieldMetadata extends PropertyMetadata
         parent::__construct($class->name, $name);
     }
 
-    public function getReflection(): \ReflectionProperty
+    public function getReflection(): ReflectionProperty
     {
         if (! isset($this->reflectionProperty)) {
-            $this->reflectionProperty = new \ReflectionProperty($this->class, $this->name);
+            $this->reflectionProperty = new ReflectionProperty($this->class, $this->name);
             $this->reflectionProperty->setAccessible(true);
         }
 
         return $this->reflectionProperty;
     }
 
-    public function getValue($object)
+    /**
+     * @return mixed
+     */
+    public function getValue(object $object)
     {
         return $this->getReflection()->getValue($object);
     }
 
-    public function setValue($object, $value): void
+    /**
+     * @param mixed $value
+     */
+    public function setValue(object $object, $value): void
     {
         $reflection = $this->getReflection();
         $reflection->setValue($object, $value);

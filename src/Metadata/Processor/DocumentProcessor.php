@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Metadata\Processor;
 
@@ -10,6 +12,14 @@ use Kcs\Metadata\MetadataInterface;
 use Refugis\ODM\Elastica\Annotation\Document;
 use Refugis\ODM\Elastica\Exception\InvalidArgumentException;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
+
+use function class_exists;
+use function explode;
+use function Safe\sprintf;
+use function strpos;
+use function trigger_error;
+
+use const E_USER_DEPRECATED;
 
 /**
  * @Processor(annotation=Document::class)
@@ -27,19 +37,19 @@ class DocumentProcessor implements ProcessorInterface
         $metadata->document = true;
         $metadata->collectionName = $subject->collection ?? $this->calculateType($metadata->getReflectionClass()->getShortName());
 
-        $sepIdx = \strpos($metadata->collectionName, '/');
-        if ($sepIdx === false && \class_exists(Type::class)) {
-            $metadata->collectionName .= '/'.$metadata->collectionName;
-        } elseif ($sepIdx !== false && ! \class_exists(Type::class)) {
+        $sepIdx = strpos($metadata->collectionName, '/');
+        if ($sepIdx === false && class_exists(Type::class)) {
+            $metadata->collectionName .= '/' . $metadata->collectionName;
+        } elseif ($sepIdx !== false && ! class_exists(Type::class)) {
             $errorMessage = sprintf('Types are not supported in Elasticsearch 7. Please remove the type name from Document annotation or attribute on document class %s', $metadata->name);
 
-            [$index, $type] = \explode('/', $metadata->collectionName) + [null, null];
-            if ($index === $type) {
-                trigger_error($errorMessage, E_USER_DEPRECATED);
-                $metadata->collectionName = $index;
-            } else {
+            [$index, $type] = explode('/', $metadata->collectionName) + [null, null];
+            if ($index !== $type) {
                 throw new InvalidArgumentException($errorMessage);
             }
+
+            trigger_error($errorMessage, E_USER_DEPRECATED);
+            $metadata->collectionName = $index;
         }
 
         $metadata->customRepositoryClassName = $subject->repositoryClass;
@@ -56,7 +66,7 @@ class DocumentProcessor implements ProcessorInterface
         }
 
         $indexName = $inflector->tableize($name);
-        if (\class_exists(Type::class)) {
+        if (class_exists(Type::class)) {
             return "$indexName/$indexName";
         }
 

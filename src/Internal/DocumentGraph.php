@@ -1,6 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Internal;
+
+use Generator;
+use IteratorAggregate;
+
+use function iterator_to_array;
+use function Safe\uasort;
 
 /**
  * Represents a document dependency graph.
@@ -8,12 +16,10 @@ namespace Refugis\ODM\Elastica\Internal;
  *
  * @internal
  */
-final class DocumentGraph implements \IteratorAggregate
+final class DocumentGraph implements IteratorAggregate
 {
-    /**
-     * @var DocumentGraphNode[]
-     */
-    private $nodes;
+    /** @var DocumentGraphNode[] */
+    private array $nodes;
 
     public function __construct()
     {
@@ -22,8 +28,6 @@ final class DocumentGraph implements \IteratorAggregate
 
     /**
      * Adds a node to the dependency graph.
-     *
-     * @param string $className
      */
     public function addNode(string $className): void
     {
@@ -36,9 +40,6 @@ final class DocumentGraph implements \IteratorAggregate
 
     /**
      * Connects two nodes.
-     *
-     * @param string $source
-     * @param string $destination
      */
     public function connect(string $source, string $destination): void
     {
@@ -61,12 +62,9 @@ final class DocumentGraph implements \IteratorAggregate
         return $this->nodes;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getIterator(): \Generator
+    public function getIterator(): Generator
     {
-        $elements = \iterator_to_array((function () {
+        $elements = iterator_to_array((function () {
             $traverse = static function (DocumentGraphNode $node, int $depth) use (&$traverse) {
                 yield [$node, $depth];
 
@@ -80,7 +78,7 @@ final class DocumentGraph implements \IteratorAggregate
             }
         })(), false);
 
-        \uasort($elements, static function (array $a, array $b) {
+        uasort($elements, static function (array $a, array $b) {
             return $b[1] <=> $a[1];
         });
 
@@ -92,6 +90,7 @@ final class DocumentGraph implements \IteratorAggregate
             }
 
             $visited[$name] = true;
+
             yield $element;
         }
     }

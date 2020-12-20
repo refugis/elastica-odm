@@ -1,7 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Command;
 
+use InvalidArgumentException;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Tools\SchemaGenerator;
 use Symfony\Component\Console\Command\Command;
@@ -9,6 +12,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+
+use function Safe\preg_match;
 
 class UpdateSchemaCommand extends Command
 {
@@ -21,18 +26,12 @@ class UpdateSchemaCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this->setName('update-schema');
         $this->addOption('filter-expression', null, InputOption::VALUE_REQUIRED, 'Filters the classes for schema updates via a regular expression');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
@@ -42,18 +41,14 @@ class UpdateSchemaCommand extends Command
         $schema = $generator->generateSchema();
 
         $expression = $input->getOption('filter-expression');
-        if (null !== $expression) {
-            if (false === \preg_match($expression, '')) {
-                throw new \InvalidArgumentException('Filter expression is not a valid regex');
+        if ($expression !== null) {
+            if (preg_match($expression, '') === false) {
+                throw new InvalidArgumentException('Filter expression is not a valid regex');
             }
 
-            $filter = static function ($value) use ($expression): bool {
-                return (bool) \preg_match($expression, $value);
-            };
+            $filter = static fn ($value): bool => (bool) preg_match($expression, $value);
         } else {
-            $filter = static function (): bool {
-                return true;
-            };
+            $filter = static fn ($value): bool => true;
         }
 
         foreach ($schema->getMapping() as $className => $mapping) {

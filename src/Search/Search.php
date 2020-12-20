@@ -1,14 +1,24 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Search;
 
 use Elastica\Query;
 use Elastica\ResultSet;
+use Generator;
+use Iterator;
+use IteratorAggregate;
+use Psr\Cache\CacheItemPoolInterface;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Hydrator\HydratorInterface;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
-class Search implements \IteratorAggregate
+use function assert;
+use function is_array;
+use function iterator_to_array;
+
+class Search implements IteratorAggregate
 {
     /**
      * The target document class.
@@ -90,7 +100,7 @@ class Search implements \IteratorAggregate
      */
     public function execute(): array
     {
-        return \iterator_to_array($this->getIterator(), false);
+        return iterator_to_array($this->getIterator(), false);
     }
 
     /**
@@ -106,30 +116,30 @@ class Search implements \IteratorAggregate
     /**
      * Iterate over the query results.
      */
-    public function getIterator(): \Iterator
+    public function getIterator(): Iterator
     {
         $hydrator = $this->documentManager->newHydrator($this->hydrationMode);
         $query = clone $this->query;
 
         if (! $query->hasParam('_source')) {
-            /** @var DocumentMetadata $class */
             $class = $this->documentManager->getClassMetadata($this->documentClass);
+            assert($class instanceof DocumentMetadata);
             $query->setSource($class->eagerFieldNames);
         }
 
-        if (null !== $this->sort) {
+        if ($this->sort !== null) {
             $query->setSort($this->sort);
         }
 
-        if (null !== $this->limit) {
+        if ($this->limit !== null) {
             $query->setSize($this->limit);
         }
 
-        if (null !== $this->offset) {
+        if ($this->offset !== null) {
             $query->setFrom($this->offset);
         }
 
-        $generator = null !== $this->cacheProfile ? $this->_doExecuteCached($query) : $this->_doExecute($query);
+        $generator = $this->cacheProfile !== null ? $this->_doExecuteCached($query) : $this->_doExecute($query);
         foreach ($generator as $resultSet) {
             yield from $hydrator->hydrateAll($resultSet, $this->documentClass);
         }
@@ -158,13 +168,13 @@ class Search implements \IteratorAggregate
     /**
      * Sets the sort fields and directions.
      *
-     * @param array|string $fieldName
+     * @param array|string|null $fieldName
      */
     public function setSort($fieldName, string $order = 'asc'): self
     {
-        if (null !== $fieldName) {
+        if ($fieldName !== null) {
             $sort = [];
-            $fields = \is_array($fieldName) ? $fieldName : [$fieldName => $order];
+            $fields = is_array($fieldName) ? $fieldName : [$fieldName => $order];
 
             foreach ($fields as $fieldName => $order) {
                 $sort[] = [$fieldName => $order];
@@ -231,15 +241,15 @@ class Search implements \IteratorAggregate
 
     public function isScroll(): bool
     {
-        return null === $this->limit && null === $this->offset && $this->scroll;
+        return $this->limit === null && $this->offset === null && $this->scroll;
     }
 
     /**
      * Instructs the executor to use a result cache.
      */
-    public function useResultCache(string $cacheKey = null, int $ttl = 0): self
+    public function useResultCache(?string $cacheKey = null, int $ttl = 0): self
     {
-        if (null === $cacheKey) {
+        if ($cacheKey === null) {
             $this->cacheProfile = null;
         } else {
             $this->cacheProfile = new SearchCacheProfile($cacheKey, $ttl);
@@ -259,7 +269,7 @@ class Search implements \IteratorAggregate
     /**
      * Executes the search action, yield all the result sets.
      *
-     * @return \Generator<ResultSet>
+     * @return Generator<ResultSet>
      */
     private function _doExecute(Query $query)
     {
@@ -279,11 +289,12 @@ class Search implements \IteratorAggregate
     /**
      * Executes a cached query.
      *
-     * @return \Generator<ResultSet>
+     * @return Generator<ResultSet>
      */
     private function _doExecuteCached(Query $query)
     {
-        if (null !== $resultCache = $this->documentManager->getResultCache()) {
+        $resultCache = $this->documentManager->getResultCache();
+        if ($resultCache !== null) {
             $item = $resultCache->getItem($this->cacheProfile->getCacheKey());
 
             if ($item->isHit()) {
@@ -293,9 +304,11 @@ class Search implements \IteratorAggregate
             }
         }
 
-        $resultSets = \iterator_to_array($this->_doExecute($query));
+        $resultSets = iterator_to_array($this->_doExecute($query));
 
         if (isset($item)) {
+            assert($resultCache instanceof CacheItemPoolInterface);
+
             $item->set($resultSets);
             $item->expiresAfter($this->cacheProfile->getTtl());
             $resultCache->save($item);

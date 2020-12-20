@@ -46,6 +46,7 @@
         "solido/php-coding-standards": "dev-master",
         "symfony/cache": "^3.1|^4.0|^5.0",
         "symfony/console": "^3.4|^4.0|^5.0",
+        "symfony/dependency-injection": "^3.4|^4.0|^5.0",
         "symfony/var-dumper": "^3.1|^4.0|^5.0"
     },
     "autoload": {

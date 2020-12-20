@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Tools\Schema;
 
@@ -7,9 +9,7 @@ namespace Refugis\ODM\Elastica\Tools\Schema;
  */
 class Schema
 {
-    /**
-     * @var array<string, Collection>
-     */
+    /** @var array<string, Collection> */
     private array $collectionMapping = [];
 
     /**

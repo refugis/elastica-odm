@@ -1,11 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Geotools\Coordinate;
 
 use Doctrine\Common\Comparable;
 use Elastica\ArrayableInterface;
+use JsonSerializable;
 
-interface CoordinateInterface extends ArrayableInterface, Comparable, \JsonSerializable
+interface CoordinateInterface extends ArrayableInterface, Comparable, JsonSerializable
 {
     /**
      * Normalizes a latitude to the (-90, 90) range.
