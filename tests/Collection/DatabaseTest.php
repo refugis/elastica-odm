@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Refugis\ODM\Elastica\Tests\Collection;
+namespace Tests\Collection;
 
 use Elastica\Client;
 use Elastica\Index;

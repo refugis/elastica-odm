@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Refugis\ODM\Elastica\Tests;
+namespace Tests;
 
 use Elastica\Index;
 use Elastica\Type;
@@ -8,11 +8,11 @@ use PHPUnit\Framework\TestCase;
 use ProxyManager\Proxy\ProxyInterface;
 use Refugis\ODM\Elastica\DocumentManager;
 use Refugis\ODM\Elastica\Geotools\Coordinate\Coordinate;
-use Refugis\ODM\Elastica\Tests\Fixtures\Document\Foo;
-use Refugis\ODM\Elastica\Tests\Fixtures\Document\FooNoAutoCreate;
-use Refugis\ODM\Elastica\Tests\Fixtures\Document\FooWithLazyField;
-use Refugis\ODM\Elastica\Tests\Traits\DocumentManagerTestTrait;
-use Refugis\ODM\Elastica\Tests\Traits\FixturesTestTrait;
+use Tests\Fixtures\Document\Foo;
+use Tests\Fixtures\Document\FooNoAutoCreate;
+use Tests\Fixtures\Document\FooWithLazyField;
+use Tests\Traits\DocumentManagerTestTrait;
+use Tests\Traits\FixturesTestTrait;
 use Refugis\ODM\Elastica\VarDumper\VarDumperTestTrait;
 
 /**
@@ -61,7 +61,7 @@ class DocumentManagerTest extends TestCase
 
         self::assertCount(1, $result);
         $this->assertDumpEquals(<<<EOF
-Refugis\ODM\Elastica\Tests\Fixtures\Document\FooWithLazyField (proxy) {
+Tests\Fixtures\Document\FooWithLazyField (proxy) {
   +id: "foo_test_document"
   +stringField: "bazbaz"
 }

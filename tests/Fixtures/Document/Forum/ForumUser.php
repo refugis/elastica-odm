@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Refugis\ODM\Elastica\Tests\Fixtures\Document\Forum;
+namespace Tests\Fixtures\Document\Forum;
 
 use Refugis\ODM\Elastica\Annotation\Document;
 use Refugis\ODM\Elastica\Annotation\DocumentId;

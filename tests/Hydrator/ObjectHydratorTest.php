@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Refugis\ODM\Elastica\Tests\Hydrator;
+namespace Tests\Hydrator;
 
 use Doctrine\Common\EventManager;
 use Elastica\Document;
@@ -18,7 +18,7 @@ use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Hydrator\ObjectHydrator;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
-use Refugis\ODM\Elastica\Tests\Fixtures\Hydrator\TestDocument;
+use Tests\Fixtures\Hydrator\TestDocument;
 use Refugis\ODM\Elastica\Type\StringType;
 use Refugis\ODM\Elastica\Type\TypeManager;
 use Refugis\ODM\Elastica\UnitOfWork;

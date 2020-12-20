@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace Refugis\ODM\Elastica\Tests\Type;
+namespace Tests\Type;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
-use Refugis\ODM\Elastica\Tests\Fixtures\Type\TestDoctrineType;
+use Tests\Fixtures\Type\TestDoctrineType;
 use Refugis\ODM\Elastica\Type\TypeInterface;
 
 class AbstractDoctrineTypeTest extends TestCase implements TypeTestInterface

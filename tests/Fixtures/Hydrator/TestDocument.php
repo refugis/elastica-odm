@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Refugis\ODM\Elastica\Tests\Fixtures\Hydrator;
+namespace Tests\Fixtures\Hydrator;
 
 class TestDocument
 {

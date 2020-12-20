@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Refugis\ODM\Elastica\Tests;
+namespace Tests;
 
 use Doctrine\Common\EventManager;
 use Elastica\Client;
@@ -13,12 +13,12 @@ use Prophecy\Prophecy\ObjectProphecy;
 use Refugis\ODM\Elastica\Collection\Database;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Persister\DocumentPersister;
-use Refugis\ODM\Elastica\Tests\Fixtures\Document\CMS\CmsPhoneNumber;
-use Refugis\ODM\Elastica\Tests\Fixtures\Document\Forum\ForumUser;
-use Refugis\ODM\Elastica\Tests\Fixtures\Document\GeoNames\City;
-use Refugis\ODM\Elastica\Tests\Fixtures\Document\GeoNames\Country;
-use Refugis\ODM\Elastica\Tests\Mocks\DocumentManagerMock;
-use Refugis\ODM\Elastica\Tests\Mocks\DocumentPersisterMock;
+use Tests\Fixtures\Document\CMS\CmsPhoneNumber;
+use Tests\Fixtures\Document\Forum\ForumUser;
+use Tests\Fixtures\Document\GeoNames\City;
+use Tests\Fixtures\Document\GeoNames\Country;
+use Tests\Mocks\DocumentManagerMock;
+use Tests\Mocks\DocumentPersisterMock;
 use Refugis\ODM\Elastica\UnitOfWork;
 
 class UnitOfWorkTest extends TestCase

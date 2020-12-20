@@ -56,7 +56,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Refugis\\ODM\\Elastica\\Tests\\": "tests/"
+            "Tests\\": "tests/"
         }
     },
     "config": {
@@ -67,7 +67,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.x-dev"
+            "dev-master": "2.x-dev"
         }
     }
 }

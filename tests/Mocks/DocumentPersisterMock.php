@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Refugis\ODM\Elastica\Tests\Mocks;
+namespace Tests\Mocks;
 
 use Refugis\ODM\Elastica\Id\PostInsertId;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;

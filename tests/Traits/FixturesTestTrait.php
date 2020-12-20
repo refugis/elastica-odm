@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Refugis\ODM\Elastica\Tests\Traits;
+namespace Tests\Traits;
 
 use Elastica\Cluster\Settings;
 use Elastica\Mapping;

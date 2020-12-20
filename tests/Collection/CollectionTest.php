@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Refugis\ODM\Elastica\Tests\Collection;
+namespace Tests\Collection;
 
 use Elastica\Index;
 use Elastica\Query;
@@ -19,10 +19,10 @@ use Refugis\ODM\Elastica\Collection\CollectionInterface;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Exception\IndexNotFoundException;
 use Refugis\ODM\Elastica\Exception\RuntimeException;
-use Refugis\ODM\Elastica\Tests\Fixtures\Document\Foo;
-use Refugis\ODM\Elastica\Tests\Fixtures\Document\FooNoAutoCreate;
-use Refugis\ODM\Elastica\Tests\Traits\DocumentManagerTestTrait;
-use Refugis\ODM\Elastica\Tests\Traits\FixturesTestTrait;
+use Tests\Fixtures\Document\Foo;
+use Tests\Fixtures\Document\FooNoAutoCreate;
+use Tests\Traits\DocumentManagerTestTrait;
+use Tests\Traits\FixturesTestTrait;
 
 class CollectionTest extends TestCase
 {

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Refugis\ODM\Elastica\Tests\Type;
+namespace Tests\Type;
 
 use PHPUnit\Framework\TestCase;
 use Refugis\ODM\Elastica\Geotools\Coordinate\Coordinate;

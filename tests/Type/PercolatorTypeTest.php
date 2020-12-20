@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Refugis\ODM\Elastica\Tests\Type;
+namespace Tests\Type;
 
 use Elastica\Query;
 use PHPUnit\Framework\TestCase;

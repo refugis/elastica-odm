@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Refugis\ODM\Elastica\Tests\Command;
+namespace Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Refugis\ODM\Elastica\Command\DropSchemaCommand;
-use Refugis\ODM\Elastica\Tests\Traits\DocumentManagerTestTrait;
-use Refugis\ODM\Elastica\Tests\Traits\FixturesTestTrait;
+use Tests\Traits\DocumentManagerTestTrait;
+use Tests\Traits\FixturesTestTrait;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class DropSchemaCommandTest extends TestCase

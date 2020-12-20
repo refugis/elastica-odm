@@ -1,12 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace Refugis\ODM\Elastica\Tests\Internal;
+namespace Tests\Internal;
 
 use PHPUnit\Framework\TestCase;
 use Refugis\ODM\Elastica\Internal\DocumentGraph;
 use Refugis\ODM\Elastica\Internal\DocumentGraphEdge;
 use Refugis\ODM\Elastica\Internal\DocumentGraphNode;
-use Refugis\ODM\Elastica\Tests\Fixtures\Document\Foo;
+use Tests\Fixtures\Document\Foo;
 
 class DocumentGraphTest extends TestCase
 {

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Refugis\ODM\Elastica\Tests\Fixtures\Document\GeoNames;
+namespace Tests\Fixtures\Document\GeoNames;
 
 use Refugis\ODM\Elastica\Annotation\Document;
 use Refugis\ODM\Elastica\Annotation\DocumentId;

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Refugis\ODM\Elastica\Tests\Metadata\Processor;
+namespace Tests\Metadata\Processor;
 
 use Elastica\Mapping;
 use Elastica\Type\Mapping as TypeMapping;
@@ -11,8 +11,8 @@ use Refugis\ODM\Elastica\Annotation\Index;
 use Refugis\ODM\Elastica\Annotation\Tokenizer;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Metadata\Processor\IndexProcessor;
-use Refugis\ODM\Elastica\Tests\Fixtures\Document\Foo;
-use Refugis\ODM\Elastica\Tests\Traits\DocumentManagerTestTrait;
+use Tests\Fixtures\Document\Foo;
+use Tests\Traits\DocumentManagerTestTrait;
 
 class IndexProcessorTest extends TestCase
 {

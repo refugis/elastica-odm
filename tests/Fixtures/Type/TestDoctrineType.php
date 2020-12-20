@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Refugis\ODM\Elastica\Tests\Fixtures\Type;
+namespace Tests\Fixtures\Type;
 
 use Refugis\ODM\Elastica\Type\AbstractDoctrineType;
 

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Refugis\ODM\Elastica\Tests\Type;
+namespace Tests\Type;
 
 use Refugis\ODM\Elastica\Type\IntegerType;
 use Refugis\ODM\Elastica\Type\TypeInterface;

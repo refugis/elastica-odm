@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Refugis\ODM\Elastica\Tests\Traits;
+namespace Tests\Traits;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Kcs\Metadata\Loader\Processor\ProcessorFactory;
