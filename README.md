@@ -1,6 +1,6 @@
 Refugis - Elastica ODM
-=============================
-[![Build Status](https://travis-ci.com/refugis/elastica-odm.svg?branch=master)](https://travis-ci.com/refugis/elastica-odm)
+======================
+![Tests](https://github.com/refugis/elastica-odm/workflows/Tests/badge.svg)
 
 Doctrine like document manager for ElasticSearch, based on [Elastica](https://www.github.com/ruflin/elastica).
 Originally written by [Fazland team](https://www.github.com/fazland/elastica-odm).
