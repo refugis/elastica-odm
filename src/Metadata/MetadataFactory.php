@@ -77,7 +77,6 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
         }
 
         $identifier = null;
-
         foreach ($classMetadata->getAttributesMetadata() as $attributesMetadata) {
             $count = 0;
 
@@ -105,6 +104,10 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
             if ($count > 1) {
                 throw new InvalidMetadataException('@DocumentId, @IndexName and @TypeName are mutually exclusive. Please select one for "' . $attributesMetadata->getName() . '"');
             }
+        }
+
+        if ($identifier === null) {
+            throw new InvalidMetadataException('At least one @DocumentId is required for an elastic document');
         }
 
         $classMetadata->identifier = $identifier;

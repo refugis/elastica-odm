@@ -50,7 +50,6 @@ jobs:
                   ES_ENDPOINT: 'http://localhost:9200/'
                   XDEBUG_MODE: coverage
             - name: Upload coverage to Codecov
-              if: ${{ matrix.php_version == '8.0' }}
               uses: codecov/codecov-action@v1
               with:
                   file: ./coverage.xml

@@ -11,20 +11,14 @@ use Refugis\ODM\Elastica\Configuration;
 use Refugis\ODM\Elastica\DocumentManager;
 use Refugis\ODM\Elastica\Metadata\Loader\AnnotationLoader;
 use Refugis\ODM\Elastica\Metadata\Loader\AttributesLoader;
+use Refugis\ODM\Elastica\Metadata\Loader\ChainLoader;
 use Refugis\ODM\Elastica\Metadata\MetadataFactory;
 use Refugis\ODM\Elastica\UnitOfWork;
 
 class DocumentManagerMock extends DocumentManager
 {
-    /**
-     * @var UnitOfWork|null
-     */
-    private $uowMock;
-
-    /**
-     * @var LazyLoadingGhostFactory|null
-     */
-    private $proxyFactoryMock;
+    private ?UnitOfWork $uowMock;
+    private ?LazyLoadingGhostFactory $proxyFactoryMock;
 
     /**
      * {@inheritdoc}
@@ -69,12 +63,8 @@ class DocumentManagerMock extends DocumentManager
             $processorFactory = new ProcessorFactory();
             $processorFactory->registerProcessors(__DIR__.'/../../src/Metadata/Processor');
 
-            if (PHP_VERSION_ID >= 80000) {
-                $loader = new AnnotationLoader($processorFactory, __DIR__.'/../Fixtures/Document');
-                $loader->setReader(new AnnotationReader());
-            } else {
-                $loader = new AttributesLoader($processorFactory, __DIR__.'/../Fixtures/Document');
-            }
+            $loader = new AnnotationLoader($processorFactory, __DIR__.'/../Fixtures/Document');
+            $loader->setReader(new AnnotationReader());
 
             $config = new Configuration();
             $config->setProxyFactory(new LazyLoadingGhostFactory());
