@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Annotation;
 
+use Attribute;
 use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
 use TypeError;
@@ -13,8 +14,6 @@ use function in_array;
 use function is_array;
 use function is_string;
 use function Safe\sprintf;
-
-use const Attribute;
 
 /**
  * @Annotation

@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Annotation;
 
+use Attribute;
 use TypeError;
 
 use function get_debug_type;
 use function is_array;
 use function is_string;
 use function Safe\sprintf;
-
-use const Attribute;
 
 /**
  * @Annotation

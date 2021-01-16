@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Annotation;
 
+use Attribute;
 use Doctrine\Common\Annotations\Annotation\Target;
 use TypeError;
 
@@ -13,7 +14,6 @@ use function is_string;
 use function Safe\sprintf;
 use function trigger_error;
 
-use const Attribute;
 use const E_USER_DEPRECATED;
 
 /**
