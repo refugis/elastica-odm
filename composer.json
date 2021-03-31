@@ -30,7 +30,7 @@
         "doctrine/common": "^3.0",
         "doctrine/inflector": "^2.0",
         "doctrine/persistence": "^2.0",
-        "kcs/class-finder": "^0.1|^0.2",
+        "kcs/class-finder": "^0.1|^0.2|^0.3",
         "kcs/metadata": "^3.1|^4.0",
         "ocramius/proxy-manager": "^2.0",
         "psr/cache-implementation": "^1.0",
