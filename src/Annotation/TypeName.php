@@ -11,7 +11,7 @@ use Doctrine\Common\Annotations\Annotation\Target;
  * @Annotation
  * @Target({"PROPERTY"})
  */
-#[Attribute]
+#[Attribute(Attribute::TARGET_PROPERTY)]
 final class TypeName
 {
 }

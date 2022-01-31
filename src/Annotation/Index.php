@@ -11,7 +11,7 @@ use Doctrine\Common\Annotations\Annotation\Target;
  * @Annotation
  * @Target({"CLASS"})
  */
-#[Attribute]
+#[Attribute(Attribute::TARGET_CLASS)]
 final class Index
 {
     /**

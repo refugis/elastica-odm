@@ -10,11 +10,13 @@ use InvalidArgumentException;
 use Kcs\Metadata\ClassMetadata;
 use Kcs\Metadata\MetadataInterface;
 use ReflectionClass;
+use Refugis\ODM\Elastica\Exception\RuntimeException;
 
 use function array_merge;
 use function array_unique;
 use function reset;
 use function Safe\sort;
+use function Safe\sprintf;
 
 final class DocumentMetadata extends ClassMetadata implements ClassMetadataInterface
 {
@@ -27,6 +29,11 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     public bool $document;
 
     /**
+     * Whether this class is representing an embeddable document.
+     */
+    public bool $embeddable;
+
+    /**
      * The elastic index/type name.
      */
     public string $collectionName;
@@ -34,7 +41,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     /**
      * The identifier field name.
      */
-    public FieldMetadata $identifier;
+    public ?FieldMetadata $identifier;
 
     /**
      * Identifier generator type.
@@ -58,6 +65,11 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     public array $fieldNames;
 
     /**
+     * An array containing all the field names.
+     */
+    public array $embeddedFieldNames;
+
+    /**
      * Gets the index dynamic settings.
      */
     public ?array $dynamicSettings = null;
@@ -78,6 +90,9 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
 
         $this->instantiator = new Instantiator();
         $this->document = false;
+        $this->embeddable = false;
+        $this->fieldNames = [];
+        $this->embeddedFieldNames = [];
         $this->eagerFieldNames = [];
         $this->dynamicSettings = [];
         $this->staticSettings = [];
@@ -92,14 +107,19 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     {
         parent::addAttributeMetadata($metadata);
 
-        if (! ($metadata instanceof FieldMetadata) || ! isset($metadata->fieldName)) {
+        if (! isset($metadata->fieldName)) {
             return;
         }
 
-        $this->fieldNames[] = $metadata->fieldName;
-        sort($this->fieldNames);
+        if ($metadata instanceof EmbeddedMetadata) {
+            $this->embeddedFieldNames[] = $metadata->fieldName;
+            sort($this->embeddedFieldNames);
+        } elseif ($metadata instanceof FieldMetadata) {
+            $this->fieldNames[] = $metadata->fieldName;
+            sort($this->fieldNames);
+        }
 
-        if ($metadata->lazy) {
+        if ($metadata->lazy ?? false) {
             return;
         }
 
@@ -210,7 +230,12 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
      */
     public function getTypeOfField($fieldName): string
     {
-        return $this->getField($fieldName)->type;
+        $field = $this->getField($fieldName);
+        if (! $field instanceof FieldMetadata) {
+            throw new RuntimeException(sprintf('Field "%s" does not exist or is not a valid field name.', $fieldName));
+        }
+
+        return $field->type;
     }
 
     /**
@@ -276,10 +301,10 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
         $this->identifier->setValue($object, $value);
     }
 
-    public function getField(string $fieldName): ?FieldMetadata
+    public function getField(string $fieldName)
     {
         foreach ($this->attributesMetadata as $metadata) {
-            if (! $metadata instanceof FieldMetadata) {
+            if (! $metadata instanceof FieldMetadata && ! $metadata instanceof EmbeddedMetadata) {
                 continue;
             }
 

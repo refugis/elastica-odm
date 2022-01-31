@@ -16,7 +16,7 @@ use function Safe\sprintf;
  * @Annotation
  * @Target({"PROPERTY"})
  */
-#[Attribute]
+#[Attribute(Attribute::TARGET_PROPERTY)]
 final class DocumentId
 {
     /**

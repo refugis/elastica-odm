@@ -14,6 +14,7 @@ use ReflectionClass;
 use Refugis\ODM\Elastica\Metadata\Loader\LoaderInterface;
 
 use function array_filter;
+use function Safe\sprintf;
 
 class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFactory
 {
@@ -77,36 +78,45 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
         }
 
         $identifier = null;
-        foreach ($classMetadata->getAttributesMetadata() as $attributesMetadata) {
-            $count = 0;
+        foreach ($classMetadata->getAttributesMetadata() as $attributeMetadata) {
+            if ($attributeMetadata instanceof EmbeddedMetadata) {
+                $targetClass = $attributeMetadata->targetClass;
+                $targetMetadata = $this->getMetadataFor($targetClass);
+                if (! $targetMetadata instanceof DocumentMetadata || ! $targetMetadata->embeddable) {
+                    throw new InvalidMetadataException(sprintf('Embedded document "%s" is not marked as embeddable', $targetClass));
+                }
 
-            if (! $attributesMetadata instanceof FieldMetadata) {
                 continue;
             }
 
-            if ($attributesMetadata->identifier) {
+            $count = 0;
+            if (! $attributeMetadata instanceof FieldMetadata) {
+                continue;
+            }
+
+            if ($attributeMetadata->identifier) {
                 if ($identifier !== null) {
                     throw new InvalidMetadataException('@DocumentId should be declared at most once per class.');
                 }
 
-                $identifier = $attributesMetadata;
+                $identifier = $attributeMetadata;
                 ++$count;
             }
 
-            if ($attributesMetadata->typeName) {
+            if ($attributeMetadata->typeName) {
                 ++$count;
             }
 
-            if ($attributesMetadata->indexName) {
+            if ($attributeMetadata->indexName) {
                 ++$count;
             }
 
             if ($count > 1) {
-                throw new InvalidMetadataException('@DocumentId, @IndexName and @TypeName are mutually exclusive. Please select one for "' . $attributesMetadata->getName() . '"');
+                throw new InvalidMetadataException('@DocumentId, @IndexName and @TypeName are mutually exclusive. Please select one for "' . $attributeMetadata->getName() . '"');
             }
         }
 
-        if ($identifier === null) {
+        if ($identifier === null && ! $classMetadata->embeddable) {
             throw new InvalidMetadataException('At least one @DocumentId is required for an elastic document');
         }
 

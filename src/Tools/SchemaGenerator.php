@@ -23,7 +23,7 @@ final class SchemaGenerator
     public function generateSchema(): Schema
     {
         $schema = new Schema();
-        $mappingGenerator = new MappingGenerator($this->documentManager->getTypeManager());
+        $mappingGenerator = new MappingGenerator($this->documentManager->getTypeManager(), $this->documentManager->getMetadataFactory());
         $factory = $this->documentManager->getMetadataFactory();
 
         foreach ($factory->getAllMetadata() as $metadata) {

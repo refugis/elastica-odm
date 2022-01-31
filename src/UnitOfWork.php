@@ -22,6 +22,7 @@ use Refugis\ODM\Elastica\Id\GeneratorInterface;
 use Refugis\ODM\Elastica\Id\IdentityGenerator;
 use Refugis\ODM\Elastica\Internal\CommitOrderCalculator;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\Metadata\EmbeddedMetadata;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 use Refugis\ODM\Elastica\Persister\DocumentPersister;
 use Refugis\ODM\Elastica\Util\ClassUtil;
@@ -347,11 +348,11 @@ final class UnitOfWork
         $class = $this->getClassMetadata($document);
         $actualData = [];
         foreach ($class->attributesMetadata as $field) {
-            if (! $field instanceof FieldMetadata || ! $field->isStored()) {
-                continue;
+            if ($field instanceof FieldMetadata && $field->isStored()) {
+                $actualData[$field->fieldName] = $field->getValue($document);
+            } elseif ($field instanceof EmbeddedMetadata) {
+                $actualData[$field->fieldName] = $field->getValue($document);
             }
-
-            $actualData[$field->fieldName] = $field->getValue($document);
         }
 
         if (! isset($this->originalDocumentData[$oid])) {
@@ -446,11 +447,11 @@ final class UnitOfWork
      *
      * @param Document   $document the elastica document containing the original data
      * @param object     $result   the resulting document object
-     * @param array|null $fields   specify the fields for partial hydration
+     * @param bool       $embedded whether we are processing an embedded document
      *
      * @throws InvalidIdentifierException
      */
-    public function createDocument(Document $document, object $result, ?array $fields = null): void
+    public function createDocument(Document $document, object $result, bool $embedded = false): void
     {
         $class = $this->getClassMetadata($result);
 
@@ -487,32 +488,62 @@ final class UnitOfWork
 
         foreach ($documentData as $key => &$value) {
             $field = $class->getField($key);
-            assert($field instanceof FieldMetadata);
-            if ($fields !== null && ! in_array($field->getName(), $fields, true)) {
-                continue;
-            }
 
-            $fieldType = $typeManager->getType($field->type);
+            if ($field instanceof EmbeddedMetadata) {
+                if ($field->multiple) {
+                    $value = array_map(function ($item) use ($field, $document) {
+                        $embeddedObject = $field->newInstance();
+                        $embeddedDocument = clone $document;
+                        $embeddedDocument->setId('');
+                        $embeddedDocument->setData($item);
+                        $this->createDocument($embeddedDocument, $embeddedObject, true);
 
-            if ($field->multiple) {
-                $value = array_map(static function ($item) use ($fieldType, $field) {
-                    return $fieldType->toPHP($item, $field->options);
-                }, (array) $value);
+                        return $embeddedObject;
+                    }, (array) $value);
+                } else {
+                    $embeddedObject = $field->newInstance();
+                    $embeddedDocument = clone $document;
+                    $embeddedDocument->setId('');
+                    $embeddedDocument->setData($value);
+                    $this->createDocument($embeddedDocument, $embeddedObject, true);
+
+                    $value = $embeddedObject;
+                }
+            } elseif ($field instanceof FieldMetadata) {
+                $fieldType = $typeManager->getType($field->type);
+                if ($field->multiple) {
+                    $value = array_map(static function ($item) use ($fieldType, $field) {
+                        return $fieldType->toPHP($item, $field->options);
+                    }, (array)$value);
+                } else {
+                    $value = $fieldType->toPHP($value, $field->options);
+                }
             } else {
-                $value = $fieldType->toPHP($value, $field->options);
+                continue;
             }
 
             $field->setValue($result, $value);
         }
 
         unset($value);
+        if ($embedded) {
+            return;
+        }
 
-        foreach ($fields ?? $class->getFieldNames() as $fieldName) {
+        foreach ($class->getFieldNames() as $fieldName) {
             if (array_key_exists($fieldName, $documentData)) {
                 continue;
             }
 
             $documentData[$fieldName] = null;
+        }
+
+        foreach ($class->embeddedFieldNames as $embeddedFieldName) {
+            if (array_key_exists($embeddedFieldName, $documentData)) {
+                $documentData[$embeddedFieldName] = clone $documentData[$embeddedFieldName];
+            } else {
+                $documentData[$embeddedFieldName] = null;
+            }
         }
 
         $this->originalDocumentData[spl_object_hash($result)] = $documentData;
@@ -624,11 +655,11 @@ final class UnitOfWork
 
         $actualData = [];
         foreach ($class->attributesMetadata as $field) {
-            if (! $field instanceof FieldMetadata || ! $field->isStored()) {
-                continue;
+            if ($field instanceof FieldMetadata && $field->isStored()) {
+                $actualData[$field->fieldName] = $field->getValue($document);
+            } elseif ($field instanceof EmbeddedMetadata) {
+                $actualData[$field->fieldName] = $field->getValue($document);
             }
-
-            $actualData[$field->fieldName] = $field->getValue($document);
         }
 
         if (! isset($this->originalDocumentData[$oid])) {
@@ -893,17 +924,18 @@ final class UnitOfWork
 
     private function persistNew(DocumentMetadata $class, object $object): void
     {
+        if (! $class->document) {
+            return;
+        }
+
         $this->lifecycleEventManager->prePersist($class, $object);
         $oid = spl_object_hash($object);
 
-        if ($class->identifier) {
-            $idGenerator = $this->getIdGenerator($class->idGeneratorType);
-            if (! $idGenerator->isPostInsertGenerator()) {
-                $id = $idGenerator->generate($this->manager, $object);
-                $class->setIdentifierValue($object, $id);
-            }
-        } else {
-            // @todo Embedded
+        assert($class->identifier !== null);
+        $idGenerator = $this->getIdGenerator($class->idGeneratorType);
+        if (! $idGenerator->isPostInsertGenerator()) {
+            $id = $idGenerator->generate($this->manager, $object);
+            $class->setIdentifierValue($object, $id);
         }
 
         $this->documentStates[$oid] = self::STATE_MANAGED;

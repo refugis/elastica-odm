@@ -10,6 +10,7 @@ use Kcs\Metadata\Loader\Processor\ProcessorFactory;
 use Kcs\Metadata\Loader\Processor\ProcessorFactoryInterface;
 use Refugis\ODM\Elastica\Annotation as Annotation;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\Metadata\EmbeddedMetadata;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 use Refugis\ODM\Elastica\Metadata\Processor as Processor;
 use TypeError;
@@ -33,6 +34,8 @@ trait AnnotationLoaderTrait
         $factory = new ProcessorFactory();
         $factory->registerProcessor(Annotation\DocumentId::class, Processor\DocumentIdProcessor::class);
         $factory->registerProcessor(Annotation\Document::class, Processor\DocumentProcessor::class);
+        $factory->registerProcessor(Annotation\Embeddable::class, Processor\EmbeddableProcessor::class);
+        $factory->registerProcessor(Annotation\Embedded::class, Processor\EmbeddedProcessor::class);
         $factory->registerProcessor(Annotation\Field::class, Processor\FieldProcessor::class);
         $factory->registerProcessor(Annotation\IndexName::class, Processor\IndexNameProcessor::class);
         $factory->registerProcessor(Annotation\Index::class, Processor\IndexProcessor::class);
@@ -59,9 +62,21 @@ trait AnnotationLoaderTrait
         }
 
         foreach ($reflectionClass->getProperties() as $reflectionProperty) {
-            $attributeMetadata = new FieldMetadata($classMetadata, $reflectionProperty->name);
-            $this->processPropertyDescriptors($attributeMetadata, $this->getPropertyDescriptors($reflectionProperty));
+            $descriptors = $this->getPropertyDescriptors($reflectionProperty);
+            $embedded = false;
+            foreach ($descriptors as $descriptor) {
+                if ($descriptor instanceof Annotation\Embedded) {
+                    $embedded = true;
+                }
+            }
 
+            if ($embedded) {
+                $attributeMetadata = new EmbeddedMetadata($classMetadata, $reflectionProperty->name);
+            } else {
+                $attributeMetadata = new FieldMetadata($classMetadata, $reflectionProperty->name);
+            }
+
+            $this->processPropertyDescriptors($attributeMetadata, $descriptors);
             $classMetadata->addAttributeMetadata($attributeMetadata);
         }
 

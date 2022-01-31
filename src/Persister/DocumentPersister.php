@@ -12,6 +12,7 @@ use Refugis\ODM\Elastica\Exception\IndexNotFoundException;
 use Refugis\ODM\Elastica\Hydrator\HydratorInterface;
 use Refugis\ODM\Elastica\Id\PostInsertId;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\Metadata\EmbeddedMetadata;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 use Refugis\ODM\Elastica\Tools\SchemaGenerator;
 use Refugis\ODM\Elastica\Util\ClassUtil;
@@ -226,16 +227,28 @@ class DocumentPersister
 
         foreach ($changeSet as $name => $value) {
             $field = $class->getField($name);
-            $type = $typeManager->getType($field->type);
+            if ($field instanceof EmbeddedMetadata) {
+                if ($field->multiple) {
+                    $body[$field->fieldName] = array_map(function ($item) use ($field) {
+                        return $this->prepareEmbeddedUpdateData($item, $field);
+                    }, (array) $value[1]);
+                } elseif ($value[1] !== null) {
+                    $body[$field->fieldName] = $this->prepareEmbeddedUpdateData($value[1], $field);
+                } else {
+                    $script[] = 'ctx._source.remove(\'' . str_replace('\'', '\\\'', $field->fieldName) . '\')';
+                }
+            } elseif ($field instanceof FieldMetadata) {
+                $type = $typeManager->getType($field->type);
 
-            if ($field->multiple) {
-                $body[$field->fieldName] = array_map(static function ($item) use ($type, $field) {
-                    return $type->toDatabase($item, $field->options);
-                }, (array) $value[1]);
-            } elseif ($value[1] !== null) {
-                $body[$field->fieldName] = $type->toDatabase($value[1], $field->options);
-            } else {
-                $script[] = 'ctx._source.remove(\'' . str_replace('\'', '\\\'', $field->fieldName) . '\')';
+                if ($field->multiple) {
+                    $body[$field->fieldName] = array_map(static function ($item) use ($type, $field) {
+                        return $type->toDatabase($item, $field->options);
+                    }, (array) $value[1]);
+                } elseif ($value[1] !== null) {
+                    $body[$field->fieldName] = $type->toDatabase($value[1], $field->options);
+                } else {
+                    $script[] = 'ctx._source.remove(\'' . str_replace('\'', '\\\'', $field->fieldName) . '\')';
+                }
             }
         }
 
@@ -243,5 +256,33 @@ class DocumentPersister
             'body' => $body,
             'script' => implode('; ', $script),
         ];
+    }
+
+    private function prepareEmbeddedUpdateData($value, EmbeddedMetadata $field): array
+    {
+        $class = $this->dm->getClassMetadata($field->targetClass);
+        assert($class instanceof DocumentMetadata);
+
+        $typeManager = $this->dm->getTypeManager();
+        $properties = [];
+        foreach ($class->getFieldNames() as $fieldName) {
+            $classField = $class->getField($fieldName);
+            assert($classField instanceof FieldMetadata);
+
+            $type = $typeManager->getType($classField->type);
+            $itemValue = $classField->getValue($value);
+
+            if ($field->multiple) {
+                $properties[$fieldName] = array_map(static function ($item) use ($type, $classField) {
+                    return $type->toDatabase($item, $classField->options);
+                }, (array) $itemValue);
+            } elseif ($itemValue !== null) {
+                $properties[$fieldName] = $type->toDatabase($itemValue, $classField->options);
+            }
+        }
+
+        // @TODO: nested embedded documents.
+
+        return $properties;
     }
 }

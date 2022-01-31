@@ -9,9 +9,9 @@ use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
  * @Annotation
- * @Target({"PROPERTY"})
+ * @Target({"CLASS"})
  */
-#[Attribute(Attribute::TARGET_PROPERTY)]
-final class IndexName
+#[Attribute(Attribute::TARGET_CLASS)]
+final class Embeddable
 {
 }

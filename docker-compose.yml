@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   php:
-    image: php:cli-buster
+    image: php:8.0-cli-buster
     environment:
       ES_ENDPOINT: 'http://elasticsearch:9200/'
     depends_on:

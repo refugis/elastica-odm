@@ -9,7 +9,9 @@ use ProxyManager\Proxy\ProxyInterface;
 use Refugis\ODM\Elastica\DocumentManager;
 use Refugis\ODM\Elastica\Geotools\Coordinate\Coordinate;
 use Tests\Fixtures\Document\Foo;
+use Tests\Fixtures\Document\FooEmbeddable;
 use Tests\Fixtures\Document\FooNoAutoCreate;
+use Tests\Fixtures\Document\FooWithEmbedded;
 use Tests\Fixtures\Document\FooWithLazyField;
 use Tests\Traits\DocumentManagerTestTrait;
 use Tests\Traits\FixturesTestTrait;
@@ -206,5 +208,33 @@ EOF
         } else {
             self::assertEquals($mapping, $index->getMapping());
         }
+    }
+
+    public function testShouldPersistDocumentWithEmbeddedField(): void
+    {
+        $document = new FooWithEmbedded();
+        $document->id = 'test_persist_with_embedded';
+        $document->emb = new FooEmbeddable();
+        $document->emb->stringField = __METHOD__;
+
+        $this->dm->persist($document);
+        $this->dm->flush();
+        $this->dm->clear();
+
+        $result = $this->dm->find(FooWithEmbedded::class, 'test_persist_with_embedded');
+        self::assertInstanceOf(FooWithEmbedded::class, $result);
+        self::assertEquals('test_persist_with_embedded', $result->id);
+        self::assertNotNull($result->emb);
+        self::assertEquals(__METHOD__, $result->emb->stringField);
+
+        $result->emb->stringField = __FUNCTION__;
+        $this->dm->flush();
+        $this->dm->clear();
+
+        $result = $this->dm->find(FooWithEmbedded::class, 'test_persist_with_embedded');
+        self::assertInstanceOf(FooWithEmbedded::class, $result);
+        self::assertEquals('test_persist_with_embedded', $result->id);
+        self::assertNotNull($result->emb);
+        self::assertEquals(__FUNCTION__, $result->emb->stringField);
     }
 }

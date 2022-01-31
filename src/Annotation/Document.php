@@ -20,7 +20,7 @@ use const E_USER_DEPRECATED;
  * @Annotation
  * @Target({"CLASS"})
  */
-#[Attribute]
+#[Attribute(Attribute::TARGET_CLASS)]
 final class Document
 {
     /**

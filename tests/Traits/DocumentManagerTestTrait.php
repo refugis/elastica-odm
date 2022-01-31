@@ -12,10 +12,7 @@ trait DocumentManagerTestTrait
 {
     private static function createDocumentManager(): DocumentManagerInterface
     {
-        $processorFactory = new ProcessorFactory();
-        $processorFactory->registerProcessors(__DIR__.'/../../src/Metadata/Processor');
-
-        $loader = new AnnotationLoader($processorFactory, __DIR__.'/../Fixtures/Document');
+        $loader = new AnnotationLoader(AnnotationLoader::createProcessorFactory(), __DIR__.'/../Fixtures/Document');
         $loader->setReader(new AnnotationReader());
 
         $builder = Builder::create()->addMetadataLoader($loader);

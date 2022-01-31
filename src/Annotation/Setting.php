@@ -19,7 +19,7 @@ use function Safe\sprintf;
  * @Annotation
  * @Target({"CLASS"})
  */
-#[Attribute]
+#[Attribute(Attribute::TARGET_CLASS)]
 final class Setting
 {
     /**
