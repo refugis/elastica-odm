@@ -14,8 +14,9 @@ jobs:
 
                 php_version:
                     - '7.4'
-                    # Currently disabled as proxy-manager for php8 is not released yet.
-                    # - '8.0'
+                    - '8.0'
+                    # Currently disabled as proxy-manager for php8.1 is not released yet.
+                    # - '8.1'
 
         name: PHP ${{ matrix.php_version }} against ES ${{ matrix.es_version.engine }}
         steps:

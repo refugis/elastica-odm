@@ -24,18 +24,18 @@
         "csfix": "vendor/bin/phpcbf --standard=Solido src/"
     },
     "require": {
-        "php": "^7.4|^8.0",
+        "php": "^7.4 || ^8.0",
         "ext-json": "*",
         "doctrine/annotations": "^1.6",
         "doctrine/common": "^3.0",
         "doctrine/inflector": "^2.0",
         "doctrine/persistence": "^2.0",
-        "kcs/class-finder": "^0.1|^0.2|^0.3",
-        "kcs/metadata": "^3.1|^4.0",
+        "kcs/class-finder": "^0.1 || ^0.2 || ^0.3",
+        "kcs/metadata": "^3.1 || ^4.0",
         "ocramius/proxy-manager": "^2.0",
         "psr/cache-implementation": "^1.0",
         "psr/log": "^1.0",
-        "ruflin/elastica": "^5.0|^6.0|^7.0",
+        "ruflin/elastica": "^5.0 || ^6.0 || ^7.0",
         "symfony/polyfill-php80": "^1.0",
         "thecodingmachine/safe": "^1.0"
     },
@@ -44,10 +44,10 @@
         "phpunit/phpunit": "^9.0",
         "roave/security-advisories": "dev-master",
         "solido/php-coding-standards": "dev-master",
-        "symfony/cache": "^3.1|^4.0|^5.0",
-        "symfony/console": "^3.4|^4.0|^5.0",
-        "symfony/dependency-injection": "^3.4|^4.0|^5.0",
-        "symfony/var-dumper": "^3.1|^4.0|^5.0"
+        "symfony/cache": "^3.1 || ^4.0 || ^5.0 || ^6.0",
+        "symfony/console": "^3.4 || ^4.0 || ^5.0 || ^6.0",
+        "symfony/dependency-injection": "^3.4 || ^4.0 || ^5.0 || ^6.0",
+        "symfony/var-dumper": "^3.1 || ^4.0 || ^5.0 || ^6.0"
     },
     "autoload": {
         "psr-4": {
@@ -60,7 +60,11 @@
         }
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "phpstan/extension-installer": true
+        }
     },
     "archive": {
         "exclude": ["tests", "vendor", ".php_cs", ".gitignore", "phpunit.xml.dist", "README.md"]
