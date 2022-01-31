@@ -49,7 +49,7 @@ final class Setting
         if (is_string($type)) {
             $data = ['type' => $type];
         } elseif (is_array($type)) {
-            $data = $type;
+            $data = $type + ['type' => 'auto'];
         } else {
             throw new TypeError(sprintf('Argument #1 passed to %s must be a string. %s passed', __METHOD__, get_debug_type($type)));
         }
