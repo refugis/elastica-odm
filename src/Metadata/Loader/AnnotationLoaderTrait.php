@@ -6,9 +6,12 @@ namespace Refugis\ODM\Elastica\Metadata\Loader;
 
 use Kcs\ClassFinder\Finder\FinderInterface;
 use Kcs\Metadata\ClassMetadataInterface;
+use Kcs\Metadata\Loader\Processor\ProcessorFactory;
 use Kcs\Metadata\Loader\Processor\ProcessorFactoryInterface;
+use Refugis\ODM\Elastica\Annotation as Annotation;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
+use Refugis\ODM\Elastica\Metadata\Processor as Processor;
 use TypeError;
 
 use function get_debug_type;
@@ -23,6 +26,20 @@ trait AnnotationLoaderTrait
         $this->prefixDir = $prefixDir;
 
         parent::__construct($processorFactory);
+    }
+
+    public static function createProcessorFactory(): ProcessorFactoryInterface
+    {
+        $factory = new ProcessorFactory();
+        $factory->registerProcessor(Annotation\DocumentId::class, Processor\DocumentIdProcessor::class);
+        $factory->registerProcessor(Annotation\Document::class, Processor\DocumentProcessor::class);
+        $factory->registerProcessor(Annotation\Field::class, Processor\FieldProcessor::class);
+        $factory->registerProcessor(Annotation\IndexName::class, Processor\IndexNameProcessor::class);
+        $factory->registerProcessor(Annotation\Index::class, Processor\IndexProcessor::class);
+        $factory->registerProcessor(Annotation\Setting::class, Processor\SettingProcessor::class);
+        $factory->registerProcessor(Annotation\TypeName::class, Processor\TypeNameProcessor::class);
+
+        return $factory;
     }
 
     public function loadClassMetadata(ClassMetadataInterface $classMetadata): bool
