@@ -52,7 +52,7 @@ abstract class AbstractDateTimeType extends AbstractType
 
         assert($value instanceof DateTimeInterface);
 
-        return $value->format($options['format'] ?? DateTime::ATOM);
+        return $value->format($options['format'] ?? DateTime::ISO8601);
     }
 
     /**
