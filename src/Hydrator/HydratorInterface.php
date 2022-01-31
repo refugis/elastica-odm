@@ -15,18 +15,18 @@ interface HydratorInterface
     /**
      * Hydrates all the documents in the result set.
      *
-     * @return object[]
-     *
      * @phpstan-param class-string $className
+     *
+     * @return object[]
      */
     public function hydrateAll(ResultSet $resultSet, string $className): array;
 
     /**
      * Hydrates only one document.
      *
-     * @return mixed
-     *
      * @phpstan-param class-string $className
+     *
+     * @return mixed
      */
     public function hydrateOne(Document $document, string $className);
 }

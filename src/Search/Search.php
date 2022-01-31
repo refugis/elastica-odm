@@ -271,7 +271,7 @@ class Search implements IteratorAggregate
      *
      * @return Generator<ResultSet>
      */
-    private function _doExecute(Query $query)
+    private function _doExecute(Query $query): Generator
     {
         $collection = $this->documentManager->getCollection($this->documentClass);
 
@@ -291,7 +291,7 @@ class Search implements IteratorAggregate
      *
      * @return Generator<ResultSet>
      */
-    private function _doExecuteCached(Query $query)
+    private function _doExecuteCached(Query $query): Generator
     {
         $resultCache = $this->documentManager->getResultCache();
         if ($resultCache !== null) {

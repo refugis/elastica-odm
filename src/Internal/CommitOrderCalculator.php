@@ -13,8 +13,7 @@ use function iterator_to_array;
 
 final class CommitOrderCalculator
 {
-    /** @var DocumentGraph */
-    private $graph;
+    private DocumentGraph $graph;
 
     public function __construct()
     {

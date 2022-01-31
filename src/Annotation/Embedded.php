@@ -8,6 +8,11 @@ use Attribute;
 use Doctrine\Common\Annotations\Annotation\Target;
 use TypeError;
 
+use function get_debug_type;
+use function is_array;
+use function is_string;
+use function sprintf;
+
 /**
  * @Annotation
  * @Target({"PROPERTY"})

@@ -34,7 +34,6 @@ use function array_map;
 use function array_merge;
 use function assert;
 use function get_class;
-use function in_array;
 use function is_array;
 use function method_exists;
 use function spl_object_hash;
@@ -514,7 +513,7 @@ final class UnitOfWork
                 if ($field->multiple) {
                     $value = array_map(static function ($item) use ($fieldType, $field) {
                         return $fieldType->toPHP($item, $field->options);
-                    }, (array)$value);
+                    }, (array) $value);
                 } else {
                     $value = $fieldType->toPHP($value, $field->options);
                 }
@@ -942,22 +941,22 @@ final class UnitOfWork
         $this->scheduleForInsert($object);
     }
 
-    private function cascadeDetach($object, $visited)
+    private function cascadeDetach($object, $visited): void
     {
         // @todo
     }
 
-    private function cascadeMerge($object, $managedCopy, $visited)
+    private function cascadeMerge($object, $managedCopy, $visited): void
     {
         // @todo
     }
 
-    private function cascadeRemove($object, $visited)
+    private function cascadeRemove($object, $visited): void
     {
         // @todo
     }
 
-    private function cascadePersist($object, $visited)
+    private function cascadePersist($object, $visited): void
     {
         // @todo
     }
@@ -1011,12 +1010,12 @@ final class UnitOfWork
         $this->documentStates[$oid] = self::STATE_REMOVED;
     }
 
-    private function dispatchOnFlush()
+    private function dispatchOnFlush(): void
     {
         // @todo
     }
 
-    private function dispatchPostFlush()
+    private function dispatchPostFlush(): void
     {
         // @todo
     }

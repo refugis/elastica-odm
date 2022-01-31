@@ -102,9 +102,9 @@ final class Configuration
     /**
      * Sets default repository class.
      *
-     * @throws InvalidDocumentRepositoryException
-     *
      * @phpstan-param class-string $className
+     *
+     * @throws InvalidDocumentRepositoryException
      */
     public function setDefaultRepositoryClassName(string $className): void
     {

@@ -11,11 +11,9 @@ namespace Refugis\ODM\Elastica\Internal;
  */
 final class DocumentGraphEdge
 {
-    /** @var DocumentGraphNode */
-    private $source;
+    private DocumentGraphNode $source;
 
-    /** @var DocumentGraphNode */
-    private $destination;
+    private DocumentGraphNode $destination;
 
     public function __construct(DocumentGraphNode $source, DocumentGraphNode $destination)
     {

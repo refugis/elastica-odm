@@ -51,7 +51,7 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
         return $metadatas;
     }
 
-    public function setMetadataFor($className, $class)
+    public function setMetadataFor($className, $class): void
     {
         // @todo
     }

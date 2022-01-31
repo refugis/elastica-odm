@@ -51,7 +51,7 @@ class DocumentPersister
      *
      * @return object|null the loaded and managed document instance or null if no document was found
      */
-    public function load(array $criteria, array $hints = [], $document = null): ?object
+    public function load(array $criteria, array $hints = [], ?object $document = null): ?object
     {
         $query = $this->prepareQuery($criteria);
         if ($hints[Hints::HINT_REFRESH] ?? false) {

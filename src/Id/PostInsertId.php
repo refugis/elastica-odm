@@ -8,17 +8,13 @@ final class PostInsertId
 {
     /**
      * The document for which the id has been created.
-     *
-     * @var object
      */
-    private $document;
+    private object $document;
 
     /**
      * The returned id.
-     *
-     * @var string
      */
-    private $id;
+    private string $id;
 
     public function __construct(object $document, string $id)
     {

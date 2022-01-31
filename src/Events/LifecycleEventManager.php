@@ -20,27 +20,27 @@ class LifecycleEventManager
         $this->evm = $evm;
     }
 
-    public function postPersist(DocumentMetadata $class, $object)
+    public function postPersist(DocumentMetadata $class, $object): void
     {
         // @todo
     }
 
-    public function prePersist(DocumentMetadata $class, $object)
+    public function prePersist(DocumentMetadata $class, $object): void
     {
         // @todo
     }
 
-    public function preRemove(DocumentMetadata $class, $object)
+    public function preRemove(DocumentMetadata $class, $object): void
     {
         // @todo
     }
 
-    public function postRemove(DocumentMetadata $class, $object)
+    public function postRemove(DocumentMetadata $class, $object): void
     {
         // @todo
     }
 
-    public function preUpdate(DocumentMetadata $class, $document)
+    public function preUpdate(DocumentMetadata $class, $document): void
     {
         // @todo Check lifecycle callbacks
 
@@ -52,7 +52,7 @@ class LifecycleEventManager
         $this->uow->recomputeSingleDocumentChangeset($document);
     }
 
-    public function postUpdate(DocumentMetadata $class, $document)
+    public function postUpdate(DocumentMetadata $class, $document): void
     {
         // @todo
     }

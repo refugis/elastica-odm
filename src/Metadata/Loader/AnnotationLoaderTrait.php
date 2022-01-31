@@ -8,11 +8,11 @@ use Kcs\ClassFinder\Finder\FinderInterface;
 use Kcs\Metadata\ClassMetadataInterface;
 use Kcs\Metadata\Loader\Processor\ProcessorFactory;
 use Kcs\Metadata\Loader\Processor\ProcessorFactoryInterface;
-use Refugis\ODM\Elastica\Annotation as Annotation;
+use Refugis\ODM\Elastica\Annotation;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Metadata\EmbeddedMetadata;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
-use Refugis\ODM\Elastica\Metadata\Processor as Processor;
+use Refugis\ODM\Elastica\Metadata\Processor;
 use TypeError;
 
 use function get_debug_type;
@@ -65,9 +65,11 @@ trait AnnotationLoaderTrait
             $descriptors = $this->getPropertyDescriptors($reflectionProperty);
             $embedded = false;
             foreach ($descriptors as $descriptor) {
-                if ($descriptor instanceof Annotation\Embedded) {
-                    $embedded = true;
+                if (! ($descriptor instanceof Annotation\Embedded)) {
+                    continue;
                 }
+
+                $embedded = true;
             }
 
             if ($embedded) {

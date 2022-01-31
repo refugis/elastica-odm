@@ -19,14 +19,13 @@ use function count;
  */
 final class DocumentGraphNode implements Countable, IteratorAggregate
 {
-    /** @var string */
-    private $className;
+    private string $className;
 
     /** @var DocumentGraphEdge[] */
-    private $inEdges;
+    private array $inEdges;
 
     /** @var DocumentGraphEdge[] */
-    private $outEdges;
+    private array $outEdges;
 
     public function __construct(string $className)
     {
