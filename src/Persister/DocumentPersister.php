@@ -272,7 +272,7 @@ class DocumentPersister
             $type = $typeManager->getType($classField->type);
             $itemValue = $classField->getValue($value);
 
-            if ($field->multiple) {
+            if ($classField->multiple) {
                 $properties[$fieldName] = array_map(static function ($item) use ($type, $classField) {
                     return $type->toDatabase($item, $classField->options);
                 }, (array) $itemValue);
