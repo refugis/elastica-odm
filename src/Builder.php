@@ -99,6 +99,7 @@ final class Builder
             ->addType(new Type\CompletionType())
             ->addType(new Type\DateTimeImmutableType())
             ->addType(new Type\DateTimeType())
+            ->addType(new Type\FlattenedType())
             ->addType(new Type\FloatType())
             ->addType(new Type\GeoPointType())
             ->addType(new Type\GeoShapeType())
