@@ -38,18 +38,13 @@ class Collection implements CollectionInterface
     /** @var array<string, mixed> */
     private array $staticSettings;
 
-    /**
-     * @deprecated
-     *
-     * @var array<string, mixed>
-     */
-    private array $indexParams;
+    private ?string $joinFieldName = null;
+    private ?string $joinType = null;
 
     public function __construct(string $documentClass, SearchableInterface $searchable)
     {
         $this->documentClass = $documentClass;
         $this->searchable = $searchable;
-        $this->indexParams = [];
         $this->dynamicSettings = [];
         $this->staticSettings = [];
 
@@ -63,18 +58,6 @@ class Collection implements CollectionInterface
     public function getName(): string
     {
         return $this->name;
-    }
-
-    /**
-     * Sets the index params used when the index is created.
-     *
-     * @deprecated Index params are deprecated and will be removed in 2.0. Please use setDynamicSettings/setStaticSettings instead.
-     *
-     * @param array<string, mixed> $indexParams
-     */
-    public function setIndexParams(array $indexParams = []): void
-    {
-        $this->indexParams = $indexParams;
     }
 
     /**
@@ -97,8 +80,19 @@ class Collection implements CollectionInterface
         $this->staticSettings = $staticSettings;
     }
 
+    /**
+     * Sets the join type and field name.
+     */
+    public function setJoin(string $joinType, string $joinFieldName): void
+    {
+        $this->joinType = $joinType;
+        $this->joinFieldName = $joinFieldName;
+    }
+
     public function scroll(Query $query, string $expiryTime = '1m'): Scroll
     {
+        $query = $this->prepareQuery($query);
+
         // Scroll requests have optimizations that make them faster when the sort order is _doc.
         // Add it to the query if no sort option have been defined.
         if (! $query->hasParam('sort')) {
@@ -120,6 +114,8 @@ class Collection implements CollectionInterface
 
     public function search(Query $query): ResultSet
     {
+        $query = $this->prepareQuery($query);
+
         try {
             return $this->searchable->search($query);
         } catch (ResponseException $exception) {
@@ -136,14 +132,14 @@ class Collection implements CollectionInterface
     public function createSearch(DocumentManagerInterface $documentManager, Query $query): Search
     {
         $search = new Search($documentManager, $this->documentClass);
-        $search->setQuery($query);
+        $search->setQuery($this->prepareQuery($query));
 
         return $search;
     }
 
     public function count(Query $query): int
     {
-        return $this->searchable->count($query);
+        return $this->searchable->count($this->prepareQuery($query));
     }
 
     public function refresh(): void
@@ -160,12 +156,21 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function create(?string $id, array $body): Response
+    public function create(?string $id, array $body, ?string $routing = null): Response
     {
         $endpoint = new Endpoints\Index();
+        $params = [];
         if (! empty($id)) {
-            $endpoint->setParams(['op_type' => 'create']);
+            $params['op_type'] = 'create';
             $endpoint->setID($id);
+        }
+
+        if ($routing !== null) {
+            $params['routing'] = $routing;
+        }
+
+        if (! empty($params)) {
+            $endpoint->setParams($params);
         }
 
         $endpoint->setBody($body);
@@ -192,7 +197,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function update(string $id, array $body, string $script = ''): void
+    public function update(string $id, array $body, string $script = '', ?string $routing = null): void
     {
         $body = array_filter([
             'doc' => $body,
@@ -221,6 +226,9 @@ class Collection implements CollectionInterface
 
         $endpoint = new Endpoints\Update();
         $endpoint->setID($id);
+        if ($routing !== null) {
+            $endpoint->setParams(['routing' => $routing]);
+        }
 
         $endpoint->setBody($body);
 
@@ -256,9 +264,10 @@ class Collection implements CollectionInterface
      */
     public function deleteByQuery(Query\AbstractQuery $query, array $params = []): void
     {
+        $q = $this->prepareQuery(new Query($query));
         $endpoint = new Endpoints\DeleteByQuery();
         $endpoint->setBody([
-            'query' => $query->toArray(),
+            'query' => $q->getQuery()->toArray(),
         ]);
 
         try {
@@ -285,10 +294,7 @@ class Collection implements CollectionInterface
         }
 
         if (! $index->exists()) {
-            $indexParams = $this->indexParams ?? null;
-            $indexParams['settings'] = array_merge($indexParams['settings'] ?? [], $this->staticSettings, $this->dynamicSettings);
-
-            $index->create($indexParams);
+            $index->create(['settings' => array_merge($this->staticSettings, $this->dynamicSettings)]);
         } elseif (! empty($this->dynamicSettings)) {
             $index->setSettings($this->dynamicSettings);
         }
@@ -324,5 +330,23 @@ class Collection implements CollectionInterface
                 throw $exception;
             }
         }
+    }
+
+    private function prepareQuery(Query $query): Query
+    {
+        if ($this->joinType === null) {
+            return clone $query;
+        }
+
+        $innerQuery = $query->getQuery();
+        $bool = new Query\BoolQuery();
+        $bool
+            ->addMust(new Query\Term([$this->joinFieldName => ['value' => $this->joinType]]))
+            ->addMust($innerQuery);
+
+        $query = clone $query;
+        $query->setQuery($bool);
+
+        return $query;
     }
 }

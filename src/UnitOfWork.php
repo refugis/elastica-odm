@@ -9,6 +9,7 @@ use Doctrine\Common\EventManager;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectManagerAware;
 use Elastica\Document;
+use Kcs\Metadata\PropertyMetadata;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Refugis\ODM\Elastica\Events\LifecycleEventManager;
 use Refugis\ODM\Elastica\Events\PreFlushEventArgs;
@@ -346,12 +347,31 @@ final class UnitOfWork
 
         $class = $this->getClassMetadata($document);
         $actualData = [];
+        $joinFieldName = $class->join['fieldName'] ?? null;
         foreach ($class->attributesMetadata as $field) {
             if ($field instanceof FieldMetadata && $field->isStored()) {
-                $actualData[$field->fieldName] = $field->getValue($document);
+                if ($field->fieldName === $class->parentField) {
+                    $parentField = $class->getAttributeMetadata($class->parentField);
+                    assert($parentField instanceof PropertyMetadata);
+
+                    $refl = $parentField->getReflection();
+                    $refl->setAccessible(true);
+
+                    $parentObject = $refl->getValue($document);
+                    $parentMetadata = $this->getClassMetadata($parentObject);
+                    $parentId = $parentMetadata->getSingleIdentifier($parentObject);
+
+                    $actualData[$joinFieldName] = ['name' => $class->join['type'], 'parent' => $parentId];
+                } else {
+                    $actualData[$field->fieldName] = $field->getValue($document);
+                }
             } elseif ($field instanceof EmbeddedMetadata) {
                 $actualData[$field->fieldName] = $field->getValue($document);
             }
+        }
+
+        if ($joinFieldName !== null && $class->parentField === null) {
+            $actualData[$joinFieldName] = ['name' => $class->join['type']];
         }
 
         if (! isset($this->originalDocumentData[$oid])) {
@@ -653,12 +673,31 @@ final class UnitOfWork
         }
 
         $actualData = [];
+        $joinFieldName = $class->join['fieldName'] ?? null;
         foreach ($class->attributesMetadata as $field) {
             if ($field instanceof FieldMetadata && $field->isStored()) {
-                $actualData[$field->fieldName] = $field->getValue($document);
+                if ($field->fieldName === $class->parentField) {
+                    $parentField = $class->getAttributeMetadata($class->parentField);
+                    assert($parentField instanceof PropertyMetadata);
+
+                    $refl = $parentField->getReflection();
+                    $refl->setAccessible(true);
+
+                    $parentObject = $refl->getValue($document);
+                    $parentMetadata = $this->getClassMetadata($parentObject);
+                    $parentId = $parentMetadata->getSingleIdentifier($parentObject);
+
+                    $actualData[$joinFieldName] = ['name' => $class->join['type'], 'parent' => $parentId];
+                } else {
+                    $actualData[$field->fieldName] = $field->getValue($document);
+                }
             } elseif ($field instanceof EmbeddedMetadata) {
                 $actualData[$field->fieldName] = $field->getValue($document);
             }
+        }
+
+        if ($joinFieldName !== null && $class->parentField === null) {
+            $actualData[$joinFieldName] = ['name' => $class->join['type']];
         }
 
         if (! isset($this->originalDocumentData[$oid])) {

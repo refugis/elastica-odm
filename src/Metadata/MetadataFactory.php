@@ -122,6 +122,40 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
 
         $classMetadata->identifier = $identifier;
         $classMetadata->eagerFieldNames = array_filter($classMetadata->eagerFieldNames);
+
+        if ($classMetadata->join === null || ! isset($classMetadata->join['parentClass'])) {
+            return;
+        }
+
+        $parentClass = $classMetadata->join['parentClass'];
+        $parentMetadata = $this->getMetadataFor($parentClass);
+        if (! $parentMetadata instanceof DocumentMetadata || ! $parentMetadata->document) {
+            throw new InvalidMetadataException(sprintf('Invalid document parent class "%s" is invalid for "%s".', $parentClass, $classMetadata->name));
+        }
+
+        if ($parentMetadata->join === null || ! isset($parentMetadata->join['type'])) {
+            throw new InvalidMetadataException(sprintf('Document parent class "%s" does not define a join type. Please add a joinType attribute to its definition.', $parentClass));
+        }
+
+        $classMetadata->collectionName = $parentMetadata->collectionName;
+        $classMetadata->dynamicSettings = $parentMetadata->dynamicSettings;
+        $classMetadata->staticSettings = $parentMetadata->staticSettings;
+
+        $joinFieldName = $parentMetadata->join['fieldName'];
+        $classMetadata->join['fieldName'] = $joinFieldName;
+
+        $fieldMetadata = $classMetadata->getField($joinFieldName);
+        if ($fieldMetadata !== null) {
+            throw new InvalidMetadataException(sprintf('Join field name "%s" conflicts with field name of property "%s" on class "%s".', $joinFieldName, $fieldMetadata->name, $classMetadata->name));
+        }
+
+        $rootMetadata = $parentMetadata;
+        while (isset($rootMetadata->join['parentClass'])) {
+            $rootMetadata = $this->getMetadataFor($rootMetadata->join['parentClass']);
+        }
+
+        $rootMetadata->join['relations'][$parentMetadata->join['type']][] = $classMetadata->join['type'];
+        $rootMetadata->childrenClasses[] = $classMetadata->name;
     }
 
     protected function createMetadata(ReflectionClass $class): ClassMetadataInterface

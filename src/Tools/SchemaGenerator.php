@@ -28,6 +28,10 @@ final class SchemaGenerator
 
         foreach ($factory->getAllMetadata() as $metadata) {
             assert($metadata instanceof DocumentMetadata);
+            if ($metadata->join !== null && isset($metadata->join['parentClass'])) {
+                continue;
+            }
+
             $mapping = $mappingGenerator->getMapping($metadata);
             $schema->addCollection(new Collection($metadata, $mapping));
         }

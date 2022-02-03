@@ -15,11 +15,11 @@ class FlattenedType extends AbstractType
      */
     public function toPHP($value, array $options = [])
     {
-        if (null === $value) {
+        if ($value === null) {
             return null;
         }
 
-        if (!is_array($value)) {
+        if (! is_array($value)) {
             throw new ConversionFailedException($value, 'array');
         }
 
@@ -31,11 +31,11 @@ class FlattenedType extends AbstractType
      */
     public function toDatabase($value, array $options = [])
     {
-        if (null === $value) {
+        if ($value === null) {
             return null;
         }
 
-        if (!is_array($value)) {
+        if (! is_array($value)) {
             throw new ConversionFailedException($value, 'array');
         }
 

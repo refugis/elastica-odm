@@ -33,8 +33,23 @@ final class Document
      */
     public ?string $repositoryClass = null;
 
-    public function __construct($collection = null, ?string $repositoryClass = null)
-    {
+    /**
+     * The label of join type for this document class.
+     */
+    public ?string $joinType = null;
+
+    /**
+     * The name of join field type for this document class. Defaults to "joinField".
+     */
+    public ?string $joinFieldName = null;
+
+    public function __construct(
+        $collection = null,
+        ?string $repositoryClass = null,
+        ?string $joinType = null,
+        ?string $joinFieldName = null,
+        ?string $parent = null
+    ) {
         if ($collection === null || is_string($collection)) {
             $data = ['collection' => $collection];
         } elseif (is_array($collection)) {
@@ -51,5 +66,7 @@ final class Document
 
         $this->collection = $data['collection'] ?? null;
         $this->repositoryClass = $data['repositoryClass'] ?? $repositoryClass;
+        $this->joinType = $data['joinType'] ?? $joinType;
+        $this->joinFieldName = $data['joinFieldName'] ?? $joinFieldName;
     }
 }

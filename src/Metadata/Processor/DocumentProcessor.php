@@ -53,6 +53,16 @@ class DocumentProcessor implements ProcessorInterface
         }
 
         $metadata->customRepositoryClassName = $subject->repositoryClass;
+        if ($subject->joinType === null) {
+            return;
+        }
+
+        $join = [
+            'type' => $subject->joinType,
+            'fieldName' => $subject->joinFieldName ?? 'joinField',
+        ];
+
+        $metadata->join = $join;
     }
 
     /**

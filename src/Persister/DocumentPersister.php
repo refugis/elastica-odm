@@ -125,8 +125,21 @@ class DocumentPersister
         $id = $postIdGenerator ? null : $class->getSingleIdentifier($document);
         $body = $this->prepareUpdateData($document)['body'];
 
+        $routing = null;
+        if ($class->join !== null) {
+            $routingObject = $document;
+            $metadata = $class;
+
+            while ($metadata->parentField !== null) {
+                $routingObject = $metadata->getField($metadata->parentField)->getValue($routingObject);
+                $metadata = $this->dm->getClassMetadata(ClassUtil::getClass($routingObject));
+            }
+
+            $routing = $metadata->getSingleIdentifier($routingObject);
+        }
+
         try {
-            $response = $this->collection->create($id, $body);
+            $response = $this->collection->create($id, $body, $routing);
         } catch (IndexNotFoundException $e) {
             $schemaGenerator = new SchemaGenerator($this->dm);
             $schema = $schemaGenerator->generateSchema()->getMapping()[$this->class->name] ?? null;
@@ -136,7 +149,7 @@ class DocumentPersister
             }
 
             $this->collection->updateMapping($schema->getMapping());
-            $response = $this->collection->create($id, $body);
+            $response = $this->collection->create($id, $body, $routing);
         }
 
         $data = $response->getData();
@@ -222,10 +235,18 @@ class DocumentPersister
         $body = [];
 
         $changeSet = $this->dm->getUnitOfWork()->getDocumentChangeSet($document);
-        $class = $this->dm->getClassMetadata(ClassUtil::getClass($document));
         $typeManager = $this->dm->getTypeManager();
 
+        $class = $this->dm->getClassMetadata(ClassUtil::getClass($document));
+        assert($class instanceof DocumentMetadata);
+
+        $joinFieldName = $class->join['fieldName'] ?? null;
         foreach ($changeSet as $name => $value) {
+            if ($name === $joinFieldName) {
+                $body[$joinFieldName] = $value[1];
+                continue;
+            }
+
             $field = $class->getField($name);
             if ($field instanceof EmbeddedMetadata) {
                 if ($field->multiple) {

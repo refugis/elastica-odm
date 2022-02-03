@@ -49,12 +49,12 @@ interface CollectionInterface
     /**
      * Request the index of a document.
      */
-    public function create(?string $id, array $body): Response;
+    public function create(?string $id, array $body, ?string $routing = null): Response;
 
     /**
      * Updates a document.
      */
-    public function update(string $id, array $body, string $script = ''): void;
+    public function update(string $id, array $body, string $script = '', ?string $routing = null): void;
 
     /**
      * Request the deletion of a document.

@@ -7,12 +7,15 @@ namespace Refugis\ODM\Elastica\Tools;
 use Elastica\Mapping;
 use Elastica\Type\Mapping as TypeMapping;
 use Kcs\Metadata\Factory\MetadataFactoryInterface;
+use Refugis\ODM\Elastica\Exception\RuntimeException;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Metadata\EmbeddedMetadata;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 use Refugis\ODM\Elastica\Type\TypeManager;
 
+use function assert;
 use function class_exists;
+use function sprintf;
 
 final class MappingGenerator
 {
@@ -67,6 +70,27 @@ final class MappingGenerator
             }
 
             $properties[$field->fieldName] = $mapping;
+        }
+
+        if (isset($class->join['type']) && ! isset($class->join['parentClass'])) {
+            $properties[$class->join['fieldName']] = [
+                'type' => 'join',
+                'relations' => $class->join['relations'],
+            ];
+        }
+
+        foreach ($class->childrenClasses as $childClassName) {
+            $childClass = $this->metadataFactory->getMetadataFor($childClassName);
+            assert($childClass instanceof DocumentMetadata);
+
+            $childProperties = $this->generatePropertiesMapping($childClass);
+            foreach ($childProperties as $name => $childProperty) {
+                if (isset($properties[$name]) && $properties[$name] !== $childProperty) {
+                    throw new RuntimeException(sprintf('Conflicting property definition while generating mapping for class "%s" and its children: definitions of field "%s" are incompatible.', $class->name, $name));
+                }
+
+                $properties[$name] = $childProperty;
+            }
         }
 
         return $properties;

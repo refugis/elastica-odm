@@ -7,8 +7,6 @@ jobs:
         strategy:
             matrix:
                 es_version:
-                    # Disable until elastic/elastic-github-actions#16 is merged
-                    # - { engine: '5.6.16', lib: '^5.0' }
                     - { engine: '6.8.13', lib: '^6.0' }
                     - { engine: '7.10.1', lib: '^7.0' }
 

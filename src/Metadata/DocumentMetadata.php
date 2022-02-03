@@ -57,27 +57,47 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     /**
      * An array containing all the non-lazy field names.
      */
-    public array $eagerFieldNames;
+    public array $eagerFieldNames = [];
 
     /**
      * An array containing all the field names.
      */
-    public array $fieldNames;
+    public array $fieldNames = [];
 
     /**
      * An array containing all the field names.
      */
-    public array $embeddedFieldNames;
+    public array $embeddedFieldNames = [];
+
+    /**
+     * The join settings.
+     *
+     * @var array<string, mixed>|null
+     * @phpstan-var array{type: string, fieldName: string, parentClass?: class-string, relations?: array<string, array<string>>}|null
+     */
+    public ?array $join = null;
+
+    /**
+     * The join parent field.
+     */
+    public ?string $parentField = null;
+
+    /**
+     * While processing joins, this property will contain all the children class names (all levels).
+     *
+     * @var array<class-string>
+     */
+    public array $childrenClasses = [];
 
     /**
      * Gets the index dynamic settings.
      */
-    public ?array $dynamicSettings = null;
+    public array $dynamicSettings = [];
 
     /**
      * Gets the index static settings.
      */
-    public ?array $staticSettings = null;
+    public array $staticSettings = [];
 
     /**
      * The instantiator used to build new object instances.
@@ -91,11 +111,6 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
         $this->instantiator = new Instantiator();
         $this->document = false;
         $this->embeddable = false;
-        $this->fieldNames = [];
-        $this->embeddedFieldNames = [];
-        $this->eagerFieldNames = [];
-        $this->dynamicSettings = [];
-        $this->staticSettings = [];
     }
 
     public function __wakeup(): void
