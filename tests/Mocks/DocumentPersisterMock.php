@@ -59,6 +59,11 @@ class DocumentPersisterMock extends DocumentPersister
         return false;
     }
 
+    public function bulkUpdate(array $documents): void
+    {
+        $this->updates = array_merge($this->updates, array_values($documents));
+    }
+
     /**
      * {@inheritdoc}
      */

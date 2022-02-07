@@ -7,6 +7,7 @@ namespace Refugis\ODM\Elastica\Persister;
 use Elastica\Bulk;
 use Elastica\Document;
 use Elastica\Query;
+use Elastica\Script\Script;
 use Refugis\ODM\Elastica\Collection\CollectionInterface;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Exception\ConversionFailedException;
@@ -19,6 +20,7 @@ use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 use Refugis\ODM\Elastica\Tools\SchemaGenerator;
 use Refugis\ODM\Elastica\Util\ClassUtil;
 
+use function array_filter;
 use function array_map;
 use function array_values;
 use function assert;
@@ -116,6 +118,8 @@ class DocumentPersister
     }
 
     /**
+     * Insert multiple documents.
+     *
      * @param object[] $documents
      *
      * @return array<PostInsertId | null>
@@ -132,19 +136,7 @@ class DocumentPersister
 
             $id = $postIdGenerator ? null : $class->getSingleIdentifier($document);
             $body = $this->prepareUpdateData($document)['body'];
-
-            $routing = null;
-            if ($class->join !== null) {
-                $routingObject = $document;
-                $metadata = $class;
-
-                while ($metadata->parentField !== null) {
-                    $routingObject = $metadata->getField($metadata->parentField)->getValue($routingObject);
-                    $metadata = $this->dm->getClassMetadata(ClassUtil::getClass($routingObject));
-                }
-
-                $routing = $metadata->getSingleIdentifier($routingObject);
-            }
+            $routing = $this->getRouting($class, $document);
 
             $doc = new Document($id, $body);
             $action = new Bulk\Action\CreateDocument($doc);
@@ -218,19 +210,7 @@ class DocumentPersister
 
         $id = $postIdGenerator ? null : $class->getSingleIdentifier($document);
         $body = $this->prepareUpdateData($document)['body'];
-
-        $routing = null;
-        if ($class->join !== null) {
-            $routingObject = $document;
-            $metadata = $class;
-
-            while ($metadata->parentField !== null) {
-                $routingObject = $metadata->getField($metadata->parentField)->getValue($routingObject);
-                $metadata = $this->dm->getClassMetadata(ClassUtil::getClass($routingObject));
-            }
-
-            $routing = $metadata->getSingleIdentifier($routingObject);
-        }
+        $routing = $this->getRouting($class, $document);
 
         try {
             $response = $this->collection->create($id, $body, $routing);
@@ -270,6 +250,57 @@ class DocumentPersister
         }
 
         return $postInsertId;
+    }
+
+    /**
+     * Updates multiple documents.
+     *
+     * @param object[] $documents
+     */
+    public function bulkUpdate(array $documents): void
+    {
+        $operations = [];
+        foreach ($documents as $document) {
+            $class = $this->dm->getClassMetadata(ClassUtil::getClass($document));
+            assert($class instanceof DocumentMetadata);
+
+            $id = $class->getSingleIdentifier($document);
+            $data = $this->prepareUpdateData($document);
+            $routing = $this->getRouting($class, $document);
+
+            $body = array_filter([
+                'doc' => $data['body'],
+                'script' => $data['script'],
+            ]);
+
+            if (count($body) > 1) {
+                $tmp = [$data['script']];
+                $params = [];
+
+                $i = 0;
+                foreach ($body['doc'] as $idx => $value) {
+                    $paramName = 'p_' . $idx . '_' . ++$i;
+                    $tmp[] = 'ctx._source.' . $idx . ' = params.' . $paramName;
+                    $params[$paramName] = $value;
+                }
+
+                $script = implode('; ', $tmp) . ';';
+                $body = new Script($script, $params);
+            } elseif (isset($body['doc'])) {
+                $body = new Document($id, $body['doc']);
+            } else {
+                $body = new Script($data['script']);
+            }
+
+            $action = new Bulk\Action\UpdateDocument($body);
+            if ($routing !== null) {
+                $action->setRouting($routing);
+            }
+
+            $operations[] = $action;
+        }
+
+        $this->collection->bulk($operations);
     }
 
     /**
@@ -399,5 +430,22 @@ class DocumentPersister
         // @TODO: nested embedded documents.
 
         return $properties;
+    }
+
+    private function getRouting(DocumentMetadata $class, object $document): ?string
+    {
+        if ($class->join === null) {
+            return null;
+        }
+
+        $routingObject = $document;
+        $metadata = $class;
+
+        while ($metadata->parentField !== null) {
+            $routingObject = $metadata->getField($metadata->parentField)->getValue($routingObject);
+            $metadata = $this->dm->getClassMetadata(ClassUtil::getClass($routingObject));
+        }
+
+        return $metadata->getSingleIdentifier($routingObject);
     }
 }

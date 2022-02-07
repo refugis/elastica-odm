@@ -23,6 +23,8 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     public const GENERATOR_TYPE_NONE = 0;
     public const GENERATOR_TYPE_AUTO = 1;
 
+    private const JOIN_FIELD_ASSOCIATION = '$$join';
+
     /**
      * Whether this class is representing a document.
      */
@@ -237,7 +239,12 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
      */
     public function getAssociationNames(): array
     {
-        return [];
+        $associations = [];
+        if ($this->join !== null && isset($this->join['parentClass'])) {
+            $associations[] = self::JOIN_FIELD_ASSOCIATION;
+        }
+
+        return $associations;
     }
 
     /**
@@ -258,7 +265,9 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
      */
     public function getAssociationTargetClass($assocName): string
     {
-        // TODO: Implement getAssociationTargetClass() method.
+        if ($assocName === self::JOIN_FIELD_ASSOCIATION) {
+            return $this->join['parentClass'];
+        }
     }
 
     /**

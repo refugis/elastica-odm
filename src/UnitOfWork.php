@@ -1091,21 +1091,30 @@ final class UnitOfWork
 
     private function executeUpdates(string $className): void
     {
-        foreach ($this->documentUpdates as $oid => $document) {
-            $class = $this->getClassMetadata($document);
-            if ($className !== $class->name) {
+        $updates = array_filter($this->documentUpdates, fn (object $document): bool => $className === $this->getClassMetadata($document)->name);
+        if (empty($updates)) {
+            return;
+        }
+
+        $classMetadata = $this->manager->getClassMetadata($className);
+        $persister = $this->getDocumentPersister($className);
+
+        $realUpdates = [];
+        foreach ($updates as $oid => $document) {
+            $this->lifecycleEventManager->preUpdate($classMetadata, $document);
+
+            if (empty($this->documentChangeSets[$oid])) {
                 continue;
             }
 
-            $this->lifecycleEventManager->preUpdate($class, $document);
+            $realUpdates[] = $document;
+        }
 
-            $persister = $this->getDocumentPersister(ClassUtil::getClass($document));
-            if (! empty($this->documentChangeSets[$oid])) {
-                $persister->update($document);
-            }
+        $persister->bulkUpdate($realUpdates);
 
+        foreach ($updates as $oid => $document) {
             unset($this->documentUpdates[$oid], $this->documentChangeSets[$oid]);
-            $this->lifecycleEventManager->postUpdate($class, $document);
+            $this->lifecycleEventManager->postUpdate($classMetadata, $document);
         }
     }
 
