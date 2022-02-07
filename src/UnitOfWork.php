@@ -29,10 +29,12 @@ use Refugis\ODM\Elastica\Persister\DocumentPersister;
 use Refugis\ODM\Elastica\Util\ClassUtil;
 use RuntimeException;
 
+use function array_filter;
 use function array_key_exists;
 use function array_keys;
 use function array_map;
 use function array_merge;
+use function array_values;
 use function assert;
 use function get_class;
 use function is_array;
@@ -1061,26 +1063,29 @@ final class UnitOfWork
 
     private function executeInserts(string $className): void
     {
-        foreach ($this->documentInsertions as $oid => $document) {
-            $class = $this->getClassMetadata($document);
-            if ($className !== $class->name) {
+        $inserts = array_filter($this->documentInsertions, fn (object $document): bool => $className === $this->getClassMetadata($document)->name);
+        if (empty($inserts)) {
+            return;
+        }
+
+        $classMetadata = $this->manager->getClassMetadata($className);
+        $persister = $this->getDocumentPersister($className);
+        $postInsertIds = $persister->bulkInsert($inserts);
+
+        foreach (array_values($inserts) as $i => $document) {
+            $postInsertId = $postInsertIds[$i];
+            if ($postInsertId === null) {
                 continue;
             }
 
-            $persister = $this->getDocumentPersister($class->name);
-            $postInsertId = $persister->insert($document);
+            $id = $postInsertId->getId();
+            $oid = spl_object_hash($document);
 
-            if ($postInsertId !== null) {
-                $id = $postInsertId->getId();
-                $oid = spl_object_hash($document);
+            $classMetadata->setIdentifierValue($document, $id);
+            $this->documentStates[$oid] = self::STATE_MANAGED;
 
-                $class->setIdentifierValue($document, $id);
-                $this->documentStates[$oid] = self::STATE_MANAGED;
-
-                $this->addToIdentityMap($document);
-            }
-
-            $this->lifecycleEventManager->postPersist($class, $document);
+            $this->addToIdentityMap($document);
+            $this->lifecycleEventManager->postPersist($classMetadata, $document);
         }
     }
 

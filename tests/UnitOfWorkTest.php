@@ -66,7 +66,14 @@ class UnitOfWorkTest extends TestCase
 
     public function testSavingSingleDocumentWithIdentityFieldForcesInsert(): void
     {
-        $this->transport->exec(Argument::cetera())->willReturn($this->prophesize(Response::class));
+        $this->transport->exec(Argument::cetera())->willReturn($response = $this->prophesize(Response::class));
+        $response->getStatus()->willReturn(200);
+        $response->getData()->willReturn([
+            'items' => [
+                ['create' => ['status' => 200, '_id' => '1']],
+            ],
+        ]);
+
         $this->transport->toArray()->will(function () {
             return [];
         });

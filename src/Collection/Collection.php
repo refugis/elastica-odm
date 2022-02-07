@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Collection;
 
+use Elastica\Bulk;
+use Elastica\Bulk\Response as BulkResponse;
+use Elastica\Bulk\ResponseSet;
+use Elastica\Exception\InvalidException;
 use Elastica\Exception\ResponseException;
 use Elastica\Index;
 use Elastica\Query;
@@ -13,6 +17,7 @@ use Elastica\Scroll;
 use Elastica\SearchableInterface;
 use Elastica\Type;
 use Elasticsearch\Endpoints;
+use Elasticsearch\Serializers\ArrayToJSONSerializer;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Exception\CannotDropAnAliasException;
 use Refugis\ODM\Elastica\Exception\IndexNotFoundException;
@@ -20,9 +25,11 @@ use Refugis\ODM\Elastica\Exception\RuntimeException;
 use Refugis\ODM\Elastica\Search\Search;
 
 use function array_filter;
+use function array_key_first;
 use function array_merge;
 use function count;
 use function implode;
+use function is_array;
 use function Safe\preg_match;
 
 class Collection implements CollectionInterface
@@ -156,6 +163,60 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
+    public function bulk(array $operations): Bulk\ResponseSet
+    {
+        $body = [];
+        foreach ($operations as $action) {
+            foreach ($action->toArray() as $data) {
+                $body[] = $data;
+            }
+        }
+
+        $endpoint = new Endpoints\Bulk(new ArrayToJSONSerializer());
+        $endpoint->setBody($body);
+
+        try {
+            $response = $this->searchable->requestEndpoint($endpoint);
+        } catch (ResponseException $exception) {
+            $response = $exception->getResponse();
+        }
+
+        $data = $response->getData();
+        $bulkResponses = [];
+        if (isset($data['items']) && is_array($data['items'])) {
+            foreach ($data['items'] as $key => $item) {
+                if (! isset($operations[$key])) {
+                    throw new InvalidException('No response found for action #' . $key);
+                }
+
+                $action = $operations[$key];
+                $opType = array_key_first($item);
+                $bulkResponseData = $item[$opType];
+
+                $response = new BulkResponse($bulkResponseData, $action, $opType);
+                if (! $response->isOk()) {
+                    if (($bulkResponseData['status'] ?? null) === 404 && ($response->getFullError()['type'] ?? null) === 'index_not_found_exception') {
+                        throw new IndexNotFoundException('Index not found: ' . $response->getErrorMessage());
+                    }
+
+                    throw new RuntimeException('Response not OK: ' . $response->getErrorMessage());
+                }
+
+                $bulkResponses[] = $response;
+            }
+        }
+
+        $bulkResponseSet = new ResponseSet($response, $bulkResponses);
+        if ($bulkResponseSet->hasError()) {
+            throw new RuntimeException('Response has errors: ' . $response->getErrorMessage());
+        }
+
+        return $bulkResponseSet;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function create(?string $id, array $body, ?string $routing = null): Response
     {
         $endpoint = new Endpoints\Index();
@@ -182,7 +243,7 @@ class Collection implements CollectionInterface
 
         $data = $response->getData();
         if (! $response->isOk()) {
-            if ($response->getStatus() === 404 && $response->getFullError()['type'] === 'index_not_found_exception' ?? null) {
+            if ($response->getStatus() === 404 && ($response->getFullError()['type'] ?? null) === 'index_not_found_exception') {
                 throw new IndexNotFoundException('Index not found: ' . $response->getErrorMessage());
             }
 
@@ -341,7 +402,7 @@ class Collection implements CollectionInterface
         $innerQuery = $query->getQuery();
         $bool = new Query\BoolQuery();
         $bool
-            ->addMust(new Query\Term([$this->joinFieldName => ['value' => $this->joinType]]))
+            ->addFilter(new Query\Term([$this->joinFieldName => ['value' => $this->joinType]]))
             ->addMust($innerQuery);
 
         $query = clone $query;

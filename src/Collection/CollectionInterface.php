@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Collection;
 
+use Elastica\Bulk;
 use Elastica\Mapping;
 use Elastica\Query;
 use Elastica\Response;
@@ -45,6 +46,11 @@ interface CollectionInterface
      * Executes a refresh operation on the index.
      */
     public function refresh(): void;
+
+    /**
+     * @param Bulk\Action[] $operations
+     */
+    public function bulk(array $operations): Bulk\ResponseSet;
 
     /**
      * Request the index of a document.

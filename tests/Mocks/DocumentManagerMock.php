@@ -13,6 +13,7 @@ use Refugis\ODM\Elastica\Metadata\Loader\AnnotationLoader;
 use Refugis\ODM\Elastica\Metadata\Loader\AttributesLoader;
 use Refugis\ODM\Elastica\Metadata\Loader\ChainLoader;
 use Refugis\ODM\Elastica\Metadata\MetadataFactory;
+use Refugis\ODM\Elastica\Type\StringType;
 use Refugis\ODM\Elastica\UnitOfWork;
 
 class DocumentManagerMock extends DocumentManager
@@ -60,15 +61,13 @@ class DocumentManagerMock extends DocumentManager
     public static function create(DatabaseInterface $database, Configuration $config = null, EventManager $eventManager = null)
     {
         if (null === $config) {
-            $processorFactory = new ProcessorFactory();
-            $processorFactory->registerProcessors(__DIR__.'/../../src/Metadata/Processor');
-
-            $loader = new AnnotationLoader($processorFactory, __DIR__.'/../Fixtures/Document');
+            $loader = new AnnotationLoader(AnnotationLoader::createProcessorFactory(), __DIR__.'/../Fixtures/Document');
             $loader->setReader(new AnnotationReader());
 
             $config = new Configuration();
             $config->setProxyFactory(new LazyLoadingGhostFactory());
             $config->setMetadataFactory(new MetadataFactory($loader));
+            $config->getTypeManager()->addType(new StringType());
         }
 
         if (null === $eventManager) {

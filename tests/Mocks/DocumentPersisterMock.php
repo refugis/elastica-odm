@@ -16,6 +16,25 @@ class DocumentPersisterMock extends DocumentPersister
     private $generatorType;
     private $existsCalled = false;
 
+    public function bulkInsert(array $documents): array
+    {
+        $ids = [];
+        foreach ($documents as $document) {
+            $this->inserts[] = $document;
+
+            if (
+                DocumentMetadata::GENERATOR_TYPE_AUTO === $this->generatorType ||
+                DocumentMetadata::GENERATOR_TYPE_AUTO === $this->getClassMetadata()->idGeneratorType
+            ) {
+                $this->postInsertIds[] = $ids[] = new PostInsertId($document, (string) $this->identityValueCounter++);
+            } else {
+                $ids[] = null;
+            }
+        }
+
+        return $ids;
+    }
+
     /**
      * {@inheritdoc}
      */

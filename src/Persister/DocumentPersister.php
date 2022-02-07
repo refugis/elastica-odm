@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Persister;
 
+use Elastica\Bulk;
+use Elastica\Document;
 use Elastica\Query;
 use Refugis\ODM\Elastica\Collection\CollectionInterface;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
@@ -18,6 +20,7 @@ use Refugis\ODM\Elastica\Tools\SchemaGenerator;
 use Refugis\ODM\Elastica\Util\ClassUtil;
 
 use function array_map;
+use function array_values;
 use function assert;
 use function count;
 use function implode;
@@ -110,6 +113,97 @@ class DocumentPersister
         $query->setParam('terminate_after', 1);
 
         return $this->collection->search($query)->count() > 0;
+    }
+
+    /**
+     * @param object[] $documents
+     *
+     * @return array<PostInsertId | null>
+     */
+    public function bulkInsert(array $documents): array
+    {
+        $operations = [];
+        foreach ($documents as $document) {
+            $class = $this->dm->getClassMetadata(ClassUtil::getClass($document));
+            assert($class instanceof DocumentMetadata);
+
+            $idGenerator = $this->dm->getUnitOfWork()->getIdGenerator($class->idGeneratorType);
+            $postIdGenerator = $idGenerator->isPostInsertGenerator();
+
+            $id = $postIdGenerator ? null : $class->getSingleIdentifier($document);
+            $body = $this->prepareUpdateData($document)['body'];
+
+            $routing = null;
+            if ($class->join !== null) {
+                $routingObject = $document;
+                $metadata = $class;
+
+                while ($metadata->parentField !== null) {
+                    $routingObject = $metadata->getField($metadata->parentField)->getValue($routingObject);
+                    $metadata = $this->dm->getClassMetadata(ClassUtil::getClass($routingObject));
+                }
+
+                $routing = $metadata->getSingleIdentifier($routingObject);
+            }
+
+            $doc = new Document($id, $body);
+            $action = new Bulk\Action\CreateDocument($doc);
+            if ($routing !== null) {
+                $action->setRouting($routing);
+            }
+
+            $operations[] = $action;
+        }
+
+        try {
+            $responseSet = $this->collection->bulk($operations)->getBulkResponses();
+        } catch (IndexNotFoundException $e) {
+            $schemaGenerator = new SchemaGenerator($this->dm);
+            $schema = $schemaGenerator->generateSchema()->getMapping()[$this->class->name] ?? null;
+
+            if ($schema === null) {
+                throw $e;
+            }
+
+            $this->collection->updateMapping($schema->getMapping());
+            $responseSet = $this->collection->bulk($operations)->getBulkResponses();
+        }
+
+        $ids = [];
+        foreach (array_values($documents) as $i => $document) {
+            $response = $responseSet[$i] ?? null;
+            $data = $response !== null ? $response->getData() : [];
+
+            $class = $this->dm->getClassMetadata(ClassUtil::getClass($document));
+            assert($class instanceof DocumentMetadata);
+            foreach ($class->attributesMetadata as $field) {
+                if (! $field instanceof FieldMetadata) {
+                    continue;
+                }
+
+                if ($field->indexName) {
+                    $field->setValue($document, $data['_index'] ?? null);
+                }
+
+                if (! $field->typeName) {
+                    continue;
+                }
+
+                $field->setValue($document, $data['_type'] ?? null);
+            }
+
+            $idGenerator = $this->dm->getUnitOfWork()->getIdGenerator($class->idGeneratorType);
+            $postIdGenerator = $idGenerator->isPostInsertGenerator();
+
+            $postInsertId = null;
+            if ($postIdGenerator) {
+                $postInsertId = new PostInsertId($document, $data['_id'] ?? '');
+            }
+
+            $ids[] = $postInsertId;
+        }
+
+        return $ids;
     }
 
     /**
