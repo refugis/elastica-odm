@@ -124,7 +124,13 @@ class Search implements IteratorAggregate
         if (! $query->hasParam('_source')) {
             $class = $this->documentManager->getClassMetadata($this->documentClass);
             assert($class instanceof DocumentMetadata);
-            $query->setSource($class->eagerFieldNames);
+
+            $fields = $class->eagerFieldNames;
+            if ($class->join !== null && $class->join['fieldName']) {
+                $fields[] = $class->join['fieldName'];
+            }
+
+            $query->setSource($fields);
         }
 
         if ($this->sort !== null) {
@@ -168,7 +174,7 @@ class Search implements IteratorAggregate
     /**
      * Sets the sort fields and directions.
      *
-     * @param array|string|null $fieldName
+     * @param array<string, string>|string|null $fieldName
      */
     public function setSort($fieldName, string $order = 'asc'): self
     {

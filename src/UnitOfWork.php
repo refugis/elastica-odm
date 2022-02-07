@@ -336,7 +336,7 @@ final class UnitOfWork
      *
      * @param object $document the entity for which to (re)calculate the change set
      *
-     * @throws InvalidArgumentException if the passed entity is not MANAGED
+     * @throws InvalidArgumentException if the passed entity is not MANAGED.
      *
      * @ignore
      */
@@ -539,6 +539,9 @@ final class UnitOfWork
                 } else {
                     $value = $fieldType->toPHP($value, $field->options);
                 }
+            } elseif ($class->join !== null && $key === $class->join['fieldName']) {
+                $value = $this->manager->getReference($class->join['parentClass'], $value['parent']);
+                $field = $class->getField($class->parentField);
             } else {
                 continue;
             }
@@ -561,7 +564,14 @@ final class UnitOfWork
 
         foreach ($class->embeddedFieldNames as $embeddedFieldName) {
             if (array_key_exists($embeddedFieldName, $documentData)) {
-                $documentData[$embeddedFieldName] = clone $documentData[$embeddedFieldName];
+                $data = $documentData[$embeddedFieldName];
+                if (is_array($data)) {
+                    $data = array_map(static fn ($v) => clone $v, $data);
+                } else {
+                    $data = clone $data;
+                }
+
+                $documentData[$embeddedFieldName] = $data;
             } else {
                 $documentData[$embeddedFieldName] = null;
             }
@@ -620,6 +630,8 @@ final class UnitOfWork
     /**
      * INTERNAL:
      * Registers a document as managed.
+     *
+     * @param array<string, mixed> $data
      *
      * @throws InvalidIdentifierException
      */
@@ -793,7 +805,9 @@ final class UnitOfWork
     /**
      * Executes a persist operation.
      *
-     * @throws \InvalidArgumentException if document state is equal to NEW
+     * @param array<string, bool> $visited
+     *
+     * @throws InvalidArgumentException if document state is equal to NEW.
      */
     private function doPersist(object $object, array &$visited): void
     {
@@ -828,7 +842,9 @@ final class UnitOfWork
     /**
      * Executes a remove operation.
      *
-     * @throws InvalidArgumentException if document state is equal to NEW
+     * @param array<string, bool> $visited
+     *
+     * @throws InvalidArgumentException if document state is equal to NEW.
      */
     private function doRemove(object $object, array &$visited): void
     {
@@ -867,7 +883,9 @@ final class UnitOfWork
     /**
      * Executes a merge operation on a document.
      *
-     * @throws \InvalidArgumentException if document state is equal to NEW
+     * @param array<string, bool> $visited
+     *
+     * @throws \InvalidArgumentException if document state is equal to NEW.
      */
     private function doMerge(object $object, array &$visited): object
     {
@@ -921,9 +939,9 @@ final class UnitOfWork
                     if (! $class->isIdentifier($name)) {
                         $property->setValue($managedCopy, $property->getValue($object));
                     }
-                } else {
-                    // @todo
                 }
+
+                // todo: associations
             }
         }
 
@@ -935,6 +953,8 @@ final class UnitOfWork
 
     /**
      * Execute detach operation.
+     *
+     * @param array<string, bool> $visited
      *
      * @throws InvalidIdentifierException
      */
@@ -982,22 +1002,34 @@ final class UnitOfWork
         $this->scheduleForInsert($object);
     }
 
-    private function cascadeDetach($object, $visited): void
+    /**
+     * @param array<string, bool> $visited
+     */
+    private function cascadeDetach(object $object, array &$visited): void
     {
         // @todo
     }
 
-    private function cascadeMerge($object, $managedCopy, $visited): void
+    /**
+     * @param array<string, bool> $visited
+     */
+    private function cascadeMerge(object $object, object $managedCopy, array &$visited): void
     {
         // @todo
     }
 
-    private function cascadeRemove($object, $visited): void
+    /**
+     * @param array<string, bool> $visited
+     */
+    private function cascadeRemove(object $object, array &$visited): void
     {
         // @todo
     }
 
-    private function cascadePersist($object, $visited): void
+    /**
+     * @param array<string, bool> $visited
+     */
+    private function cascadePersist(object $object, array &$visited): void
     {
         // @todo
     }

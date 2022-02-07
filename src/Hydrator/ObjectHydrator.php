@@ -43,8 +43,11 @@ class ObjectHydrator implements HydratorInterface
         }
 
         $allFields = [...$class->fieldNames, ...$class->embeddedFieldNames];
-        sort($allFields);
+        if ($class->join !== null && $class->join['fieldName']) {
+            $allFields[] = $class->join['fieldName'];
+        }
 
+        sort($allFields);
         if ($source !== null && $source !== $allFields) {
             $fields = $source === false ? [] : $source;
             $instantiator = new ProxyInstantiator($fields, $this->manager);

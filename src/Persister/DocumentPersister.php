@@ -82,6 +82,12 @@ class DocumentPersister
             ->hydrateOne($esDoc, $this->class->name);
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     * @param array<string, string>|null $orderBy
+     *
+     * @return object[]
+     */
     public function loadAll(array $criteria = [], ?array $orderBy = null, ?int $limit = null, ?int $offset = null): array
     {
         $query = $this->prepareQuery($criteria);
@@ -334,6 +340,9 @@ class DocumentPersister
         $this->collection->refresh();
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     */
     private function prepareQuery(array $criteria): Query
     {
         $bool = new Query\BoolQuery();
@@ -404,7 +413,12 @@ class DocumentPersister
         ];
     }
 
-    private function prepareEmbeddedUpdateData($value, EmbeddedMetadata $field): array
+    /**
+     * @return array<string, mixed>
+     *
+     * @throws ConversionFailedException
+     */
+    private function prepareEmbeddedUpdateData(object $value, EmbeddedMetadata $field): array
     {
         $class = $this->dm->getClassMetadata($field->targetClass);
         assert($class instanceof DocumentMetadata);
