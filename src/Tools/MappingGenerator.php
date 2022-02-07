@@ -69,6 +69,10 @@ final class MappingGenerator
                 $mapping['index'] = $field->options['index'];
             }
 
+            if (! empty($field->options['fields'])) {
+                $mapping['fields'] = $field->options['fields'];
+            }
+
             $properties[$field->fieldName] = $mapping;
         }
 
