@@ -34,6 +34,11 @@ final class Document
     public ?string $repositoryClass = null;
 
     /**
+     * Whether the document is readonly.
+     */
+    public ?bool $readOnly = null;
+
+    /**
      * The label of join type for this document class.
      */
     public ?string $joinType = null;
@@ -47,8 +52,7 @@ final class Document
         $collection = null,
         ?string $repositoryClass = null,
         ?string $joinType = null,
-        ?string $joinFieldName = null,
-        ?string $parent = null
+        ?string $joinFieldName = null
     ) {
         if ($collection === null || is_string($collection)) {
             $data = ['collection' => $collection];

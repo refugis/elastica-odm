@@ -36,6 +36,11 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     public bool $embeddable;
 
     /**
+     * Whether this document is readonly. Not applicable to embedded documents.
+     */
+    public bool $isReadOnly;
+
+    /**
      * The elastic index/type name.
      */
     public string $collectionName;

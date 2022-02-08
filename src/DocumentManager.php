@@ -86,6 +86,8 @@ class DocumentManager implements DocumentManagerInterface
         $document = $instantiator->instantiate($className);
         $class->identifier->setValue($document, $id);
 
+        $this->unitOfWork->registerManaged($document, []);
+
         return $document;
     }
 

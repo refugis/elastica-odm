@@ -36,6 +36,7 @@ class DocumentProcessor implements ProcessorInterface
     {
         $metadata->document = true;
         $metadata->collectionName = $subject->collection ?? $this->calculateType($metadata->getReflectionClass()->getShortName());
+        $metadata->isReadOnly = $subject->readOnly ?? false;
 
         $sepIdx = strpos($metadata->collectionName, '/');
         if ($sepIdx === false && class_exists(Type::class)) {

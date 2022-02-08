@@ -17,6 +17,7 @@ use Refugis\ODM\Elastica\Exception\DocumentNotManagedException;
 use Refugis\ODM\Elastica\Exception\IndexNotFoundException;
 use Refugis\ODM\Elastica\Exception\InvalidArgumentException;
 use Refugis\ODM\Elastica\Exception\InvalidIdentifierException;
+use Refugis\ODM\Elastica\Exception\ReadOnlyRequiresManagedDocumentException;
 use Refugis\ODM\Elastica\Exception\UnexpectedDocumentStateException;
 use Refugis\ODM\Elastica\Id\AssignedIdGenerator;
 use Refugis\ODM\Elastica\Id\GeneratorInterface;
@@ -39,7 +40,7 @@ use function assert;
 use function get_class;
 use function is_array;
 use function method_exists;
-use function spl_object_hash;
+use function spl_object_id;
 
 final class UnitOfWork
 {
@@ -51,7 +52,7 @@ final class UnitOfWork
     /**
      * Map documents by identifiers.
      *
-     * @var array<string, array<string, object>>
+     * @var array<string, array<array-key, object>>
      */
     private array $identityMap = [];
 
@@ -66,7 +67,7 @@ final class UnitOfWork
      * Map of the original document data of managed documents.
      * Keys are object hash. This is used for calculating changesets at commit time.
      *
-     * @var array<string, mixed>
+     * @var array<array-key, mixed>
      */
     private array $originalDocumentData = [];
 
@@ -75,7 +76,7 @@ final class UnitOfWork
      * Keys are object hash. Note that only MANAGED and REMOVED states are known,
      * as DETACHED documents can be gc'd and the associated hashes can be re-used.
      *
-     * @var array<string, int>
+     * @var array<array-key, int>
      */
     private array $documentStates = [];
 
@@ -104,21 +105,21 @@ final class UnitOfWork
     /**
      * Map of pending document deletions.
      *
-     * @var array<string, object>
+     * @var array<array-key, object>
      */
     private array $documentDeletions = [];
 
     /**
      * Map of pending document insertions.
      *
-     * @var array<string, object>
+     * @var array<array-key, object>
      */
     private array $documentInsertions = [];
 
     /**
      * Map of pending document updates.
      *
-     * @var array<string, object>
+     * @var array<array-key, object>
      */
     private array $documentUpdates = [];
 
@@ -126,7 +127,7 @@ final class UnitOfWork
      * Map of read-only document.
      * Keys are the object hash.
      *
-     * @var array<string, object>
+     * @var array<array-key, object>
      */
     private array $readOnlyObjects = [];
 
@@ -134,7 +135,7 @@ final class UnitOfWork
      * Maps of document change sets.
      * Keys are the object hash.
      *
-     * @var array<string, mixed>
+     * @var array<array-key, array<string, mixed>>
      */
     private array $documentChangeSets = [];
 
@@ -208,7 +209,7 @@ final class UnitOfWork
      */
     public function isInIdentityMap(object $object): bool
     {
-        $oid = spl_object_hash($object);
+        $oid = spl_object_id($object);
         if (! isset($this->objects[$oid])) {
             return false;
         }
@@ -228,7 +229,7 @@ final class UnitOfWork
      */
     public function getDocumentState(object $document, ?int $assume = null): int
     {
-        $oid = spl_object_hash($document);
+        $oid = spl_object_id($document);
 
         if (isset($this->documentStates[$oid])) {
             return $this->documentStates[$oid];
@@ -308,14 +309,16 @@ final class UnitOfWork
             $class = $this->manager->getClassMetadata($className);
             assert($class instanceof DocumentMetadata);
 
-            // @todo readonly
+            if ($class->isReadOnly) {
+                continue;
+            }
 
             foreach ($documents as $document) {
                 if ($document instanceof LazyLoadingInterface && ! $document->isProxyInitialized()) {
                     continue;
                 }
 
-                $oid = spl_object_hash($document);
+                $oid = spl_object_id($document);
                 if (isset($this->documentInsertions[$oid]) || isset($this->documentDeletions[$oid]) || ! isset($this->documentStates[$oid])) {
                     continue;
                 }
@@ -342,7 +345,7 @@ final class UnitOfWork
      */
     public function recomputeSingleDocumentChangeset(object $document): void
     {
-        $oid = spl_object_hash($document);
+        $oid = spl_object_id($document);
         if (! isset($this->documentStates[$oid]) || $this->documentStates[$oid] !== self::STATE_MANAGED) {
             throw new DocumentNotManagedException($document);
         }
@@ -414,7 +417,7 @@ final class UnitOfWork
      */
     public function &getDocumentChangeSet(object $document): array
     {
-        $oid = spl_object_hash($document);
+        $oid = spl_object_id($document);
         $data = [];
 
         if (! isset($this->documentChangeSets[$oid])) {
@@ -577,7 +580,7 @@ final class UnitOfWork
             }
         }
 
-        $this->originalDocumentData[spl_object_hash($result)] = $documentData;
+        $this->originalDocumentData[spl_object_id($result)] = $documentData;
         $this->addToIdentityMap($result);
     }
 
@@ -615,7 +618,7 @@ final class UnitOfWork
      */
     public function isScheduledForInsert(object $document): bool
     {
-        return isset($this->documentInsertions[spl_object_hash($document)]);
+        return isset($this->documentInsertions[spl_object_id($document)]);
     }
 
     /**
@@ -624,7 +627,7 @@ final class UnitOfWork
      */
     public function isScheduledForDelete(object $document): bool
     {
-        return isset($this->documentDeletions[spl_object_hash($document)]);
+        return isset($this->documentDeletions[spl_object_id($document)]);
     }
 
     /**
@@ -637,12 +640,39 @@ final class UnitOfWork
      */
     public function registerManaged(object $document, array $data): void
     {
-        $oid = spl_object_hash($document);
+        $oid = spl_object_id($document);
 
         $this->documentStates[$oid] = self::STATE_MANAGED;
         $this->originalDocumentData[$oid] = $data;
 
         $this->addToIdentityMap($document);
+    }
+
+    /**
+     * Marks a document as read-only so that it will not be considered for updates during UnitOfWork#commit().
+     *
+     * This operation cannot be undone as some parts of the UnitOfWork now keep gathering information
+     * on this object that might be necessary to perform a correct update.
+     *
+     * @throws InvalidArgumentException
+     */
+    public function markReadOnly(object $object): void
+    {
+        if (! $this->isInIdentityMap($object)) {
+            throw new ReadOnlyRequiresManagedDocumentException($object);
+        }
+
+        $this->readOnlyObjects[spl_object_id($object)] = true;
+    }
+
+    /**
+     * Is this document read only?
+     *
+     * @throws InvalidArgumentException
+     */
+    public function isReadOnly(object $object): bool
+    {
+        return isset($this->readOnlyObjects[spl_object_id($object)]);
     }
 
     /**
@@ -681,7 +711,7 @@ final class UnitOfWork
      */
     private function computeChangeSet(DocumentMetadata $class, object $document): void
     {
-        $oid = spl_object_hash($document);
+        $oid = spl_object_id($document);
         if (isset($this->readOnlyObjects[$oid])) {
             return;
         }
@@ -772,7 +802,7 @@ final class UnitOfWork
      */
     private function addToIdentityMap(object $object): void
     {
-        $oid = spl_object_hash($object);
+        $oid = spl_object_id($object);
         $class = $this->getClassMetadata($object);
         $id = $class->getSingleIdentifier($object);
 
@@ -799,7 +829,7 @@ final class UnitOfWork
             throw new InvalidIdentifierException('Documents must have an identifier in order to be added to the identity map.');
         }
 
-        unset($this->identityMap[$class->name][$id]);
+        unset($this->identityMap[$class->name][$id], $this->readOnlyObjects[$class->name][$id]);
     }
 
     /**
@@ -811,7 +841,7 @@ final class UnitOfWork
      */
     private function doPersist(object $object, array &$visited): void
     {
-        $oid = spl_object_hash($object);
+        $oid = spl_object_id($object);
         if (isset($visited[$oid])) {
             return;
         }
@@ -848,7 +878,7 @@ final class UnitOfWork
      */
     private function doRemove(object $object, array &$visited): void
     {
-        $oid = spl_object_hash($object);
+        $oid = spl_object_id($object);
         if (isset($visited[$oid])) {
             return;
         }
@@ -889,7 +919,7 @@ final class UnitOfWork
      */
     private function doMerge(object $object, array &$visited): object
     {
-        $oid = spl_object_hash($object);
+        $oid = spl_object_id($object);
         if (isset($visited[$oid])) {
             return $visited[$oid];
         }
@@ -945,7 +975,7 @@ final class UnitOfWork
             }
         }
 
-        $visited[spl_object_hash($managedCopy)] = $managedCopy;
+        $visited[spl_object_id($managedCopy)] = $managedCopy;
         $this->cascadeMerge($object, $managedCopy, $visited);
 
         return $managedCopy;
@@ -960,7 +990,7 @@ final class UnitOfWork
      */
     private function doDetach(object $object, array &$visited): void
     {
-        $oid = spl_object_hash($object);
+        $oid = spl_object_id($object);
         if (isset($visited[$oid])) {
             return;
         }
@@ -989,7 +1019,7 @@ final class UnitOfWork
         }
 
         $this->lifecycleEventManager->prePersist($class, $object);
-        $oid = spl_object_hash($object);
+        $oid = spl_object_id($object);
 
         assert($class->identifier !== null);
         $idGenerator = $this->getIdGenerator($class->idGeneratorType);
@@ -1042,7 +1072,7 @@ final class UnitOfWork
      */
     private function scheduleForInsert(object $object): void
     {
-        $oid = spl_object_hash($object);
+        $oid = spl_object_id($object);
         $class = $this->getClassMetadata($object);
 
         $this->documentInsertions[$oid] = $object;
@@ -1061,7 +1091,7 @@ final class UnitOfWork
      */
     private function scheduleForDeletion(object $object): void
     {
-        $oid = spl_object_hash($object);
+        $oid = spl_object_id($object);
         if (isset($this->documentInsertions[$oid])) {
             if ($this->isInIdentityMap($object)) {
                 $this->removeFromIdentityMap($object);
@@ -1111,7 +1141,7 @@ final class UnitOfWork
             }
 
             $id = $postInsertId->getId();
-            $oid = spl_object_hash($document);
+            $oid = spl_object_id($document);
 
             $classMetadata->setIdentifierValue($document, $id);
             $this->documentStates[$oid] = self::STATE_MANAGED;
