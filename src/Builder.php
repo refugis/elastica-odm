@@ -14,7 +14,10 @@ use Refugis\ODM\Elastica\Metadata\MetadataFactory;
 use Refugis\ODM\Elastica\Type\TypeInterface;
 use Refugis\ODM\Elastica\Type\TypeManager;
 
+use function parse_url;
+
 use const CURLOPT_SSL_VERIFYPEER;
+use const PHP_URL_PATH;
 
 final class Builder
 {
@@ -110,8 +113,7 @@ final class Builder
             ->addType(new Type\IpType())
             ->addType(new Type\PercolatorType())
             ->addType(new Type\StringType())
-            ->addType(new Type\RawType())
-        ;
+            ->addType(new Type\RawType());
     }
 
     public function addMetadataLoader(Loader\LoaderInterface $loader): self
@@ -137,6 +139,11 @@ final class Builder
     public function build(): DocumentManager
     {
         if ($this->client === null) {
+            $path = @parse_url($this->connectionUrl, PHP_URL_PATH);
+            if ($path === null) {
+                $this->connectionUrl .= '/';
+            }
+
             $this->client = new Client([
                 'url' => $this->connectionUrl,
                 'connectTimeout' => $this->connectTimeout,

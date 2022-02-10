@@ -7,9 +7,9 @@ jobs:
         strategy:
             matrix:
                 es_version:
-                    - { image: 'elasticsearch:6.8.13', lib: '^6.0', proto: http }
-                    - { image: 'elasticsearch:7.10.1', lib: '^7.0', proto: http }
-                    - { image: 'opensearchproject/opensearch:1.2.4', lib: '^7.0', proto: https }
+                    - { image: 'elasticsearch:6.8.13', lib: '^6.0', proto: http, endpoint: 'http://localhost:9200/' }
+                    - { image: 'elasticsearch:7.10.1', lib: '^7.0', proto: http, endpoint: 'http://localhost:9200/' }
+                    - { image: 'opensearchproject/opensearch:1.2.4', lib: '^7.0', proto: https, endpoint: 'https://admin:admin@localhost:9200/' }
 
                 php_version:
                     - '7.4'
@@ -43,7 +43,7 @@ jobs:
 
             - run: vendor/bin/phpunit --coverage-clover coverage.xml
               env:
-                  ES_ENDPOINT: ${{ matrix.es_version.proto }}://localhost:9200
+                  ES_ENDPOINT: ${{ matrix.es_version.endpoint }}
                   XDEBUG_MODE: coverage
             - name: Upload coverage to Codecov
               uses: codecov/codecov-action@v1
