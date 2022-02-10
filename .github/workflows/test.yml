@@ -7,9 +7,9 @@ jobs:
         strategy:
             matrix:
                 es_version:
-                    - { image: 'elasticsearch:6.8.13', lib: '^6.0' }
-                    - { image: 'elasticsearch:7.10.1', lib: '^7.0' }
-                    - { image: 'opensearchproject/opensearch:1.2.4', lib: '^7.0'}
+                    - { image: 'elasticsearch:6.8.13', lib: '^6.0', proto: http }
+                    - { image: 'elasticsearch:7.10.1', lib: '^7.0', proto: http }
+                    - { image: 'opensearchproject/opensearch:1.2.4', lib: '^7.0', proto: https }
 
                 php_version:
                     - '7.4'
@@ -39,11 +39,11 @@ jobs:
             - run: composer install
 
             - name: Waiting for ES server to become available
-              run: ./wait-for-it.sh localhost:9200
+              run: ./wait-for-it.sh -p ${{ matrix.es_version.proto }} localhost:9200
 
             - run: vendor/bin/phpunit --coverage-clover coverage.xml
               env:
-                  ES_ENDPOINT: 'http://localhost:9200/'
+                  ES_ENDPOINT: ${{ matrix.es_version.proto }}://localhost:9200
                   XDEBUG_MODE: coverage
             - name: Upload coverage to Codecov
               uses: codecov/codecov-action@v1

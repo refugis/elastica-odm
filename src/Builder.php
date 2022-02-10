@@ -14,6 +14,8 @@ use Refugis\ODM\Elastica\Metadata\MetadataFactory;
 use Refugis\ODM\Elastica\Type\TypeInterface;
 use Refugis\ODM\Elastica\Type\TypeManager;
 
+use const CURLOPT_SSL_VERIFYPEER;
+
 final class Builder
 {
     private ?Client $client = null;
@@ -26,6 +28,7 @@ final class Builder
     private TypeManager $typeManager;
     private bool $addDefaultTypes = true;
     private ?Loader\LoaderInterface $metadataLoader = null;
+    private bool $insecure = false;
 
     public static function create(): self
     {
@@ -107,7 +110,8 @@ final class Builder
             ->addType(new Type\IpType())
             ->addType(new Type\PercolatorType())
             ->addType(new Type\StringType())
-            ->addType(new Type\RawType());
+            ->addType(new Type\RawType())
+        ;
     }
 
     public function addMetadataLoader(Loader\LoaderInterface $loader): self
@@ -123,6 +127,13 @@ final class Builder
         return $this;
     }
 
+    public function allowInsecureConnection(bool $allow = true): self
+    {
+        $this->insecure = $allow;
+
+        return $this;
+    }
+
     public function build(): DocumentManager
     {
         if ($this->client === null) {
@@ -131,6 +142,12 @@ final class Builder
                 'connectTimeout' => $this->connectTimeout,
                 'timeout' => $this->timeout,
             ], null, $this->logger);
+        }
+
+        if ($this->insecure) {
+            $curlOpts = $this->client->getConfigValue('curl', []);
+            $curlOpts[CURLOPT_SSL_VERIFYPEER] = 0;
+            $this->client->setConfigValue('curl', $curlOpts);
         }
 
         if ($this->proxyFactory === null) {

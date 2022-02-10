@@ -2,6 +2,7 @@
 
 TIMEOUT=60
 QUIET=0
+PROTOCOL=http
 
 echoerr() {
   if [ "$QUIET" -ne 1 ]; then printf "%s\n" "$*" 1>&2; fi
@@ -14,6 +15,7 @@ Usage:
   $cmdname host:port [-t timeout] [-- command args]
   -q | --quiet                        Do not output any status messages
   -t TIMEOUT | --timeout=timeout      Timeout in seconds, zero for no timeout
+  -p PROTOCOL | --protocol=proto      The protocol to use (http or https)
   -- COMMAND ARGS                     Execute command with args after the test finishes
 USAGE
   exit "$exitcode"
@@ -22,7 +24,7 @@ USAGE
 wait_for() {
   for i in `seq $TIMEOUT` ; do
     echo -n .
-    curl -q "$HOST:$PORT" > /dev/null 2>&1
+    curl -k -q "$PROTOCOL://$HOST:$PORT" > /dev/null 2>&1
 
     result=$?
     if [ $result -eq 0 ] ; then
@@ -55,8 +57,17 @@ do
     if [ "$TIMEOUT" = "" ]; then break; fi
     shift 2
     ;;
+    -p)
+    PROTOCOL="$2"
+    if [ "$PROTOCOL" = "" ]; then break; fi
+    shift 2
+    ;;
     --timeout=*)
     TIMEOUT="${1#*=}"
+    shift 1
+    ;;
+    --protocol=*)
+    PROTOCOL="${1#*=}"
     shift 1
     ;;
     --)

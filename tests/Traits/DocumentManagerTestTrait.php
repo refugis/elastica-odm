@@ -3,10 +3,11 @@
 namespace Tests\Traits;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Kcs\Metadata\Loader\Processor\ProcessorFactory;
 use Refugis\ODM\Elastica\Builder;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Metadata\Loader\AnnotationLoader;
+
+use function getenv;
 
 trait DocumentManagerTestTrait
 {
@@ -17,8 +18,9 @@ trait DocumentManagerTestTrait
 
         $builder = Builder::create()->addMetadataLoader($loader);
 
-        if ($endpoint = \getenv('ES_ENDPOINT')) {
+        if ($endpoint = getenv('ES_ENDPOINT')) {
             $builder->setConnectionUrl($endpoint);
+            $builder->allowInsecureConnection();
         }
 
         return $builder->build();
