@@ -5,19 +5,18 @@ declare(strict_types=1);
 namespace Refugis\ODM\Elastica;
 
 use Elastica\Client;
-use InvalidArgumentException;
 use ProxyManager\Factory\LazyLoadingGhostFactory;
 use Psr\Log\LoggerInterface;
 use Refugis\ODM\Elastica\Collection\Database;
+use Refugis\ODM\Elastica\Exception\InvalidArgumentException;
 use Refugis\ODM\Elastica\Metadata\Loader;
 use Refugis\ODM\Elastica\Metadata\MetadataFactory;
+use Refugis\ODM\Elastica\Transport\Transport;
 use Refugis\ODM\Elastica\Type\TypeInterface;
 use Refugis\ODM\Elastica\Type\TypeManager;
 
+use function array_filter;
 use function parse_url;
-
-use const CURLOPT_SSL_VERIFYPEER;
-use const PHP_URL_PATH;
 
 final class Builder
 {
@@ -32,6 +31,7 @@ final class Builder
     private bool $addDefaultTypes = true;
     private ?Loader\LoaderInterface $metadataLoader = null;
     private bool $insecure = false;
+    private bool $awsAuth = false;
 
     public static function create(): self
     {
@@ -136,25 +136,24 @@ final class Builder
         return $this;
     }
 
+    public function enableAwsAuth(bool $enable = true): self
+    {
+        $this->awsAuth = $enable;
+
+        return $this;
+    }
+
     public function build(): DocumentManager
     {
         if ($this->client === null) {
-            $path = @parse_url($this->connectionUrl, PHP_URL_PATH);
-            if ($path === null) {
-                $this->connectionUrl .= '/';
-            }
-
-            $this->client = new Client([
-                'url' => $this->connectionUrl,
+            $this->client = new Client(self::buildUrl($this->connectionUrl) + [
                 'connectTimeout' => $this->connectTimeout,
                 'timeout' => $this->timeout,
+                'transport' => new Transport([
+                    'insecure' => $this->insecure,
+                    'aws_auth_v4' => $this->awsAuth,
+                ]),
             ], null, $this->logger);
-        }
-
-        if ($this->insecure) {
-            $curlOpts = $this->client->getConfigValue('curl', []);
-            $curlOpts[CURLOPT_SSL_VERIFYPEER] = 0;
-            $this->client->setConfigValue('curl', $curlOpts);
         }
 
         if ($this->proxyFactory === null) {
@@ -179,5 +178,40 @@ final class Builder
         $configuration->setTypeManager($this->typeManager);
 
         return new DocumentManager(new Database($this->client), $configuration);
+    }
+
+    private static function buildUrl(string $url): array
+    {
+        $url = @parse_url($url);
+        if ($url === false) {
+            throw new InvalidArgumentException('Malformed URL');
+        }
+
+        if (! isset($url['path'])) {
+            $url['path'] = '/';
+        }
+
+        if (! isset($url['scheme'])) {
+            $url['scheme'] = 'http';
+        }
+
+        if (! isset($url['host'])) {
+            $url['host'] = 'localhost';
+            $url['port'] = '9200';
+        }
+
+        $authority = $url['user'] ?? '';
+        if ($authority && ! empty($url['pass'])) {
+            $authority .= ':' . $url['pass'];
+        }
+
+        $authority = $authority ? $authority . '@' : '';
+        $port = ! empty($url['port']) ? ':' . $url['port'] : '';
+
+        return array_filter([
+            'url' => $url['scheme'] . '://' . $authority . $url['host'] . $port . $url['path'] . (! empty($url['query']) ? '?' . $url['query'] : ''),
+            'username' => $url['user'] ?? null,
+            'password' => $url['pass'] ?? null,
+        ]);
     }
 }

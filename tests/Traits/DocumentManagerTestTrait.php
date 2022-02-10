@@ -17,10 +17,10 @@ trait DocumentManagerTestTrait
         $loader->setReader(new AnnotationReader());
 
         $builder = Builder::create()->addMetadataLoader($loader);
+        $builder->allowInsecureConnection();
 
         if ($endpoint = getenv('ES_ENDPOINT')) {
             $builder->setConnectionUrl($endpoint);
-            $builder->allowInsecureConnection();
         }
 
         return $builder->build();

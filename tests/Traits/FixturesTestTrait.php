@@ -6,6 +6,7 @@ use Elastica\Cluster\Settings;
 use Elastica\Mapping;
 use Elastica\Type\Mapping as TypeMapping;
 use Elasticsearch\Endpoints;
+use Exception;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
 
 trait FixturesTestTrait
@@ -14,13 +15,29 @@ trait FixturesTestTrait
     {
         $database = $dm->getDatabase();
         $connection = $database->getConnection();
+
+        $i = 0;
+        while (true) {
+            $health = $connection->requestEndpoint(new Endpoints\Cluster\Health());
+            $status = $health->getData()['status'] ?? 'red';
+
+            if ($status === 'yellow' || $status === 'green') {
+                break;
+            }
+
+            sleep(1);
+            if (++$i > 30) {
+                throw new Exception('Timed out');
+            }
+        }
+
         (new Settings($connection))->set([
             'persistent' => [
                 'action.auto_create_index' => '-foo_index_no_auto_create,+*',
             ],
         ]);
 
-        $connection->requestEndpoint((new Endpoints\Indices\Delete())->setIndex('*'));
+        $connection->requestEndpoint((new Endpoints\Indices\Delete())->setIndex('foo_*'));
         $connection->requestEndpoint((new Endpoints\Indices\Create())->setIndex('foo_index'));
         $connection->requestEndpoint((new Endpoints\Indices\Create())->setIndex('foo_lazy_index'));
         $connection->requestEndpoint((new Endpoints\Indices\Create())->setIndex('foo_with_aliases_index_foo_alias'));
