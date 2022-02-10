@@ -542,7 +542,7 @@ final class UnitOfWork
                 } else {
                     $value = $fieldType->toPHP($value, $field->options);
                 }
-            } elseif ($class->join !== null && $key === $class->join['fieldName']) {
+            } elseif ($class->join !== null && $key === $class->join['fieldName'] && $class->parentField !== null) {
                 $value = $this->manager->getReference($class->join['parentClass'], $value['parent']);
                 $field = $class->getField($class->parentField);
             } else {
