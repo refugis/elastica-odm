@@ -37,6 +37,7 @@ final class EmbeddedMetadata extends PropertyMetadata
 
     public function __wakeup(): void
     {
+        parent::__wakeup();
         $this->instantiator = new Instantiator();
     }
 

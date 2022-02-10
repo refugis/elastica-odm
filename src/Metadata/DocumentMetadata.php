@@ -122,6 +122,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
 
     public function __wakeup(): void
     {
+        parent::__wakeup();
         $this->instantiator = new Instantiator();
     }
 
