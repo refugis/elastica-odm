@@ -302,7 +302,7 @@ class Collection implements CollectionInterface
             'routing' => $options['routing'] ?? null,
             'if_seq_no' => $options['seq_no'] ?? null,
             'if_primary_term' => $options['primary_term'] ?? null,
-        ]);
+        ], static fn ($value) => $value !== null);
 
         if ($endpointParams) {
             $endpoint->setParams($endpointParams);

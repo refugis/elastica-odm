@@ -74,8 +74,6 @@ final class CompletionType extends AbstractType
             'search_analyzer' => $options['search_analyzer'] ?? null,
             'preserve_separators' => $options['preserve_separators'] ?? null,
             'preserve_position_increments' => $options['preserve_position_increments'] ?? null,
-        ], static function ($value) {
-            return $value !== null;
-        });
+        ], static fn ($value) => $value !== null);
     }
 }

@@ -307,7 +307,7 @@ class DocumentPersister
                 'routing' => $routing,
                 'if_seq_no' => $seqNo,
                 'if_primary_term' => $primaryTerm,
-            ]);
+            ], static fn ($value) => $value !== null);
 
             if ($metadata) {
                 $action->setMetadata($metadata);

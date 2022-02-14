@@ -58,6 +58,6 @@ final class StringType extends AbstractType
             'analyzer' => $options['analyzer'] ?? null,
             'search_analyzer' => $options['search_analyzer'] ?? null,
             'term_vector' => $options['term_vector'] ?? null,
-        ]);
+        ], static fn ($value) => $value !== null);
     }
 }
