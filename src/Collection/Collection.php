@@ -22,6 +22,7 @@ use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Exception\CannotDropAnAliasException;
 use Refugis\ODM\Elastica\Exception\IndexNotFoundException;
 use Refugis\ODM\Elastica\Exception\RuntimeException;
+use Refugis\ODM\Elastica\Exception\VersionConflictException;
 use Refugis\ODM\Elastica\Search\Search;
 
 use function array_filter;
@@ -199,6 +200,10 @@ class Collection implements CollectionInterface
                         throw new IndexNotFoundException('Index not found: ' . $response->getErrorMessage());
                     }
 
+                    if (($bulkResponseData['status'] ?? null) === 409 && ($response->getFullError()['type'] ?? null) === 'version_conflict_engine_exception') {
+                        throw new VersionConflictException('Version conflict: ' . $response->getErrorMessage());
+                    }
+
                     throw new RuntimeException('Response not OK: ' . $response->getErrorMessage());
                 }
 
@@ -310,6 +315,10 @@ class Collection implements CollectionInterface
         }
 
         if (! $response->isOk()) {
+            if ($response->getStatus() === 409 && ($response->getFullError()['type'] ?? null) === 'version_conflict_engine_exception') {
+                throw new VersionConflictException('Version conflict: ' . $response->getErrorMessage());
+            }
+
             throw new RuntimeException('Response not OK: ' . $response->getErrorMessage());
         }
     }

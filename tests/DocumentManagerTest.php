@@ -7,6 +7,7 @@ use Elastica\Type;
 use PHPUnit\Framework\TestCase;
 use ProxyManager\Proxy\ProxyInterface;
 use Refugis\ODM\Elastica\DocumentManager;
+use Refugis\ODM\Elastica\Exception\VersionConflictException;
 use Refugis\ODM\Elastica\Geotools\Coordinate\Coordinate;
 use Tests\Fixtures\Document\Foo;
 use Tests\Fixtures\Document\FooEmbeddable;
@@ -142,6 +143,19 @@ EOF
         self::assertNotInstanceOf(ProxyInterface::class, $document);
         self::assertInstanceOf(Foo::class, $document);
         self::assertSame($document, $reference);
+    }
+
+    public function testUpdateOptimisticLockingFails(): void
+    {
+        $this->expectException(VersionConflictException::class);
+        $this->expectExceptionMessage('Version conflict');
+
+        $document = $this->dm->find(Foo::class, 'foo_test_document');
+        self::assertInstanceOf(Foo::class, $document);
+        $document->seqNo += 50;
+
+        $document->stringField = 'test_string_field';
+        $this->dm->flush();
     }
 
     public function testUpdateAndFlush(): void
