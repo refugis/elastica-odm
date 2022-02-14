@@ -508,6 +508,16 @@ final class UnitOfWork
                 $fieldMetadata->setValue($result, $document->getType());
                 continue;
             }
+
+            if ($fieldMetadata->seqNo) {
+                $fieldMetadata->setValue($result, $document->getParam('_seq_no'));
+                continue;
+            }
+
+            if ($fieldMetadata->primaryTerm) {
+                $fieldMetadata->setValue($result, $document->getParam('_primary_term'));
+                continue;
+            }
         }
 
         foreach ($documentData as $key => &$value) {
@@ -536,9 +546,7 @@ final class UnitOfWork
             } elseif ($field instanceof FieldMetadata) {
                 $fieldType = $typeManager->getType($field->type);
                 if ($field->multiple) {
-                    $value = array_map(static function ($item) use ($fieldType, $field) {
-                        return $fieldType->toPHP($item, $field->options);
-                    }, (array) $value);
+                    $value = array_map(static fn ($item) => $fieldType->toPHP($item, $field->options), (array) $value);
                 } else {
                     $value = $fieldType->toPHP($value, $field->options);
                 }
@@ -1005,7 +1013,7 @@ final class UnitOfWork
         unset(
             $this->documentStates[$oid],
             $this->objects[$oid],
-            $this->originalDocumentData[$oid]
+            $this->originalDocumentData[$oid],
         );
 
         $this->removeFromIdentityMap($object);

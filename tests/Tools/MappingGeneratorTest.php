@@ -20,7 +20,6 @@ class MappingGeneratorTest extends TestCase
         $generator = new MappingGenerator($dm->getTypeManager(), $dm->getMetadataFactory());
 
         self::assertEquals([
-            'id' => [],
             'stringField' => ['type' => 'text'],
         ], $generator->getMapping($dm->getClassMetadata(Foo::class))->getProperties());
     }
@@ -31,7 +30,6 @@ class MappingGeneratorTest extends TestCase
         $generator = new MappingGenerator($dm->getTypeManager(), $dm->getMetadataFactory());
 
         self::assertEquals([
-            'id' => [],
             'emb' => [
                 'type' => 'nested',
                 'dynamic' => 'strict',

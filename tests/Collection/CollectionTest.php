@@ -81,6 +81,7 @@ class CollectionTest extends TestCase
 
         $this->query->hasParam('sort')->willReturn(false);
         $this->query->setSort(['_doc'])->shouldBeCalled();
+        $this->query->setParam('seq_no_primary_term', true)->shouldBeCalled();
 
         $expiryTime = '1m';
 

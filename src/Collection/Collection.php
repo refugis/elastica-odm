@@ -211,13 +211,17 @@ class Collection implements CollectionInterface
             throw new RuntimeException('Response has errors: ' . $response->getErrorMessage());
         }
 
+        if ($bulkResponseSet->getStatus() >= 400) {
+            throw new RuntimeException('Response not OK: ' . $response->getErrorMessage());
+        }
+
         return $bulkResponseSet;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function create(?string $id, array $body, ?string $routing = null): Response
+    public function create(?string $id, array $body, array $options = []): Response
     {
         $endpoint = new Endpoints\Index();
         $params = [];
@@ -226,8 +230,8 @@ class Collection implements CollectionInterface
             $endpoint->setID($id);
         }
 
-        if ($routing !== null) {
-            $params['routing'] = $routing;
+        if (isset($options['routing'])) {
+            $params['routing'] = $options['routing'];
         }
 
         if (! empty($params)) {
@@ -258,7 +262,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function update(string $id, array $body, string $script = '', ?string $routing = null): void
+    public function update(string $id, array $body, string $script = '', array $options = []): void
     {
         $body = array_filter([
             'doc' => $body,
@@ -287,11 +291,17 @@ class Collection implements CollectionInterface
 
         $endpoint = new Endpoints\Update();
         $endpoint->setID($id);
-        if ($routing !== null) {
-            $endpoint->setParams(['routing' => $routing]);
-        }
-
         $endpoint->setBody($body);
+
+        $endpointParams = array_filter([
+            'routing' => $options['routing'] ?? null,
+            'if_seq_no' => $options['seq_no'] ?? null,
+            'if_primary_term' => $options['primary_term'] ?? null,
+        ]);
+
+        if ($endpointParams) {
+            $endpoint->setParams($endpointParams);
+        }
 
         try {
             $response = $this->searchable->requestEndpoint($endpoint);
@@ -395,8 +405,11 @@ class Collection implements CollectionInterface
 
     private function prepareQuery(Query $query): Query
     {
+        $query = clone $query;
+        $query->setParam('seq_no_primary_term', true);
+
         if ($this->joinType === null) {
-            return clone $query;
+            return $query;
         }
 
         $innerQuery = $query->getQuery();
@@ -405,7 +418,6 @@ class Collection implements CollectionInterface
             ->addFilter(new Query\Term([$this->joinFieldName => ['value' => $this->joinType]]))
             ->addMust($innerQuery);
 
-        $query = clone $query;
         $query->setQuery($bool);
 
         return $query;

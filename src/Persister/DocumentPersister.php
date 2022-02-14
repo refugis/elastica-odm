@@ -181,13 +181,13 @@ class DocumentPersister
 
                 if ($field->indexName) {
                     $field->setValue($document, $data['_index'] ?? null);
+                } elseif ($field->typeName) {
+                    $field->setValue($document, $data['_type'] ?? null);
+                } elseif ($field->seqNo) {
+                    $field->setValue($document, $data['_seq_no'] ?? null);
+                } elseif ($field->primaryTerm) {
+                    $field->setValue($document, $data['_primary_term'] ?? null);
                 }
-
-                if (! $field->typeName) {
-                    continue;
-                }
-
-                $field->setValue($document, $data['_type'] ?? null);
             }
 
             $idGenerator = $this->dm->getUnitOfWork()->getIdGenerator($class->idGeneratorType);
@@ -211,6 +211,7 @@ class DocumentPersister
     {
         $class = $this->dm->getClassMetadata(ClassUtil::getClass($document));
         assert($class instanceof DocumentMetadata);
+
         $idGenerator = $this->dm->getUnitOfWork()->getIdGenerator($class->idGeneratorType);
         $postIdGenerator = $idGenerator->isPostInsertGenerator();
 
@@ -219,7 +220,7 @@ class DocumentPersister
         $routing = $this->getRouting($class, $document);
 
         try {
-            $response = $this->collection->create($id, $body, $routing);
+            $response = $this->collection->create($id, $body, ['routing' => $routing]);
         } catch (IndexNotFoundException $e) {
             $schemaGenerator = new SchemaGenerator($this->dm);
             $schema = $schemaGenerator->generateSchema()->getMapping()[$this->class->name] ?? null;
@@ -229,7 +230,7 @@ class DocumentPersister
             }
 
             $this->collection->updateMapping($schema->getMapping());
-            $response = $this->collection->create($id, $body, $routing);
+            $response = $this->collection->create($id, $body, ['routing' => $routing]);
         }
 
         $data = $response->getData();
@@ -241,13 +242,13 @@ class DocumentPersister
 
             if ($field->indexName) {
                 $field->setValue($document, $data['_index'] ?? null);
+            } elseif ($field->typeName) {
+                $field->setValue($document, $data['_type'] ?? null);
+            } elseif ($field->seqNo) {
+                $field->setValue($document, $data['_seq_no'] ?? null);
+            } elseif ($field->primaryTerm) {
+                $field->setValue($document, $data['_primary_term'] ?? null);
             }
-
-            if (! $field->typeName) {
-                continue;
-            }
-
-            $field->setValue($document, $data['_type'] ?? null);
         }
 
         $postInsertId = null;
@@ -272,7 +273,10 @@ class DocumentPersister
 
             $id = $class->getSingleIdentifier($document);
             $data = $this->prepareUpdateData($document);
+
             $routing = $this->getRouting($class, $document);
+            $seqNo = $class->getSequenceNumber($document);
+            $primaryTerm = $class->getPrimaryTerm($document);
 
             $body = array_filter([
                 'doc' => $data['body'],
@@ -299,8 +303,14 @@ class DocumentPersister
             }
 
             $action = new Bulk\Action\UpdateDocument($body);
-            if ($routing !== null) {
-                $action->setRouting($routing);
+            $metadata = $action->getMetadata() + array_filter([
+                'routing' => $routing,
+                'if_seq_no' => $seqNo,
+                'if_primary_term' => $primaryTerm,
+            ]);
+
+            if ($metadata) {
+                $action->setMetadata($metadata);
             }
 
             $operations[] = $action;
@@ -315,10 +325,20 @@ class DocumentPersister
     public function update(object $document): void
     {
         $class = $this->dm->getClassMetadata(ClassUtil::getClass($document));
+        assert($class instanceof DocumentMetadata);
+
         $data = $this->prepareUpdateData($document);
         $id = $class->getSingleIdentifier($document);
 
-        $this->collection->update((string) $id, $data['body'], $data['script']);
+        $routing = $this->getRouting($class, $document);
+        $seqNo = $class->getSequenceNumber($document);
+        $primaryTerm = $class->getPrimaryTerm($document);
+
+        $this->collection->update((string) $id, $data['body'], $data['script'], [
+            'routing' => $routing,
+            'seq_no' => $seqNo,
+            'primary_term' => $primaryTerm,
+        ]);
     }
 
     /**

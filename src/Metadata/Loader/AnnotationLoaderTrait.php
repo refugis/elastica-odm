@@ -40,6 +40,8 @@ trait AnnotationLoaderTrait
         $factory->registerProcessor(Annotation\IndexName::class, Processor\IndexNameProcessor::class);
         $factory->registerProcessor(Annotation\Index::class, Processor\IndexProcessor::class);
         $factory->registerProcessor(Annotation\ParentDocument::class, Processor\ParentDocumentProcessor::class);
+        $factory->registerProcessor(Annotation\PrimaryTerm::class, Processor\PrimaryTermProcessor::class);
+        $factory->registerProcessor(Annotation\SequenceNumber::class, Processor\SequenceNumberProcessor::class);
         $factory->registerProcessor(Annotation\Setting::class, Processor\SettingProcessor::class);
         $factory->registerProcessor(Annotation\TypeName::class, Processor\TypeNameProcessor::class);
 

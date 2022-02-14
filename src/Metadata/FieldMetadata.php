@@ -13,6 +13,8 @@ class FieldMetadata extends PropertyMetadata
     public bool $field = false;
     public bool $indexName = false;
     public bool $typeName = false;
+    public bool $seqNo = false;
+    public bool $primaryTerm = false;
     public string $fieldName;
     public string $type;
     public bool $multiple = false;
@@ -62,7 +64,9 @@ class FieldMetadata extends PropertyMetadata
         return ! (
             $this->identifier ||
             $this->indexName ||
-            $this->typeName
+            $this->typeName ||
+            $this->seqNo ||
+            $this->primaryTerm
         );
     }
 }

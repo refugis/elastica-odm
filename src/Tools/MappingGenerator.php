@@ -59,7 +59,7 @@ final class MappingGenerator
                 $properties[$field->fieldName] = $mapping;
             }
 
-            if (! $field instanceof FieldMetadata) {
+            if (! $field instanceof FieldMetadata || ! $field->isStored()) {
                 continue;
             }
 

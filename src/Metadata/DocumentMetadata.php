@@ -23,6 +23,8 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     public const GENERATOR_TYPE_NONE = 0;
     public const GENERATOR_TYPE_AUTO = 1;
 
+    public const LOCKING_TYPE_NONE = 0;
+
     private const JOIN_FIELD_ASSOCIATION = '$$join';
 
     /**
@@ -329,6 +331,32 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     public function setIdentifierValue($object, $value): void
     {
         $this->identifier->setValue($object, $value);
+    }
+
+    public function getSequenceNumber($object): ?int
+    {
+        foreach ($this->attributesMetadata as $metadata) {
+            if (! $metadata instanceof FieldMetadata || ! $metadata->seqNo) {
+                continue;
+            }
+
+            return $metadata->getValue($object);
+        }
+
+        return null;
+    }
+
+    public function getPrimaryTerm($object): ?int
+    {
+        foreach ($this->attributesMetadata as $metadata) {
+            if (! $metadata instanceof FieldMetadata || ! $metadata->primaryTerm) {
+                continue;
+            }
+
+            return $metadata->getValue($object);
+        }
+
+        return null;
     }
 
     public function getField(string $fieldName)

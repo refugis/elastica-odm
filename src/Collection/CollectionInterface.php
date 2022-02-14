@@ -54,13 +54,19 @@ interface CollectionInterface
 
     /**
      * Request the index of a document.
+     *
+     * @param array<string, mixed> $options
+     * @phpstan-param array{routing?: string, sequence_number?: int, primary_term?: int} $options
      */
-    public function create(?string $id, array $body, ?string $routing = null): Response;
+    public function create(?string $id, array $body, array $options = []): Response;
 
     /**
      * Updates a document.
+     *
+     * @param array<string, mixed> $options
+     * @phpstan-param array{routing?: string, sequence_number?: int, primary_term?: int} $options
      */
-    public function update(string $id, array $body, string $script = '', ?string $routing = null): void;
+    public function update(string $id, array $body, string $script = '', array $options = []): void;
 
     /**
      * Request the deletion of a document.

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Refugis\ODM\Elastica\Annotation;
 
 use Attribute;
-use Doctrine\Common\Annotations\Annotation\Target;
 use TypeError;
 
 use function get_debug_type;
@@ -48,11 +47,19 @@ final class Document
      */
     public ?string $joinFieldName = null;
 
+    /**
+     * The type of locking for this document. Supports "none" (default) and "optimistic"
+     *
+     * @Enum({"none", "optimistic"})
+     */
+    public string $locking;
+
     public function __construct(
         $collection = null,
         ?string $repositoryClass = null,
         ?string $joinType = null,
-        ?string $joinFieldName = null
+        ?string $joinFieldName = null,
+        ?string $locking = null
     ) {
         if ($collection === null || is_string($collection)) {
             $data = ['collection' => $collection];
@@ -72,5 +79,6 @@ final class Document
         $this->repositoryClass = $data['repositoryClass'] ?? $repositoryClass;
         $this->joinType = $data['joinType'] ?? $joinType;
         $this->joinFieldName = $data['joinFieldName'] ?? $joinFieldName;
+        $this->locking = $data['locking'] ?? $locking ?? 'none';
     }
 }
