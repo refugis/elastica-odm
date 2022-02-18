@@ -15,6 +15,7 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use ProxyManager\Factory\LazyLoadingGhostFactory;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
+use Refugis\ODM\Elastica\Exception\RuntimeException;
 use Refugis\ODM\Elastica\Hydrator\ObjectHydrator;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
@@ -31,14 +32,12 @@ class ObjectHydratorTest extends TestCase
      * @var EventManager|ObjectProphecy
      */
     private ObjectProphecy $eventManager;
-
     private TypeManager $typeManager;
 
     /**
      * @var DocumentManagerInterface|ObjectProphecy
      */
     private ObjectProphecy $documentManager;
-
     private UnitOfWork $uow;
     private ObjectHydrator $hydrator;
 
@@ -79,10 +78,27 @@ class ObjectHydratorTest extends TestCase
         $this->assertTestDocumentEquals($expectedDocumentValues, $result);
     }
 
+    public function testHydrateAllShouldThrowIfResponseIsNotOk(): void
+    {
+        $resultSet = $this->prophesize(ResultSet::class);
+        $resultSet->getResponse()->willReturn($response = $this->prophesize(Response::class));
+        $resultSet->count()->willReturn(0);
+
+        $response->isOk()->willReturn(false);
+        $response->getErrorMessage()->willReturn('Test error');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Response not OK: Test error');
+        $this->hydrator->hydrateAll($resultSet->reveal(), TestDocument::class);
+    }
+
     public function testHydrateAllShouldReturnEmptyArrayOnEmptyResultSet(): void
     {
         $resultSet = $this->prophesize(ResultSet::class);
+        $resultSet->getResponse()->willReturn($response = $this->prophesize(Response::class));
         $resultSet->count()->willReturn(0);
+
+        $response->isOk()->willReturn(true);
 
         self::assertEmpty($this->hydrator->hydrateAll($resultSet->reveal(), TestDocument::class));
     }
@@ -96,7 +112,9 @@ class ObjectHydratorTest extends TestCase
         $result2 = $this->prophesize(Result::class);
 
         $results = [$result1->reveal(), $result2->reveal()];
-        $resultSet = new ResultSet($this->prophesize(Response::class)->reveal(), $query->reveal(), $results);
+        $response = $this->prophesize(Response::class);
+        $response->isOk()->willReturn(true);
+        $resultSet = new ResultSet($response->reveal(), $query->reveal(), $results);
 
         $document1Id = '12345';
         $expectedDocument1Values = [
@@ -139,7 +157,9 @@ class ObjectHydratorTest extends TestCase
         $query->getParam('_source')->willReturn(['id', 'field2']);
 
         $result = $this->prophesize(Result::class);
-        $resultSet = new ResultSet($this->prophesize(Response::class)->reveal(), $query->reveal(), [$result->reveal()]);
+        $response = $this->prophesize(Response::class);
+        $response->isOk()->willReturn(true);
+        $resultSet = new ResultSet($response->reveal(), $query->reveal(), [$result->reveal()]);
 
         $documentId = '12345';
         $document = $this->prophesize(Document::class);
@@ -163,12 +183,12 @@ class ObjectHydratorTest extends TestCase
 
         $this->documentManager->refresh(Argument::any())->shouldNotHaveBeenCalled();
         $this->documentManager->refresh($documents[0])
-                              ->shouldBeCalledOnce()
-                              ->will(function () use ($documents) {
-                                  (function () {
-                                      $this->field1 = 'test_field1';
-                                  })->bindTo($documents[0], TestDocument::class)();
-                              });
+            ->shouldBeCalledOnce()
+            ->will(function () use ($documents) {
+                (function () {
+                    $this->field1 = 'test_field1';
+                })->bindTo($documents[0], TestDocument::class)();
+            });
 
         self::assertEquals('test_field1', $documents[0]->getField1());
     }
