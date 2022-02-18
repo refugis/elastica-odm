@@ -12,15 +12,8 @@ use Tests\Fixtures\Document\Foo;
 
 class DocumentIdProcessorTest extends TestCase
 {
-    /**
-     * @var DocumentIdProcessor
-     */
-    private $processor;
-
-    /**
-     * @var DocumentMetadata|ObjectProphecy
-     */
-    private $documentMetadata;
+    private DocumentIdProcessor $processor;
+    private DocumentMetadata $documentMetadata;
 
     /**
      * {@inheritdoc}

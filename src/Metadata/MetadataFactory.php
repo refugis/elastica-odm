@@ -14,18 +14,23 @@ use ReflectionClass;
 use Refugis\ODM\Elastica\Metadata\Loader\LoaderInterface;
 
 use function array_filter;
+use function method_exists;
+use function Safe\preg_replace;
 use function Safe\sprintf;
+use function str_replace;
 
 class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFactory
 {
     private LoaderInterface $loader;
     private EventManager $eventManager;
+    private ?CacheItemPoolInterface $cache;
 
     public function __construct(LoaderInterface $loader, ?CacheItemPoolInterface $cache = null)
     {
-        $this->loader = $loader;
-
         parent::__construct($loader, null, $cache);
+
+        $this->loader = $loader;
+        $this->cache = $cache;
     }
 
     /**
@@ -53,7 +58,20 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
 
     public function setMetadataFor($className, $class): void
     {
-        // @todo
+        if (method_exists(AbstractMetadataFactory::class, 'setMetadataFor')) {
+            parent::setMetadataFor($className, $class);
+
+            return;
+        }
+
+        if ($this->cache === null) {
+            return;
+        }
+
+        $cacheKey = preg_replace('#[\{\}\(\)/\\\\@:]#', '_', str_replace('_', '__', $className));
+        $item = $this->cache->getItem($cacheKey);
+        $item->set($class);
+        $this->cache->save($item);
     }
 
     /**
@@ -152,6 +170,7 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
 
         $rootMetadata->join['relations'][$parentMetadata->join['type']][] = $classMetadata->join['type'];
         $rootMetadata->childrenClasses[] = $classMetadata->name;
+        $this->setMetadataFor($rootMetadata->name, $rootMetadata);
     }
 
     protected function createMetadata(ReflectionClass $class): ClassMetadataInterface

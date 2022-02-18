@@ -18,15 +18,8 @@ class IndexProcessorTest extends TestCase
 {
     use DocumentManagerTestTrait;
 
-    /**
-     * @var IndexProcessor
-     */
-    private $processor;
-
-    /**
-     * @var DocumentMetadata
-     */
-    private $documentMetadata;
+    private IndexProcessor $processor;
+    private DocumentMetadata $documentMetadata;
 
     protected function setUp(): void
     {
