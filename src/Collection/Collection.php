@@ -187,7 +187,7 @@ class Collection implements CollectionInterface
         $endpoint->setBody($body);
 
         try {
-            $response = $this->searchable->getClient()->requestEndpoint($endpoint);
+            $response = $this->getClient()->requestEndpoint($endpoint);
         } catch (ResponseException $exception) {
             $response = $exception->getResponse();
         }
@@ -330,7 +330,7 @@ class Collection implements CollectionInterface
         }
 
         try {
-            $response = $this->searchable->getClient()->requestEndpoint($endpoint);
+            $response = $this->getClient()->requestEndpoint($endpoint);
         } catch (ResponseException $exception) {
             $response = $exception->getResponse();
         }
@@ -361,7 +361,7 @@ class Collection implements CollectionInterface
         }
 
         try {
-            $response = $this->searchable->getClient()->requestEndpoint($endpoint);
+            $response = $this->getClient()->requestEndpoint($endpoint);
         } catch (ResponseException $exception) {
             $response = $exception->getResponse();
         }
@@ -462,5 +462,14 @@ class Collection implements CollectionInterface
         $query->setQuery($bool);
 
         return $query;
+    }
+
+    private function getClient()
+    {
+        if ($this->searchable instanceof Type) {
+            return $this->searchable->getIndex()->getClient();
+        }
+
+        return $this->searchable->getClient();
     }
 }
