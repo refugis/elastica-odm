@@ -359,6 +359,19 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
         return null;
     }
 
+    public function getIndexName($object): ?string
+    {
+        foreach ($this->attributesMetadata as $metadata) {
+            if (! $metadata instanceof FieldMetadata || ! $metadata->indexName) {
+                continue;
+            }
+
+            return $metadata->getValue($object);
+        }
+
+        return null;
+    }
+
     public function getField(string $fieldName)
     {
         foreach ($this->attributesMetadata as $metadata) {

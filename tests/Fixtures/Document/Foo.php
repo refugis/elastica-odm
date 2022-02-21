@@ -8,6 +8,7 @@ use Refugis\ODM\Elastica\Annotation\DocumentId;
 use Refugis\ODM\Elastica\Annotation\Field;
 use Refugis\ODM\Elastica\Annotation\Filter;
 use Refugis\ODM\Elastica\Annotation\Index;
+use Refugis\ODM\Elastica\Annotation\IndexName;
 use Refugis\ODM\Elastica\Annotation\PrimaryTerm;
 use Refugis\ODM\Elastica\Annotation\SequenceNumber;
 use Refugis\ODM\Elastica\Annotation\Tokenizer;
@@ -38,6 +39,11 @@ class Foo
      * @Field(type="string")
      */
     public $stringField;
+
+    /**
+     * @IndexName()
+     */
+    public $indexName;
 
     /**
      * @SequenceNumber()

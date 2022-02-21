@@ -64,14 +64,17 @@ interface CollectionInterface
      * Updates a document.
      *
      * @param array<string, mixed> $options
-     * @phpstan-param array{routing?: string, sequence_number?: int, primary_term?: int} $options
+     * @phpstan-param array{routing?: string, sequence_number?: int, primary_term?: int, index?: string} $options
      */
     public function update(string $id, array $body, string $script = '', array $options = []): void;
 
     /**
      * Request the deletion of a document.
+     *
+     * @param array<string, mixed> $options
+     * @phpstan-param array{index?: string, type?: string} $options
      */
-    public function delete(string $id): void;
+    public function delete(string $id, array $options = []): void;
 
     /**
      * Request the deletion of a set of document, matched by the given query.

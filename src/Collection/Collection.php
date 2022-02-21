@@ -168,6 +168,16 @@ class Collection implements CollectionInterface
     {
         $body = [];
         foreach ($operations as $action) {
+            $meta = $action->getMetadata();
+            if ($this->searchable instanceof Type) {
+                $action->setType($this->searchable->getName());
+                if (! isset($meta['_index'])) {
+                    $action->setIndex($this->searchable->getIndex()->getName());
+                }
+            } elseif (! isset($meta['_index']) && $this->searchable instanceof Index) {
+                $action->setIndex($this->searchable->getName());
+            }
+
             foreach ($action->toArray() as $data) {
                 $body[] = $data;
             }
@@ -177,7 +187,7 @@ class Collection implements CollectionInterface
         $endpoint->setBody($body);
 
         try {
-            $response = $this->searchable->requestEndpoint($endpoint);
+            $response = $this->searchable->getClient()->requestEndpoint($endpoint);
         } catch (ResponseException $exception) {
             $response = $exception->getResponse();
         }
@@ -308,8 +318,19 @@ class Collection implements CollectionInterface
             $endpoint->setParams($endpointParams);
         }
 
+        if ($this->searchable instanceof Type) {
+            $endpoint->setType($this->searchable->getName());
+            $endpoint->setIndex($this->searchable->getIndex()->getName());
+        }
+
+        if (! empty($options['index'])) {
+            $endpoint->setIndex($options['index']);
+        } elseif ($this->searchable instanceof Index) {
+            $endpoint->setIndex($this->searchable->getName());
+        }
+
         try {
-            $response = $this->searchable->requestEndpoint($endpoint);
+            $response = $this->searchable->getClient()->requestEndpoint($endpoint);
         } catch (ResponseException $exception) {
             $response = $exception->getResponse();
         }
@@ -323,13 +344,24 @@ class Collection implements CollectionInterface
         }
     }
 
-    public function delete(string $id): void
+    public function delete(string $id, array $options = []): void
     {
         $endpoint = new Endpoints\Delete();
         $endpoint->setID($id);
 
+        if ($this->searchable instanceof Type) {
+            $endpoint->setType($this->searchable->getName());
+            $endpoint->setIndex($this->searchable->getIndex()->getName());
+        }
+
+        if (! empty($options['index'])) {
+            $endpoint->setIndex($options['index']);
+        } elseif ($this->searchable instanceof Index) {
+            $endpoint->setIndex($this->searchable->getName());
+        }
+
         try {
-            $response = $this->searchable->requestEndpoint($endpoint);
+            $response = $this->searchable->getClient()->requestEndpoint($endpoint);
         } catch (ResponseException $exception) {
             $response = $exception->getResponse();
         }

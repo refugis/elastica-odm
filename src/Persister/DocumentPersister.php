@@ -277,6 +277,7 @@ class DocumentPersister
             $routing = $this->getRouting($class, $document);
             $seqNo = $class->getSequenceNumber($document);
             $primaryTerm = $class->getPrimaryTerm($document);
+            $index = $class->getIndexName($document);
 
             $body = array_filter([
                 'doc' => $data['body'],
@@ -307,6 +308,7 @@ class DocumentPersister
                 'routing' => $routing,
                 'if_seq_no' => $seqNo,
                 'if_primary_term' => $primaryTerm,
+                '_index' => $index,
             ], static fn ($value) => $value !== null);
 
             if ($metadata) {
@@ -333,11 +335,13 @@ class DocumentPersister
         $routing = $this->getRouting($class, $document);
         $seqNo = $class->getSequenceNumber($document);
         $primaryTerm = $class->getPrimaryTerm($document);
+        $index = $class->getIndexName($document);
 
         $this->collection->update((string) $id, $data['body'], $data['script'], [
             'routing' => $routing,
             'seq_no' => $seqNo,
             'primary_term' => $primaryTerm,
+            'index' => $index,
         ]);
     }
 
@@ -349,7 +353,11 @@ class DocumentPersister
         $class = $this->dm->getClassMetadata(ClassUtil::getClass($document));
         $id = $class->getSingleIdentifier($document);
 
-        $this->collection->delete((string) $id);
+        $options = array_filter([
+            'index' => $class->getIndexName($document),
+        ], static fn ($value) => $value !== null);
+
+        $this->collection->delete((string) $id, $options);
     }
 
     /**
