@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Refugis\ODM\Elastica\Events;
 
 use Doctrine\Common\EventManager;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Refugis\ODM\Elastica\Events;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\UnitOfWork;
@@ -20,14 +21,26 @@ class LifecycleEventManager
         $this->evm = $evm;
     }
 
-    public function postPersist(DocumentMetadata $class, $object): void
+    public function postPersist(DocumentMetadata $class, object $document): void
     {
-        // @todo
+        // @todo Check lifecycle callbacks
+
+        if (! $this->evm->hasListeners(Events::postPersist)) {
+            return;
+        }
+
+        $this->evm->dispatchEvent(Events::postPersist, new LifecycleEventArgs($document, $this->uow->getObjectManager()));
     }
 
-    public function prePersist(DocumentMetadata $class, $object): void
+    public function prePersist(DocumentMetadata $class, object $document): void
     {
-        // @todo
+        // @todo Check lifecycle callbacks
+
+        if (! $this->evm->hasListeners(Events::prePersist)) {
+            return;
+        }
+
+        $this->evm->dispatchEvent(Events::prePersist, new LifecycleEventArgs($document, $this->uow->getObjectManager()));
     }
 
     public function preRemove(DocumentMetadata $class, $object): void
@@ -40,7 +53,7 @@ class LifecycleEventManager
         // @todo
     }
 
-    public function preUpdate(DocumentMetadata $class, $document): void
+    public function preUpdate(DocumentMetadata $class, object $document): void
     {
         // @todo Check lifecycle callbacks
 
