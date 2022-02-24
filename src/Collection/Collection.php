@@ -406,7 +406,13 @@ class Collection implements CollectionInterface
         }
 
         if (! $index->exists()) {
-            $index->create(['settings' => array_merge($this->staticSettings, $this->dynamicSettings)]);
+            $options = [];
+            $settings = array_merge($this->staticSettings, $this->dynamicSettings);
+            if (! empty($settings)) {
+                $options['settings'] = $settings;
+            }
+
+            $index->create($options);
         } elseif (! empty($this->dynamicSettings)) {
             $index->setSettings($this->dynamicSettings);
         }

@@ -156,8 +156,9 @@ class DocumentPersister
         try {
             $responseSet = $this->collection->bulk($operations)->getBulkResponses();
         } catch (IndexNotFoundException $e) {
+            $mappingClass = $this->class->join['rootClass'] ?? $this->class->name;
             $schemaGenerator = new SchemaGenerator($this->dm);
-            $schema = $schemaGenerator->generateSchema()->getMapping()[$this->class->name] ?? null;
+            $schema = $schemaGenerator->generateSchema()->getMapping()[$mappingClass] ?? null;
 
             if ($schema === null) {
                 throw $e;
@@ -512,8 +513,17 @@ class DocumentPersister
         $metadata = $class;
 
         while ($metadata->parentField !== null) {
-            $routingObject = $metadata->getField($metadata->parentField)->getValue($routingObject);
+            $obj = $metadata->getField($metadata->parentField)->getValue($routingObject);
+            if ($obj === null) {
+                break;
+            }
+
+            $routingObject = $obj;
             $metadata = $this->dm->getClassMetadata(ClassUtil::getClass($routingObject));
+        }
+
+        if ($routingObject === $document) {
+            return null;
         }
 
         return $metadata->getSingleIdentifier($routingObject);

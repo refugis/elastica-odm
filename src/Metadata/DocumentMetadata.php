@@ -23,8 +23,6 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     public const GENERATOR_TYPE_NONE = 0;
     public const GENERATOR_TYPE_AUTO = 1;
 
-    public const LOCKING_TYPE_NONE = 0;
-
     private const JOIN_FIELD_ASSOCIATION = '$$join';
 
     /**
@@ -82,7 +80,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
      * The join settings.
      *
      * @var array<string, mixed>|null
-     * @phpstan-var array{type: string, fieldName: string, parentClass?: class-string, relations?: array<string, array<string>>}|null
+     * @phpstan-var array{type: string, fieldName: string, parentClass?: class-string, rootClass?: class-string, relations?: array<string, array<string>>}|null
      */
     public ?array $join = null;
 
@@ -120,6 +118,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
         $this->instantiator = new Instantiator();
         $this->document = false;
         $this->embeddable = false;
+        $this->isReadOnly = false;
     }
 
     public function __wakeup(): void

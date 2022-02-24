@@ -171,6 +171,8 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
         $rootMetadata->join['relations'][$parentMetadata->join['type']][] = $classMetadata->join['type'];
         $rootMetadata->childrenClasses[] = $classMetadata->name;
         $this->setMetadataFor($rootMetadata->name, $rootMetadata);
+
+        $classMetadata->join['rootClass'] = $rootMetadata->name;
     }
 
     protected function createMetadata(ReflectionClass $class): ClassMetadataInterface

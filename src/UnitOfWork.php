@@ -736,8 +736,12 @@ final class UnitOfWork
                     $refl->setAccessible(true);
 
                     $parentObject = $refl->getValue($document);
-                    $parentMetadata = $this->getClassMetadata($parentObject);
-                    $parentId = $parentMetadata->getSingleIdentifier($parentObject);
+                    if ($parentObject !== null) {
+                        $parentMetadata = $this->getClassMetadata($parentObject);
+                        $parentId = $parentMetadata->getSingleIdentifier($parentObject);
+                    } else {
+                        $parentId = null;
+                    }
 
                     $actualData[$joinFieldName] = ['name' => $class->join['type'], 'parent' => $parentId];
                 } else {
