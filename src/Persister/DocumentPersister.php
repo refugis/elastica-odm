@@ -412,13 +412,21 @@ class DocumentPersister
             $field = $class->getField($name);
             if ($field instanceof EmbeddedMetadata) {
                 if ($field->multiple) {
-                    $body[$field->fieldName] = array_map(function ($item) use ($field) {
+                    $embeddedData = array_map(function ($item) use ($field) {
                         return $this->prepareEmbeddedUpdateData($item, $field);
                     }, (array) $value[1]);
-                } elseif ($value[1] !== null) {
-                    $body[$field->fieldName] = $this->prepareEmbeddedUpdateData($value[1], $field);
+
+                    $fieldBody = [];
+                    foreach ($embeddedData as [$embeddedBody, $embeddedScript]) {
+                        $fieldBody[] = $embeddedBody;
+                        $script = [...$script, ...$embeddedScript];
+                    }
+
+                    $body[$field->fieldName] = $fieldBody;
                 } else {
-                    $script[] = 'ctx._source.remove(\'' . str_replace('\'', '\\\'', $field->fieldName) . '\')';
+                    [$embeddedBody, $embeddedScript] = $this->prepareEmbeddedUpdateData($value[1], $field);
+                    $body[$field->fieldName] = $embeddedBody;
+                    $script = [...$script, ...$embeddedScript];
                 }
             } elseif ($field instanceof FieldMetadata) {
                 $type = $typeManager->getType($field->type);
@@ -442,7 +450,7 @@ class DocumentPersister
     }
 
     /**
-     * @return array<string, mixed>
+     * @return mixed[]
      *
      * @throws ConversionFailedException
      */
@@ -453,25 +461,45 @@ class DocumentPersister
 
         $typeManager = $this->dm->getTypeManager();
         $properties = [];
-        foreach ($class->getFieldNames() as $fieldName) {
+        $script = [];
+
+        foreach ([...$class->getFieldNames(), ...$class->embeddedFieldNames] as $fieldName) {
             $classField = $class->getField($fieldName);
-            assert($classField instanceof FieldMetadata);
+            assert($classField !== null);
 
-            $type = $typeManager->getType($classField->type);
             $itemValue = $classField->getValue($value);
+            if ($classField instanceof EmbeddedMetadata) {
+                if ($classField->multiple) {
+                    $embeddedData = array_map(function ($item) use ($classField) {
+                        return $this->prepareEmbeddedUpdateData($item, $classField);
+                    }, (array) $itemValue);
 
-            if ($classField->multiple) {
-                $properties[$fieldName] = array_map(static function ($item) use ($type, $classField) {
-                    return $type->toDatabase($item, $classField->options);
-                }, (array) $itemValue);
-            } elseif ($itemValue !== null) {
-                $properties[$fieldName] = $type->toDatabase($itemValue, $classField->options);
+                    $fieldBody = [];
+                    foreach ($embeddedData as [$embeddedBody, $embeddedScript]) {
+                        $fieldBody[] = $embeddedBody;
+                        $script = [...$script, ...$embeddedScript];
+                    }
+
+                    $properties[$classField->fieldName] = $fieldBody;
+                } else {
+                    [$embeddedBody, $embeddedScript] = $this->prepareEmbeddedUpdateData($itemValue, $classField);
+                    $properties[$classField->fieldName] = $embeddedBody;
+                    $script = [...$script, ...$embeddedScript];
+                }
+            } elseif ($classField instanceof FieldMetadata) {
+                $type = $typeManager->getType($classField->type);
+
+                if ($classField->multiple) {
+                    $properties[$fieldName] = array_map(static function ($item) use ($type, $classField) {
+                        return $type->toDatabase($item, $classField->options);
+                    }, (array) $itemValue);
+                } elseif ($itemValue !== null) {
+                    $properties[$fieldName] = $type->toDatabase($itemValue, $classField->options);
+                }
             }
         }
 
-        // @TODO: nested embedded documents.
-
-        return $properties;
+        return [$properties, $script];
     }
 
     private function getRouting(DocumentMetadata $class, object $document): ?string

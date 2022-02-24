@@ -11,6 +11,7 @@ use Refugis\ODM\Elastica\Exception\VersionConflictException;
 use Refugis\ODM\Elastica\Geotools\Coordinate\Coordinate;
 use Tests\Fixtures\Document\Foo;
 use Tests\Fixtures\Document\FooEmbeddable;
+use Tests\Fixtures\Document\FooNestedEmbeddable;
 use Tests\Fixtures\Document\FooNoAutoCreate;
 use Tests\Fixtures\Document\FooWithEmbedded;
 use Tests\Fixtures\Document\FooWithLazyField;
@@ -230,6 +231,8 @@ EOF
         $document->id = 'test_persist_with_embedded';
         $document->emb = new FooEmbeddable();
         $document->emb->stringField = __METHOD__;
+        $document->emb->nestedEmbeddable = new FooNestedEmbeddable();
+        $document->emb->nestedEmbeddable->stringFieldRenest = __FUNCTION__;
 
         $this->dm->persist($document);
         $this->dm->flush();
@@ -241,7 +244,11 @@ EOF
         self::assertNotNull($result->emb);
         self::assertEquals(__METHOD__, $result->emb->stringField);
 
+        self::assertInstanceOf(FooNestedEmbeddable::class, $result->emb->nestedEmbeddable);
+        self::assertEquals(__FUNCTION__, $result->emb->nestedEmbeddable->stringFieldRenest);
+
         $result->emb->stringField = __FUNCTION__;
+        $result->emb->nestedEmbeddable->stringFieldRenest = __METHOD__;
         $this->dm->flush();
         $this->dm->clear();
 
@@ -250,5 +257,6 @@ EOF
         self::assertEquals('test_persist_with_embedded', $result->id);
         self::assertNotNull($result->emb);
         self::assertEquals(__FUNCTION__, $result->emb->stringField);
+        self::assertEquals(__METHOD__, $result->emb->nestedEmbeddable->stringFieldRenest);
     }
 }

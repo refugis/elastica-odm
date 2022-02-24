@@ -35,6 +35,13 @@ class MappingGeneratorTest extends TestCase
                 'dynamic' => 'strict',
                 'properties' => [
                     'stringField' => ['type' => 'text'],
+                    'nestedEmbeddable' => [
+                        'type' => 'nested',
+                        'dynamic' => 'strict',
+                        'properties' => [
+                            'stringFieldRenest' => ['type' => 'text'],
+                        ],
+                    ],
                 ],
             ],
         ], $generator->getMapping($dm->getClassMetadata(FooWithEmbedded::class))->getProperties());
