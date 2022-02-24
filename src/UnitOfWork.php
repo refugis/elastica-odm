@@ -294,6 +294,13 @@ final class UnitOfWork
             $this->executeUpdates($className);
             $this->executeDeletions($className);
 
+            $class = $this->manager->getClassMetadata($className);
+            assert($class instanceof DocumentMetadata);
+
+            if (! $class->refreshOnCommit) {
+                continue;
+            }
+
             $this->getDocumentPersister($className)->refreshCollection();
         }
 

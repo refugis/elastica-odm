@@ -107,6 +107,11 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     public array $staticSettings = [];
 
     /**
+     * Whether to call refresh on index after the uow commit operation.
+     */
+    public bool $refreshOnCommit;
+
+    /**
      * The instantiator used to build new object instances.
      */
     private Instantiator $instantiator;
@@ -119,6 +124,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
         $this->document = false;
         $this->embeddable = false;
         $this->isReadOnly = false;
+        $this->refreshOnCommit = true;
     }
 
     public function __wakeup(): void

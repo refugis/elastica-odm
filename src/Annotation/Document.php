@@ -48,6 +48,11 @@ final class Document
     public ?string $joinFieldName = null;
 
     /**
+     * Whether to auto-refresh collection on flush. Defaults to true.
+     */
+    public ?bool $refreshOnFlush = null;
+
+    /**
      * The type of locking for this document. Supports "none" (default) and "optimistic"
      *
      * @Enum({"none", "optimistic"})
@@ -59,6 +64,7 @@ final class Document
         ?string $repositoryClass = null,
         ?string $joinType = null,
         ?string $joinFieldName = null,
+        ?bool $refreshOnFlush = null,
         ?string $locking = null
     ) {
         if ($collection === null || is_string($collection)) {
@@ -79,6 +85,7 @@ final class Document
         $this->repositoryClass = $data['repositoryClass'] ?? $repositoryClass;
         $this->joinType = $data['joinType'] ?? $joinType;
         $this->joinFieldName = $data['joinFieldName'] ?? $joinFieldName;
+        $this->refreshOnFlush = $data['refreshOnFlush'] ?? $refreshOnFlush ?? true;
         $this->locking = $data['locking'] ?? $locking ?? 'none';
     }
 }
