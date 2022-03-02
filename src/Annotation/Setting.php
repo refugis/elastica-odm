@@ -44,6 +44,10 @@ final class Setting
      */
     public $value;
 
+    /**
+     * @param string|array<string, mixed> $type
+     * @param mixed $value
+     */
     public function __construct($type = 'auto', ?string $key = null, $value = null)
     {
         if (is_string($type)) {
@@ -55,7 +59,7 @@ final class Setting
         }
 
         $this->type = $data['type'] ?? $type;
-        $this->key = $data['key'] ?? null;
+        $this->key = $data['key'] ?? $key;
         $this->value = $data['value'] ?? $value;
 
         if (! in_array($this->type, ['auto', 'static', 'dynamic'], true)) {

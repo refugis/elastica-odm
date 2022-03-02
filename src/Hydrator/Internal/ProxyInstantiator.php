@@ -13,6 +13,7 @@ use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 use function array_map;
 use function assert;
 use function in_array;
+use function sprintf;
 use function strtolower;
 
 class ProxyInstantiator implements InstantiatorInterface
@@ -21,6 +22,9 @@ class ProxyInstantiator implements InstantiatorInterface
     private array $fields;
     private DocumentManagerInterface $manager;
 
+    /**
+     * @param string[] $fields
+     */
     public function __construct(array $fields, DocumentManagerInterface $manager)
     {
         $this->fields = $fields;
@@ -36,6 +40,7 @@ class ProxyInstantiator implements InstantiatorInterface
     }
 
     /**
+     * @param string[] $fields
      * @phpstan-param class-string $className
      */
     private function createProxy(string $className, array $fields): GhostObjectInterface
@@ -55,7 +60,7 @@ class ProxyInstantiator implements InstantiatorInterface
         ) use (
             $fields,
             $allowedMethods
-): bool {
+        ): bool {
             if (($method === '__get' || $method === '__set') && in_array($parameters['name'], $fields, true)) {
                 return false;
             }
@@ -83,9 +88,9 @@ class ProxyInstantiator implements InstantiatorInterface
             $reflectionProperty = $field->getReflection();
 
             if ($reflectionProperty->isPrivate()) {
-                $skippedProperties[] = "\0{$field->class}\0{$field->name}";
+                $skippedProperties[] = sprintf("\0%s\0%s", $field->class, $field->name);
             } elseif ($reflectionProperty->isProtected()) {
-                $skippedProperties[] = "\0*\0{$field->name}";
+                $skippedProperties[] = sprintf("\0*\0%s", $field->name);
             } else {
                 $skippedProperties[] = $field->name;
             }

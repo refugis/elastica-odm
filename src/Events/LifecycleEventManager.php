@@ -43,12 +43,12 @@ class LifecycleEventManager
         $this->evm->dispatchEvent(Events::prePersist, new LifecycleEventArgs($document, $this->uow->getObjectManager()));
     }
 
-    public function preRemove(DocumentMetadata $class, $object): void
+    public function preRemove(DocumentMetadata $class, object $document): void
     {
         // @todo
     }
 
-    public function postRemove(DocumentMetadata $class, $object): void
+    public function postRemove(DocumentMetadata $class, object $document): void
     {
         // @todo
     }
@@ -65,7 +65,7 @@ class LifecycleEventManager
         $this->uow->recomputeSingleDocumentChangeset($document);
     }
 
-    public function postUpdate(DocumentMetadata $class, $document): void
+    public function postUpdate(DocumentMetadata $class, object $document): void
     {
         // @todo
     }

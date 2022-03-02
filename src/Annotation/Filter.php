@@ -37,9 +37,15 @@ final class Filter
 
     /**
      * Type-specific options.
+     *
+     * @var array<string, mixed>
      */
     public array $options;
 
+    /**
+     * @param string|array<string, mixed> $name
+     * @param array<string, mixed> $options
+     */
     public function __construct($name, string $type = 'raw', array $options = [])
     {
         if (is_string($name)) {

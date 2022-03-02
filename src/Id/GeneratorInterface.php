@@ -14,7 +14,7 @@ interface GeneratorInterface
      *
      * @return mixed
      *
-     * @throws InvalidIdentifierException if id cannot be generated or invalid
+     * @throws InvalidIdentifierException if id cannot be generated or invalid.
      */
     public function generate(DocumentManagerInterface $dm, object $document);
 

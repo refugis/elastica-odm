@@ -35,6 +35,9 @@ final class MappingGenerator
         return class_exists(TypeMapping::class) ? TypeMapping::create($properties) : Mapping::create($properties);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function generatePropertiesMapping(DocumentMetadata $class): array
     {
         $properties = [];

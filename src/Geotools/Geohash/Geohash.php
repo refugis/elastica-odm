@@ -148,7 +148,7 @@ class Geohash
      */
     private function encode(CoordinateInterface $coordinate, int $length = self::MAX_LENGTH): void
     {
-        if ((int) $length < self::MIN_LENGTH || (int) $length > self::MAX_LENGTH) {
+        if ($length < self::MIN_LENGTH || $length > self::MAX_LENGTH) {
             throw new InvalidArgumentException('The length should be between 1 and 12.');
         }
 
@@ -186,7 +186,7 @@ class Geohash
                 $charIndex = 0;
             }
 
-            $isEven = $isEven ? false : true;
+            $isEven = ! $isEven;
         }
 
         $this->latitudeInterval = $latitudeInterval;
@@ -236,7 +236,7 @@ class Geohash
                     }
                 }
 
-                $isEven = $isEven ? false : true;
+                $isEven = ! $isEven;
             }
         }
 

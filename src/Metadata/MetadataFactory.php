@@ -56,7 +56,11 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
         return $metadatas;
     }
 
-    public function setMetadataFor($className, $class): void
+    /**
+     * @param class-string $className
+     * @param DocumentMetadata $class
+     */
+    public function setMetadataFor($className, $class): void // phpcs:ignore SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
     {
         if (method_exists(AbstractMetadataFactory::class, 'setMetadataFor')) {
             parent::setMetadataFor($className, $class);

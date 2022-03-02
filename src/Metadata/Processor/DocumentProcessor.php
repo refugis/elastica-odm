@@ -79,7 +79,7 @@ class DocumentProcessor implements ProcessorInterface
 
         $indexName = $inflector->tableize($name);
         if (class_exists(Type::class)) {
-            return "$indexName/$indexName";
+            return sprintf('%s/%s', $indexName, $indexName);
         }
 
         return $indexName;

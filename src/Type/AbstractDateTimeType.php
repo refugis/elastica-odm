@@ -13,6 +13,7 @@ use function assert;
 use function preg_replace_callback;
 use function Safe\preg_match;
 use function Safe\substr;
+use function sprintf;
 
 abstract class AbstractDateTimeType extends AbstractType
 {
@@ -71,7 +72,7 @@ abstract class AbstractDateTimeType extends AbstractType
      */
     abstract protected function getClass(): string;
 
-    private function toJoda(string $format)
+    private function toJoda(string $format): string
     {
         if ($format === 'U') {
             return 'epoch_second';
@@ -178,7 +179,7 @@ abstract class AbstractDateTimeType extends AbstractType
                     }
 
                     if (preg_match('/[a-z0-9]/i', $token)) {
-                        return "'$token'";
+                        return sprintf("'%s'", $token);
                     }
 
                     return $token;

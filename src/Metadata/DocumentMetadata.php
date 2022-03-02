@@ -9,6 +9,7 @@ use Doctrine\Persistence\Mapping\ClassMetadata as ClassMetadataInterface;
 use InvalidArgumentException;
 use Kcs\Metadata\ClassMetadata;
 use Kcs\Metadata\MetadataInterface;
+use Kcs\Metadata\PropertyMetadata;
 use ReflectionClass;
 use Refugis\ODM\Elastica\Exception\RuntimeException;
 
@@ -63,16 +64,22 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
 
     /**
      * An array containing all the non-lazy field names.
+     *
+     * @var string[]
      */
     public array $eagerFieldNames = [];
 
     /**
      * An array containing all the field names.
+     *
+     * @var string[]
      */
     public array $fieldNames = [];
 
     /**
      * An array containing all the field names.
+     *
+     * @var string[]
      */
     public array $embeddedFieldNames = [];
 
@@ -98,11 +105,15 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
 
     /**
      * Gets the index dynamic settings.
+     *
+     * @var array<string, mixed>
      */
     public array $dynamicSettings = [];
 
     /**
      * Gets the index static settings.
+     *
+     * @var array<string, mixed>
      */
     public array $staticSettings = [];
 
@@ -323,7 +334,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
         return $this->identifier->fieldName;
     }
 
-    public function getSingleIdentifier($object): ?string
+    public function getSingleIdentifier(object $object): ?string
     {
         $id = $this->getIdentifierValues($object);
         if (empty($id)) {
@@ -333,12 +344,12 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
         return reset($id);
     }
 
-    public function setIdentifierValue($object, $value): void
+    public function setIdentifierValue(object $object, string $value): void
     {
         $this->identifier->setValue($object, $value);
     }
 
-    public function getSequenceNumber($object): ?int
+    public function getSequenceNumber(object $object): ?int
     {
         foreach ($this->attributesMetadata as $metadata) {
             if (! $metadata instanceof FieldMetadata || ! $metadata->seqNo) {
@@ -351,7 +362,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
         return null;
     }
 
-    public function getPrimaryTerm($object): ?int
+    public function getPrimaryTerm(object $object): ?int
     {
         foreach ($this->attributesMetadata as $metadata) {
             if (! $metadata instanceof FieldMetadata || ! $metadata->primaryTerm) {
@@ -364,7 +375,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
         return null;
     }
 
-    public function getIndexName($object): ?string
+    public function getIndexName(object $object): ?string
     {
         foreach ($this->attributesMetadata as $metadata) {
             if (! $metadata instanceof FieldMetadata || ! $metadata->indexName) {
@@ -377,7 +388,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
         return null;
     }
 
-    public function getField(string $fieldName)
+    public function getField(string $fieldName): ?PropertyMetadata
     {
         foreach ($this->attributesMetadata as $metadata) {
             if (! $metadata instanceof FieldMetadata && ! $metadata instanceof EmbeddedMetadata) {

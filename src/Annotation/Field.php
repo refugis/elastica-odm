@@ -47,6 +47,10 @@ final class Field
      */
     public bool $lazy;
 
+    /**
+     * @param string|array<string, mixed> $name
+     * @param array<string, mixed> $options
+     */
     public function __construct($name, string $type = 'raw', bool $multiple = false, array $options = [], bool $lazy = false)
     {
         if (is_string($name)) {

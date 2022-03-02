@@ -39,9 +39,9 @@ final class CommitOrderCalculator
     /**
      * Gets the commit order set.
      *
-     * @param array $classNames
+     * @param class-string[] $classNames
      *
-     * @return array
+     * @return class-string[]
      */
     public function getOrder(array $classNames): array
     {

@@ -18,6 +18,7 @@ class FieldMetadata extends PropertyMetadata
     public string $fieldName;
     public string $type;
     public bool $multiple = false;
+    /** @var array<string, mixed> */
     public array $options = [];
     public bool $lazy = false;
     public DocumentMetadata $documentMetadata;

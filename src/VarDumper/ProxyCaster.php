@@ -13,7 +13,12 @@ use function strpos;
 
 final class ProxyCaster
 {
-    public static function castProxy(ProxyInterface $proxy, array $a, Stub $stub, bool $isNested): array
+    /**
+     * @param array<array-key, mixed> $a
+     *
+     * @return array<array-key, mixed>
+     */
+    public static function castProxy(ProxyInterface $proxy, array $a, Stub $stub): array
     {
         $stub->class = get_parent_class($proxy) . ' (proxy)';
         $prefix = "\0" . get_class($proxy) . "\0";

@@ -49,6 +49,9 @@ final class Analyzer
      */
     public ?array $filters = null;
 
+    /**
+     * @param string|array<string, mixed> $name
+     */
     public function __construct($name, ?string $tokenizer = null, ?array $charFilters = null, ?array $filters = null)
     {
         if (is_string($name)) {

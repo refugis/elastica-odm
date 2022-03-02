@@ -30,7 +30,8 @@ class Coordinate implements CoordinateInterface
     /**
      * Set the latitude and the longitude of the coordinates into an selected ellipsoid.
      *
-     * @param array|string $coordinates the coordinates
+     * @param float[]|string $coordinates the coordinates
+     * @phpstan-param array{0: float, 1: float}|string $coordinates
      *
      * @throws InvalidArgumentException
      */
@@ -61,7 +62,8 @@ class Coordinate implements CoordinateInterface
     /**
      * Creates a new coordinate object.
      *
-     * @param array|string $coordinates
+     * @param float[]|string $coordinates the coordinates
+     * @phpstan-param array{0: float, 1: float}|string $coordinates
      */
     public static function create($coordinates): self
     {

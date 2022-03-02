@@ -55,6 +55,7 @@ interface CollectionInterface
     /**
      * Request the index of a document.
      *
+     * @param array<string, mixed> $body
      * @param array<string, mixed> $options
      * @phpstan-param array{routing?: string, sequence_number?: int, primary_term?: int} $options
      */
@@ -63,6 +64,7 @@ interface CollectionInterface
     /**
      * Updates a document.
      *
+     * @param array<string, mixed> $body
      * @param array<string, mixed> $options
      * @phpstan-param array{routing?: string, sequence_number?: int, primary_term?: int, index?: string} $options
      */

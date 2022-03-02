@@ -88,6 +88,9 @@ trait AnnotationLoaderTrait
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getAllClassNames(): array
     {
         $classes = [];

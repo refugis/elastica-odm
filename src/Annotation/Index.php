@@ -35,6 +35,12 @@ final class Index
      */
     public array $tokenizers;
 
+    /**
+     * @param array<string, Filter[]|Analyzer[]|Tokenizer[]>|Filter[] $filters
+     * @param Analyzer[] $analyzers
+     * @param Tokenizer[] $tokenizers
+     * @phpstan-param array{filters?: Filter[], analyzers?: Analyzer[], tokenizers?: Tokenizer[]}|Filter[] $filters
+     */
     public function __construct(array $filters = [], array $analyzers = [], array $tokenizers = [])
     {
         if (isset($filters['filters']) || isset($filters['analyzers']) || isset($filters['tokenizers'])) {

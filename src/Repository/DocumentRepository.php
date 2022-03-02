@@ -12,6 +12,10 @@ use Refugis\ODM\Elastica\Persister\DocumentPersister;
 use Refugis\ODM\Elastica\Search\Search;
 use Refugis\ODM\Elastica\UnitOfWork;
 
+/**
+ * @template T
+ * @implements DocumentRepositoryInterface<T>
+ */
 class DocumentRepository implements DocumentRepositoryInterface
 {
     protected DocumentManagerInterface $dm;
@@ -66,6 +70,9 @@ class DocumentRepository implements DocumentRepositoryInterface
         return $this->documentClass;
     }
 
+    /**
+     * @return Collection<T>
+     */
     public function matching(Criteria $criteria): Collection
     {
         // TODO: Implement matching() method.

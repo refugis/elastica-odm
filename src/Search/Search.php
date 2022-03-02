@@ -108,13 +108,15 @@ class Search implements IteratorAggregate
      */
     public function count(): int
     {
-        $collection = $this->documentManager->getCollection($this->documentClass);
-
-        return $collection->count($this->query);
+        return $this->documentManager
+            ->getCollection($this->documentClass)
+            ->count($this->query);
     }
 
     /**
      * Iterate over the query results.
+     *
+     * @return Iterator<object>
      */
     public function getIterator(): Iterator
     {
@@ -174,7 +176,7 @@ class Search implements IteratorAggregate
     /**
      * Sets the sort fields and directions.
      *
-     * @param array<string, string>|string|null $fieldName
+     * @param array<string, string>[]|string|null $fieldName
      */
     public function setSort($fieldName, string $order = 'asc'): self
     {
@@ -196,6 +198,8 @@ class Search implements IteratorAggregate
 
     /**
      * Gets the sort array.
+     *
+     * @return array<string, string>[]|null
      */
     public function getSort(): ?array
     {
@@ -277,7 +281,7 @@ class Search implements IteratorAggregate
      *
      * @return Generator<ResultSet>
      */
-    private function _doExecute(Query $query): Generator
+    private function _doExecute(Query $query): Generator // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $collection = $this->documentManager->getCollection($this->documentClass);
 
@@ -297,7 +301,7 @@ class Search implements IteratorAggregate
      *
      * @return Generator<ResultSet>
      */
-    private function _doExecuteCached(Query $query): Generator
+    private function _doExecuteCached(Query $query): Generator // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $resultCache = $this->documentManager->getResultCache();
         if ($resultCache !== null) {

@@ -16,7 +16,11 @@ trait VarDumperTestTrait
 {
     use BaseTrait;
 
-    protected function getDump($data, $key = null, $filter = 0): ?string
+    /**
+     * @param mixed $data
+     * @param array-key|null $key
+     */
+    protected function getDump($data, $key = null, int $filter = 0): ?string
     {
         $flags = getenv('DUMP_LIGHT_ARRAY') ? CliDumper::DUMP_LIGHT_ARRAY : 0;
         $flags |= getenv('DUMP_STRING_LENGTH') ? CliDumper::DUMP_STRING_LENGTH : 0;
@@ -29,7 +33,7 @@ trait VarDumperTestTrait
         $dumper = new CliDumper(null, null, $flags);
         $dumper->setColors(false);
         $data = $cloner->cloneVar($data, $filter)->withRefHandles(false);
-        if ($key !== null && null === $data = $data->seek($key)) {
+        if ($key !== null && ($data = $data->seek($key)) === null) { // phpcs:ignore SlevomatCodingStandard.ControlStructures.AssignmentInCondition.AssignmentInCondition
             return null;
         }
 

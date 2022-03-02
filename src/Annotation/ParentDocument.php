@@ -25,6 +25,9 @@ final class ParentDocument
      */
     public ?string $target;
 
+    /**
+     * @param string|array<string, mixed> $target
+     */
     public function __construct($target)
     {
         if (is_string($target)) {

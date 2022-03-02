@@ -36,9 +36,15 @@ final class Tokenizer
 
     /**
      * Type-specific options.
+     *
+     * @var array<string, mixed>
      */
     public array $options;
 
+    /**
+     * @param string|array<string, mixed> $name
+     * @param array<string, mixed> $options
+     */
     public function __construct($name, ?string $type = null, array $options = [])
     {
         if (is_string($name)) {

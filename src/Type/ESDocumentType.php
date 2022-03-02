@@ -44,6 +44,9 @@ final class ESDocumentType extends AbstractType implements ContainerAwareInterfa
         return self::NAME;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getMappingDeclaration(array $options = []): array
     {
         return [];

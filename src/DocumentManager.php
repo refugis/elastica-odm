@@ -62,13 +62,9 @@ class DocumentManager implements DocumentManagerInterface
     public function find($className, $id): ?object
     {
         $class = $this->getClassMetadata($className);
-        if ($document = $this->unitOfWork->tryGetById($id, $class)) {
-            return $document;
-        }
+        $document = $this->unitOfWork->tryGetById($id, $class);
 
-        $persister = $this->getUnitOfWork()->getDocumentPersister($className);
-
-        return $persister->load(['_id' => $id]);
+        return $document ?? $this->getUnitOfWork()->getDocumentPersister($className)->load(['_id' => $id]);
     }
 
     /**
@@ -77,7 +73,8 @@ class DocumentManager implements DocumentManagerInterface
     public function getReference(string $className, $id): object
     {
         $class = $this->getClassMetadata($className);
-        if ($document = $this->unitOfWork->tryGetById($id, $class)) {
+        $document = $this->unitOfWork->tryGetById($id, $class);
+        if ($document !== null) {
             return $document;
         }
 

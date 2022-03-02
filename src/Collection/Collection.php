@@ -7,6 +7,7 @@ namespace Refugis\ODM\Elastica\Collection;
 use Elastica\Bulk;
 use Elastica\Bulk\Response as BulkResponse;
 use Elastica\Bulk\ResponseSet;
+use Elastica\Client;
 use Elastica\Exception\InvalidException;
 use Elastica\Exception\ResponseException;
 use Elastica\Index;
@@ -344,6 +345,10 @@ class Collection implements CollectionInterface
         }
     }
 
+    /**
+     * @param array<string, mixed> $options
+     * @phpstan-param array{index?: string} $options
+     */
     public function delete(string $id, array $options = []): void
     {
         $endpoint = new Endpoints\Delete();
@@ -470,7 +475,7 @@ class Collection implements CollectionInterface
         return $query;
     }
 
-    private function getClient()
+    private function getClient(): Client
     {
         if ($this->searchable instanceof Type) {
             return $this->searchable->getIndex()->getClient();

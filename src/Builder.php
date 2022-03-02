@@ -180,6 +180,9 @@ final class Builder
         return new DocumentManager(new Database($this->client), $configuration);
     }
 
+    /**
+     * @return array<string, string>
+     */
     private static function buildUrl(string $url): array
     {
         $url = @parse_url($url);

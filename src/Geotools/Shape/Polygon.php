@@ -18,10 +18,11 @@ final class Polygon extends Geoshape
     /** @var Collection<CoordinateInterface> */
     private Collection $outer;
 
-    /** @var Collection<CoordinateInterface[]> */
-    private Collection $holes;
+    /** @var Collection<CoordinateInterface>[] */
+    private array $holes;
 
     /**
+     * @param CoordinateInterface[] $outer
      * @param CoordinateInterface[][] ...$holes
      */
     public function __construct(array $outer, array ...$holes)

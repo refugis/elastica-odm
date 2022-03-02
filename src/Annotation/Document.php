@@ -59,6 +59,9 @@ final class Document
      */
     public string $locking;
 
+    /**
+     * @param string|array<string, mixed> $collection
+     */
     public function __construct(
         $collection = null,
         ?string $repositoryClass = null,

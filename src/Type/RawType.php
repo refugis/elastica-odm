@@ -30,6 +30,9 @@ final class RawType extends AbstractType
         return self::NAME;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getMappingDeclaration(array $options = []): array
     {
         return [];

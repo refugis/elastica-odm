@@ -42,6 +42,9 @@ final class Embedded
      */
     public bool $multiple;
 
+    /**
+     * @param class-string|array<string, mixed> $targetClass
+     */
     public function __construct($targetClass, ?string $name = null, bool $enabled = true, bool $multiple = false)
     {
         if (is_string($targetClass)) {

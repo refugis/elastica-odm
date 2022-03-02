@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica;
 
+// phpcs:disable Generic.NamingConventions.UpperCaseConstantName.ClassConstantNotUpperCase
+
 final class Events
 {
     /**

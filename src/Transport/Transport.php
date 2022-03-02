@@ -38,6 +38,9 @@ class Transport extends AwsAuthV4
     /** @var array<string, mixed> */
     private array $options;
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function __construct(array $options = [
         'aws_auth_v4' => false,
         'insecure' => false,
@@ -68,7 +71,8 @@ class Transport extends AwsAuthV4
             $options[RequestOptions::TIMEOUT] = $connection->getTimeout();
         }
 
-        if (null !== $proxy = $connection->getProxy()) {
+        $proxy = $connection->getProxy();
+        if ($proxy !== null) {
             $options[RequestOptions::PROXY] = $proxy;
         }
 
@@ -132,7 +136,7 @@ class Transport extends AwsAuthV4
         return self::$_guzzleClientConnection;
     }
 
-    protected function _createPsr7Request(Request $request, Connection $connection): Psr7\Request
+    protected function _createPsr7Request(Request $request, Connection $connection): Psr7\Request // phpcs:ignore
     {
         $req = new Psr7\Request(
             $request->getMethod(),
@@ -196,6 +200,9 @@ class Transport extends AwsAuthV4
         });
     }
 
+    /**
+     * @param mixed $data
+     */
     private function streamFor($data): StreamInterface
     {
         if (is_array($data)) {
