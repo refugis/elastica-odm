@@ -22,9 +22,10 @@ use Elasticsearch\Serializers\ArrayToJSONSerializer;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Exception\CannotDropAnAliasException;
 use Refugis\ODM\Elastica\Exception\IndexNotFoundException;
-use Refugis\ODM\Elastica\Exception\RuntimeException;
+use Refugis\ODM\Elastica\Exception\ResponseException as ODMResponseException;
 use Refugis\ODM\Elastica\Exception\VersionConflictException;
 use Refugis\ODM\Elastica\Search\Search;
+use RuntimeException;
 
 use function array_filter;
 use function array_key_first;
@@ -115,10 +116,10 @@ class Collection implements CollectionInterface
         }
 
         if ($response->getStatus() === 404 && $response->getFullError()['type'] === 'index_not_found_exception' ?? null) {
-            throw new IndexNotFoundException('Index not found: ' . $response->getErrorMessage());
+            throw new IndexNotFoundException($response, 'Index not found: ' . $response->getErrorMessage());
         }
 
-        throw new RuntimeException('Response not OK: ' . $response->getErrorMessage());
+        throw new ODMResponseException($response, 'Response not OK: ' . $response->getErrorMessage());
     }
 
     public function search(Query $query): ResultSet
@@ -132,10 +133,10 @@ class Collection implements CollectionInterface
         }
 
         if ($response->getStatus() === 404 && $response->getFullError()['type'] === 'index_not_found_exception' ?? null) {
-            throw new IndexNotFoundException('Index not found: ' . $response->getErrorMessage());
+            throw new IndexNotFoundException($response, 'Index not found: ' . $response->getErrorMessage());
         }
 
-        throw new RuntimeException('Response not OK: ' . $response->getErrorMessage());
+        throw new ODMResponseException('Response not OK: ' . $response->getErrorMessage());
     }
 
     public function createSearch(DocumentManagerInterface $documentManager, Query $query): Search
@@ -158,7 +159,7 @@ class Collection implements CollectionInterface
         try {
             $this->searchable->requestEndpoint($endpoint);
         } catch (ResponseException $exception) {
-            throw new RuntimeException($exception->getMessage(), 0, $exception);
+            throw new ODMResponseException($exception->getResponse(), $exception->getMessage(), 0, $exception);
         }
     }
 
@@ -208,14 +209,14 @@ class Collection implements CollectionInterface
                 $response = new BulkResponse($bulkResponseData, $action, $opType);
                 if (! $response->isOk()) {
                     if (($bulkResponseData['status'] ?? null) === 404 && ($response->getFullError()['type'] ?? null) === 'index_not_found_exception') {
-                        throw new IndexNotFoundException('Index not found: ' . $response->getErrorMessage());
+                        throw new IndexNotFoundException($response, 'Index not found: ' . $response->getErrorMessage());
                     }
 
                     if (($bulkResponseData['status'] ?? null) === 409 && ($response->getFullError()['type'] ?? null) === 'version_conflict_engine_exception') {
-                        throw new VersionConflictException('Version conflict: ' . $response->getErrorMessage());
+                        throw new VersionConflictException($response, 'Version conflict: ' . $response->getErrorMessage());
                     }
 
-                    throw new RuntimeException('Response not OK: ' . $response->getErrorMessage());
+                    throw new ODMResponseException($response, 'Response not OK: ' . $response->getErrorMessage());
                 }
 
                 $bulkResponses[] = $response;
@@ -224,11 +225,11 @@ class Collection implements CollectionInterface
 
         $bulkResponseSet = new ResponseSet($response, $bulkResponses);
         if ($bulkResponseSet->hasError()) {
-            throw new RuntimeException('Response has errors: ' . $response->getErrorMessage());
+            throw new ODMResponseException($response, 'Response has errors: ' . $response->getErrorMessage());
         }
 
         if ($bulkResponseSet->getStatus() >= 400) {
-            throw new RuntimeException('Response not OK: ' . $response->getErrorMessage());
+            throw new ODMResponseException($response, 'Response not OK: ' . $response->getErrorMessage());
         }
 
         return $bulkResponseSet;
@@ -264,10 +265,10 @@ class Collection implements CollectionInterface
         $data = $response->getData();
         if (! $response->isOk()) {
             if ($response->getStatus() === 404 && ($response->getFullError()['type'] ?? null) === 'index_not_found_exception') {
-                throw new IndexNotFoundException('Index not found: ' . $response->getErrorMessage());
+                throw new IndexNotFoundException($response, 'Index not found: ' . $response->getErrorMessage());
             }
 
-            throw new RuntimeException('Response not OK: ' . $response->getErrorMessage());
+            throw new ODMResponseException($response, 'Response not OK: ' . $response->getErrorMessage());
         }
 
         $this->_lastInsertId = $data['_id'] ?? null;
@@ -338,10 +339,10 @@ class Collection implements CollectionInterface
 
         if (! $response->isOk()) {
             if ($response->getStatus() === 409 && ($response->getFullError()['type'] ?? null) === 'version_conflict_engine_exception') {
-                throw new VersionConflictException('Version conflict: ' . $response->getErrorMessage());
+                throw new VersionConflictException($response, 'Version conflict: ' . $response->getErrorMessage());
             }
 
-            throw new RuntimeException('Response not OK: ' . $response->getErrorMessage());
+            throw new ODMResponseException($response, 'Response not OK: ' . $response->getErrorMessage());
         }
     }
 
@@ -372,7 +373,7 @@ class Collection implements CollectionInterface
         }
 
         if (! $response->isOk()) {
-            throw new \RuntimeException('Response not OK: ' . $response->getErrorMessage());
+            throw new RuntimeException('Response not OK: ' . $response->getErrorMessage());
         }
     }
 
@@ -394,7 +395,7 @@ class Collection implements CollectionInterface
         }
 
         if (! $response->isOk()) {
-            throw new \RuntimeException('Response not OK: ' . $response->getErrorMessage());
+            throw new RuntimeException('Response not OK: ' . $response->getErrorMessage());
         }
     }
 
@@ -429,7 +430,7 @@ class Collection implements CollectionInterface
         }
 
         if (! $response->isOk()) {
-            throw new \RuntimeException('Response not OK: ' . $response->getErrorMessage());
+            throw new RuntimeException('Response not OK: ' . $response->getErrorMessage());
         }
     }
 
@@ -446,7 +447,7 @@ class Collection implements CollectionInterface
             $response = $exception->getResponse();
 
             if ($response->getStatus() === 400 && preg_match('/The provided expression \[.+\] matches an alias/', $response->getErrorMessage())) {
-                throw new CannotDropAnAliasException($index->getName(), $exception);
+                throw new CannotDropAnAliasException($response, $index->getName(), $exception);
             }
 
             if ($response->getStatus() !== 404) {
