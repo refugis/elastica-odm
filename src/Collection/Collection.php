@@ -196,6 +196,8 @@ class Collection implements CollectionInterface
 
         $data = $response->getData();
         $bulkResponses = [];
+        $exception = null;
+
         if (isset($data['items']) && is_array($data['items'])) {
             foreach ($data['items'] as $key => $item) {
                 if (! isset($operations[$key])) {
@@ -206,30 +208,34 @@ class Collection implements CollectionInterface
                 $opType = array_key_first($item);
                 $bulkResponseData = $item[$opType];
 
-                $response = new BulkResponse($bulkResponseData, $action, $opType);
-                if (! $response->isOk()) {
-                    if (($bulkResponseData['status'] ?? null) === 404 && ($response->getFullError()['type'] ?? null) === 'index_not_found_exception') {
-                        throw new IndexNotFoundException($response, 'Index not found: ' . $response->getErrorMessage());
+                $bulkResponse = new BulkResponse($bulkResponseData, $action, $opType);
+                if (! $bulkResponse->isOk()) {
+                    if (($bulkResponseData['status'] ?? null) === 404 && ($bulkResponse->getFullError()['type'] ?? null) === 'index_not_found_exception') {
+                        $exception ??= static fn (Response $r) => new IndexNotFoundException($r, 'Index not found: ' . $bulkResponse->getErrorMessage());
                     }
 
-                    if (($bulkResponseData['status'] ?? null) === 409 && ($response->getFullError()['type'] ?? null) === 'version_conflict_engine_exception') {
-                        throw new VersionConflictException($response, 'Version conflict: ' . $response->getErrorMessage());
+                    if (($bulkResponseData['status'] ?? null) === 409 && ($bulkResponse->getFullError()['type'] ?? null) === 'version_conflict_engine_exception') {
+                        $exception ??= static fn (Response $r) => new VersionConflictException($r, 'Version conflict: ' . $bulkResponse->getErrorMessage());
                     }
 
-                    throw new ODMResponseException($response, 'Response not OK: ' . $response->getErrorMessage());
+                    $exception ??= static fn (Response $r) => new ODMResponseException($r, 'Response not OK: ' . $bulkResponse->getErrorMessage());
                 }
 
-                $bulkResponses[] = $response;
+                $bulkResponses[] = $bulkResponse;
             }
         }
 
         $bulkResponseSet = new ResponseSet($response, $bulkResponses);
+        if ($exception !== null) {
+            throw $exception($bulkResponseSet);
+        }
+
         if ($bulkResponseSet->hasError()) {
-            throw new ODMResponseException($response, 'Response has errors: ' . $response->getErrorMessage());
+            throw new ODMResponseException($bulkResponseSet, 'Response has errors: ' . $response->getErrorMessage());
         }
 
         if ($bulkResponseSet->getStatus() >= 400) {
-            throw new ODMResponseException($response, 'Response not OK: ' . $response->getErrorMessage());
+            throw new ODMResponseException($bulkResponseSet, 'Response not OK: ' . $response->getErrorMessage());
         }
 
         return $bulkResponseSet;
