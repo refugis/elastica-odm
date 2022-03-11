@@ -156,6 +156,7 @@ final class UnitOfWork
             $this->identityMap =
             $this->objects =
             $this->documentStates =
+            $this->documentInsertions =
             $this->documentPersisters =
             $this->documentDeletions =
             $this->documentUpdates =
