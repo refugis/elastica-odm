@@ -57,7 +57,7 @@ interface CollectionInterface
      *
      * @param array<string, mixed> $body
      * @param array<string, mixed> $options
-     * @phpstan-param array{routing?: string, sequence_number?: int, primary_term?: int} $options
+     * @phpstan-param array{routing?: string, sequence_number?: int, primary_term?: int, index?: string} $options
      */
     public function create(?string $id, array $body, array $options = []): Response;
 

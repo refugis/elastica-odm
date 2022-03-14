@@ -2,6 +2,7 @@
 
 namespace Tests\Collection;
 
+use Elastica\Client;
 use Elastica\Index;
 use Elastica\Query;
 use Elastica\Response;
@@ -140,8 +141,15 @@ class CollectionTest extends TestCase
         $endpoint->setParams(['op_type' => 'create']);
         $endpoint->setID('test_id');
         $endpoint->setBody(['field' => 'value']);
+        $endpoint->setIndex('foo_index');
+        if (class_exists(Type::class)) {
+            $endpoint->setType('foo_type');
+        }
 
-        $this->searchable->requestEndpoint($endpoint)
+        $this->searchable->getClient()
+            ->willReturn($client = $this->prophesize(Client::class));
+
+        $client->requestEndpoint($endpoint)
             ->willReturn(new Response(['_id' => 'test_id'], 200))
             ->shouldBeCalled()
         ;
@@ -153,8 +161,15 @@ class CollectionTest extends TestCase
     {
         $endpoint = new Endpoints\Index();
         $endpoint->setBody(['field' => 'value']);
+        $endpoint->setIndex('foo_index');
+        if (class_exists(Type::class)) {
+            $endpoint->setType('foo_type');
+        }
 
-        $this->searchable->requestEndpoint($endpoint)
+        $this->searchable->getClient()
+            ->willReturn($client = $this->prophesize(Client::class));
+
+        $client->requestEndpoint($endpoint)
             ->willReturn(new Response(['_id' => 'foo_id'], 200))
             ->shouldBeCalled()
         ;
@@ -169,8 +184,15 @@ class CollectionTest extends TestCase
 
         $endpoint = new Endpoints\Index();
         $endpoint->setBody(['field' => 'value']);
+        $endpoint->setIndex('foo_index');
+        if (class_exists(Type::class)) {
+            $endpoint->setType('foo_type');
+        }
 
-        $this->searchable->requestEndpoint($endpoint)
+        $this->searchable->getClient()
+            ->willReturn($client = $this->prophesize(Client::class));
+
+        $client->requestEndpoint($endpoint)
             ->willReturn(new Response(['_id' => 'foo_id'], 409))
             ->shouldBeCalled()
         ;

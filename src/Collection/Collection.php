@@ -261,9 +261,20 @@ class Collection implements CollectionInterface
             $endpoint->setParams($params);
         }
 
+        if (isset($options['index'])) {
+            $endpoint->setIndex($options['index']);
+        } elseif ($this->searchable instanceof Type) {
+            $endpoint->setType($this->searchable->getName());
+            $endpoint->setIndex($this->searchable->getIndex()->getName());
+        } else {
+            $endpoint->setIndex($this->searchable->getName());
+        }
+
         $endpoint->setBody($body);
+        $client = $this->searchable->getClient();
+
         try {
-            $response = $this->searchable->requestEndpoint($endpoint);
+            $response = $client->requestEndpoint($endpoint);
         } catch (ResponseException $exception) {
             $response = $exception->getResponse();
         }
