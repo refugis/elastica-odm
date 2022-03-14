@@ -41,6 +41,11 @@ class CollectionTest extends TestCase
      */
     private ObjectProphecy $query;
 
+    /**
+     * @var Client|ObjectProphecy
+     */
+    private ObjectProphecy $client;
+
     private string $documentClass;
     private CollectionInterface $collection;
 
@@ -49,6 +54,7 @@ class CollectionTest extends TestCase
      */
     protected function setUp(): void
     {
+        $this->client = $this->prophesize(Client::class);
         if (class_exists(Type::class)) {
             $this->searchable = $this->prophesize(Type::class);
             $this->searchable->getIndex()->willReturn($index = $this->prophesize(Index::class));
@@ -58,6 +64,7 @@ class CollectionTest extends TestCase
             $index = $this->searchable;
         }
 
+        $index->getClient()->willReturn($this->client);
         $index->getName()->willReturn('foo_index');
 
         $this->query = $this->prophesize(Query::class);
@@ -146,10 +153,7 @@ class CollectionTest extends TestCase
             $endpoint->setType('foo_type');
         }
 
-        $this->searchable->getClient()
-            ->willReturn($client = $this->prophesize(Client::class));
-
-        $client->requestEndpoint($endpoint)
+        $this->client->requestEndpoint($endpoint)
             ->willReturn(new Response(['_id' => 'test_id'], 200))
             ->shouldBeCalled()
         ;
@@ -166,10 +170,7 @@ class CollectionTest extends TestCase
             $endpoint->setType('foo_type');
         }
 
-        $this->searchable->getClient()
-            ->willReturn($client = $this->prophesize(Client::class));
-
-        $client->requestEndpoint($endpoint)
+        $this->client->requestEndpoint($endpoint)
             ->willReturn(new Response(['_id' => 'foo_id'], 200))
             ->shouldBeCalled()
         ;
@@ -189,10 +190,7 @@ class CollectionTest extends TestCase
             $endpoint->setType('foo_type');
         }
 
-        $this->searchable->getClient()
-            ->willReturn($client = $this->prophesize(Client::class));
-
-        $client->requestEndpoint($endpoint)
+        $this->client->requestEndpoint($endpoint)
             ->willReturn(new Response(['_id' => 'foo_id'], 409))
             ->shouldBeCalled()
         ;

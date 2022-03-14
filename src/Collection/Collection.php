@@ -136,7 +136,7 @@ class Collection implements CollectionInterface
             throw new IndexNotFoundException($response, 'Index not found: ' . $response->getErrorMessage());
         }
 
-        throw new ODMResponseException('Response not OK: ' . $response->getErrorMessage());
+        throw new ODMResponseException($response, 'Response not OK: ' . $response->getErrorMessage());
     }
 
     public function createSearch(DocumentManagerInterface $documentManager, Query $query): Search
@@ -271,10 +271,9 @@ class Collection implements CollectionInterface
         }
 
         $endpoint->setBody($body);
-        $client = $this->searchable->getClient();
 
         try {
-            $response = $client->requestEndpoint($endpoint);
+            $response = $this->getClient()->requestEndpoint($endpoint);
         } catch (ResponseException $exception) {
             $response = $exception->getResponse();
         }
