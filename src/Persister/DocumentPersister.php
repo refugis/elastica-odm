@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Persister;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection as DoctrineCollection;
 use Elastica\Bulk;
 use Elastica\Document;
@@ -459,7 +460,14 @@ class DocumentPersister
                 $type = $typeManager->getType($field->type);
 
                 if ($field->multiple) {
-                    assert($value[1] instanceof DoctrineCollection);
+                    if ($value[1] === null) {
+                        $value[1] = new ArrayCollection();
+                    }
+
+                    if (is_array($value[1])) {
+                        $value[1] = new ArrayCollection($value[1]);
+                    }
+
                     $body[$field->fieldName] = $value[1]
                         ->map(static fn ($item) => $type->toDatabase($item, $field->options))
                         ->toArray();
@@ -498,9 +506,10 @@ class DocumentPersister
             $itemValue = $classField->getValue($value);
             if ($classField instanceof EmbeddedMetadata) {
                 if ($classField->multiple) {
-                    $embeddedData = array_map(function ($item) use ($classField) {
+                    assert($itemValue instanceof DoctrineCollection);
+                    $embeddedData = $itemValue->map(function ($item) use ($classField) {
                         return $this->prepareEmbeddedUpdateData($item, $classField);
-                    }, (array) $itemValue);
+                    });
 
                     $fieldBody = [];
                     foreach ($embeddedData as [$embeddedBody, $embeddedScript]) {

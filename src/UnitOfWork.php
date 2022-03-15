@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Refugis\ODM\Elastica;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Comparable;
 use Doctrine\Common\EventManager;
 use Doctrine\Persistence\ObjectManager;
@@ -398,8 +399,20 @@ final class UnitOfWork
 
         foreach ($actualData as $propName => $actualValue) {
             $orgValue = $originalData[$propName] ?? null;
+            if ($actualValue instanceof Collection) {
+                $actualValue = $actualValue->toArray();
+            }
 
+            // skip if value haven't changed
             if ($orgValue === $actualValue) {
+                continue;
+            }
+
+            if (
+                $orgValue instanceof Comparable &&
+                $actualValue instanceof Comparable &&
+                $orgValue->compareTo($actualValue) === 0
+            ) {
                 continue;
             }
 
@@ -781,12 +794,16 @@ final class UnitOfWork
             $actualData[$joinFieldName] = ['name' => $class->join['type']];
         }
 
-        if (! isset($this->originalDocumentData[$oid])) {
+        if (! isset($this->originalDocumentData[$oid]) || $this->getDocumentState($document) === self::STATE_NEW) {
             // Entity is either NEW or MANAGED but not yet fully persisted.
             $this->originalDocumentData[$oid] = $actualData;
 
             $changeSet = [];
             foreach ($actualData as $field => $value) {
+                if ($value instanceof Collection) {
+                    $value = $value->toArray();
+                }
+
                 $changeSet[$field] = [null, $value];
             }
 
@@ -804,6 +821,9 @@ final class UnitOfWork
                     }
 
                     $orgValue = $originalData[$propName];
+                    if ($actualValue instanceof Collection) {
+                        $actualValue = $actualValue->toArray();
+                    }
 
                     // skip if value haven't changed
                     if ($orgValue === $actualValue) {
