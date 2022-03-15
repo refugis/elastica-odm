@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Persister;
 
+use Doctrine\Common\Collections\Collection as DoctrineCollection;
 use Elastica\Bulk;
 use Elastica\Document;
 use Elastica\Query;
 use Elastica\Script\Script;
+use Refugis\ODM\Elastica\Annotation\Version;
 use Refugis\ODM\Elastica\Collection\CollectionInterface;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Exception\ConversionFailedException;
@@ -150,6 +152,16 @@ class DocumentPersister
                 $action->setRouting($routing);
             }
 
+            $metadata = $action->getMetadata();
+            if ($class->versionType === Version::EXTERNAL) {
+                $version = $class->getVersion($document);
+                if ($version !== null) {
+                    $metadata['version_type'] = Version::EXTERNAL;
+                    $metadata['version'] = $version;
+                    $action->setMetadata($metadata);
+                }
+            }
+
             $operations[] = $action;
         }
 
@@ -188,6 +200,8 @@ class DocumentPersister
                     $field->setValue($document, $data['_seq_no'] ?? null);
                 } elseif ($field->primaryTerm) {
                     $field->setValue($document, $data['_primary_term'] ?? null);
+                } elseif ($field->version) {
+                    $field->setValue($document, $data['_version'] ?? null);
                 }
             }
 
@@ -220,8 +234,17 @@ class DocumentPersister
         $body = $this->prepareUpdateData($document)['body'];
         $routing = $this->getRouting($class, $document);
 
+        $options = ['routing' => $routing];
+        if ($class->versionType === Version::EXTERNAL) {
+            $version = $class->getVersion($document);
+            if ($version !== null) {
+                $options['version_type'] = Version::EXTERNAL;
+                $options['version'] = $version;
+            }
+        }
+
         try {
-            $response = $this->collection->create($id, $body, ['routing' => $routing]);
+            $response = $this->collection->create($id, $body, $options);
         } catch (IndexNotFoundException $e) {
             $schemaGenerator = new SchemaGenerator($this->dm);
             $schema = $schemaGenerator->generateSchema()->getMapping()[$this->class->name] ?? null;
@@ -231,7 +254,7 @@ class DocumentPersister
             }
 
             $this->collection->updateMapping($schema->getMapping());
-            $response = $this->collection->create($id, $body, ['routing' => $routing]);
+            $response = $this->collection->create($id, $body, $options);
         }
 
         $data = $response->getData();
@@ -249,6 +272,8 @@ class DocumentPersister
                 $field->setValue($document, $data['_seq_no'] ?? null);
             } elseif ($field->primaryTerm) {
                 $field->setValue($document, $data['_primary_term'] ?? null);
+            } elseif ($field->version) {
+                $field->setValue($document, $data['_version'] ?? null);
             }
         }
 
@@ -433,9 +458,10 @@ class DocumentPersister
                 $type = $typeManager->getType($field->type);
 
                 if ($field->multiple) {
-                    $body[$field->fieldName] = array_map(static function ($item) use ($type, $field) {
-                        return $type->toDatabase($item, $field->options);
-                    }, (array) $value[1]);
+                    assert($value[1] instanceof DoctrineCollection);
+                    $body[$field->fieldName] = $value[1]
+                        ->map(static fn ($item) => $type->toDatabase($item, $field->options))
+                        ->toArray();
                 } elseif ($value[1] !== null) {
                     $body[$field->fieldName] = $type->toDatabase($value[1], $field->options);
                 } else {
@@ -491,9 +517,10 @@ class DocumentPersister
                 $type = $typeManager->getType($classField->type);
 
                 if ($classField->multiple) {
-                    $properties[$fieldName] = array_map(static function ($item) use ($type, $classField) {
-                        return $type->toDatabase($item, $classField->options);
-                    }, (array) $itemValue);
+                    assert($itemValue instanceof DoctrineCollection);
+                    $properties[$fieldName] = $itemValue
+                        ->map(static fn ($item) => $type->toDatabase($item, $classField->options))
+                        ->toArray();
                 } elseif ($itemValue !== null) {
                     $properties[$fieldName] = $type->toDatabase($itemValue, $classField->options);
                 }

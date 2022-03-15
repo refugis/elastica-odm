@@ -125,12 +125,12 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
                 ++$count;
             }
 
-            if ($attributeMetadata->typeName || $attributeMetadata->indexName || $attributeMetadata->seqNo || $attributeMetadata->primaryTerm) {
+            if ($attributeMetadata->typeName || $attributeMetadata->indexName || $attributeMetadata->seqNo || $attributeMetadata->primaryTerm || $attributeMetadata->version) {
                 ++$count;
             }
 
             if ($count > 1) {
-                throw new InvalidMetadataException('@DocumentId, @IndexName, @TypeName, @SequenceNumber and @PrimaryTerm are mutually exclusive. Please select one for "' . $attributeMetadata->getName() . '"');
+                throw new InvalidMetadataException('@DocumentId, @IndexName, @TypeName, @SequenceNumber, @PrimaryTerm and @Version are mutually exclusive. Please select one for "' . $attributeMetadata->getName() . '"');
             }
         }
 

@@ -22,6 +22,7 @@ final class EmbeddedMetadata extends PropertyMetadata
 
     public string $fieldName;
     public bool $multiple = false;
+    public bool $lazy = false;
 
     /**
      * The instantiator used to build new object instances.

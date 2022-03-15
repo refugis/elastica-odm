@@ -21,6 +21,7 @@ class MappingGeneratorTest extends TestCase
 
         self::assertEquals([
             'stringField' => ['type' => 'text'],
+            'multiStringField' => ['type' => 'text'],
         ], $generator->getMapping($dm->getClassMetadata(Foo::class))->getProperties());
     }
 

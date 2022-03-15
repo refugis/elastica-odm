@@ -2,6 +2,8 @@
 
 namespace Tests\Fixtures\Document;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Refugis\ODM\Elastica\Annotation\Analyzer;
 use Refugis\ODM\Elastica\Annotation\Document;
 use Refugis\ODM\Elastica\Annotation\DocumentId;
@@ -12,6 +14,7 @@ use Refugis\ODM\Elastica\Annotation\IndexName;
 use Refugis\ODM\Elastica\Annotation\PrimaryTerm;
 use Refugis\ODM\Elastica\Annotation\SequenceNumber;
 use Refugis\ODM\Elastica\Annotation\Tokenizer;
+use Refugis\ODM\Elastica\Annotation\Version;
 
 /**
  * @Document(collection="foo_index")
@@ -41,6 +44,13 @@ class Foo
     public $stringField;
 
     /**
+     * @var Collection<string>
+     *
+     * @Field(type="string", multiple=true)
+     */
+    public Collection $multiStringField;
+
+    /**
      * @IndexName()
      */
     public $indexName;
@@ -54,4 +64,14 @@ class Foo
      * @PrimaryTerm()
      */
     public $primaryTerm;
+
+    /**
+     * @Version(type=Version::EXTERNAL)
+     */
+    public ?int $version = null;
+
+    public function __construct()
+    {
+        $this->multiStringField = new ArrayCollection();
+    }
 }

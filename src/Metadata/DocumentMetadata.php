@@ -11,6 +11,7 @@ use Kcs\Metadata\ClassMetadata;
 use Kcs\Metadata\MetadataInterface;
 use Kcs\Metadata\PropertyMetadata;
 use ReflectionClass;
+use Refugis\ODM\Elastica\Annotation\Version;
 use Refugis\ODM\Elastica\Exception\RuntimeException;
 
 use function array_merge;
@@ -123,6 +124,11 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     public bool $refreshOnCommit;
 
     /**
+     * Whether the version type is external or internal.
+     */
+    public ?string $versionType;
+
+    /**
      * The instantiator used to build new object instances.
      */
     private Instantiator $instantiator;
@@ -136,6 +142,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
         $this->embeddable = false;
         $this->isReadOnly = false;
         $this->refreshOnCommit = true;
+        $this->versionType = Version::INTERNAL;
     }
 
     public function __wakeup(): void
@@ -158,6 +165,10 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
         } elseif ($metadata instanceof FieldMetadata) {
             $this->fieldNames[] = $metadata->fieldName;
             sort($this->fieldNames);
+
+            if ($metadata->version) {
+                $this->versionType = $metadata->versionType;
+            }
         }
 
         if ($metadata->lazy ?? false) {
@@ -379,6 +390,19 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     {
         foreach ($this->attributesMetadata as $metadata) {
             if (! $metadata instanceof FieldMetadata || ! $metadata->indexName) {
+                continue;
+            }
+
+            return $metadata->getValue($object);
+        }
+
+        return null;
+    }
+
+    public function getVersion(object $object): ?int
+    {
+        foreach ($this->attributesMetadata as $metadata) {
+            if (! $metadata instanceof FieldMetadata || ! $metadata->version) {
                 continue;
             }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Comparable;
 use Doctrine\Common\EventManager;
 use Doctrine\Persistence\ObjectManager;
@@ -38,6 +39,7 @@ use function array_merge;
 use function array_values;
 use function assert;
 use function get_class;
+use function in_array;
 use function is_array;
 use function method_exists;
 use function spl_object_id;
@@ -498,34 +500,47 @@ final class UnitOfWork
         }
 
         foreach ($class->attributesMetadata as $fieldMetadata) {
-            if (! $fieldMetadata instanceof FieldMetadata) {
+            if ($fieldMetadata instanceof FieldMetadata) {
+                if ($fieldMetadata->identifier) {
+                    $fieldMetadata->setValue($result, $document->getId());
+                    continue;
+                }
+
+                if ($fieldMetadata->indexName) {
+                    $fieldMetadata->setValue($result, $document->getIndex());
+                    continue;
+                }
+
+                if ($fieldMetadata->typeName && method_exists($document, 'getType')) {
+                    $fieldMetadata->setValue($result, $document->getType());
+                    continue;
+                }
+
+                if ($fieldMetadata->seqNo) {
+                    $fieldMetadata->setValue($result, $document->getParam('_seq_no'));
+                    continue;
+                }
+
+                if ($fieldMetadata->primaryTerm) {
+                    $fieldMetadata->setValue($result, $document->getParam('_primary_term'));
+                    continue;
+                }
+
+                if ($fieldMetadata->version) {
+                    $fieldMetadata->setValue($result, $document->getParam('_version'));
+                    continue;
+                }
+            }
+
+            if (! $fieldMetadata instanceof FieldMetadata && ! $fieldMetadata instanceof EmbeddedMetadata) {
                 continue;
             }
 
-            if ($fieldMetadata->identifier) {
-                $fieldMetadata->setValue($result, $document->getId());
+            if (! $fieldMetadata->multiple || ! in_array($fieldMetadata->name, $class->eagerFieldNames, true)) {
                 continue;
             }
 
-            if ($fieldMetadata->indexName) {
-                $fieldMetadata->setValue($result, $document->getIndex());
-                continue;
-            }
-
-            if ($fieldMetadata->typeName && method_exists($document, 'getType')) {
-                $fieldMetadata->setValue($result, $document->getType());
-                continue;
-            }
-
-            if ($fieldMetadata->seqNo) {
-                $fieldMetadata->setValue($result, $document->getParam('_seq_no'));
-                continue;
-            }
-
-            if ($fieldMetadata->primaryTerm) {
-                $fieldMetadata->setValue($result, $document->getParam('_primary_term'));
-                continue;
-            }
+            $fieldMetadata->setValue($result, new ArrayCollection());
         }
 
         foreach ($documentData as $key => &$value) {
@@ -533,15 +548,16 @@ final class UnitOfWork
 
             if ($field instanceof EmbeddedMetadata) {
                 if ($field->multiple) {
-                    $value = array_map(function ($item) use ($field, $document) {
-                        $embeddedObject = $field->newInstance();
-                        $embeddedDocument = clone $document;
-                        $embeddedDocument->setId('');
-                        $embeddedDocument->setData($item);
-                        $this->createDocument($embeddedDocument, $embeddedObject, true);
+                    $value = (new ArrayCollection((array) $value))
+                        ->map(function ($item) use ($field, $document) {
+                            $embeddedObject = $field->newInstance();
+                            $embeddedDocument = clone $document;
+                            $embeddedDocument->setId('');
+                            $embeddedDocument->setData($item);
+                            $this->createDocument($embeddedDocument, $embeddedObject, true);
 
-                        return $embeddedObject;
-                    }, (array) $value);
+                            return $embeddedObject;
+                        });
                 } else {
                     $embeddedObject = $field->newInstance();
                     $embeddedDocument = clone $document;
@@ -554,7 +570,8 @@ final class UnitOfWork
             } elseif ($field instanceof FieldMetadata) {
                 $fieldType = $typeManager->getType($field->type);
                 if ($field->multiple) {
-                    $value = array_map(static fn ($item) => $fieldType->toPHP($item, $field->options), (array) $value);
+                    $value = (new ArrayCollection((array) $value))
+                        ->map(static fn ($item) => $fieldType->toPHP($item, $field->options));
                 } else {
                     $value = $fieldType->toPHP($value, $field->options);
                 }

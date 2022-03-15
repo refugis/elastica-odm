@@ -10,6 +10,7 @@ use Generator;
 use Iterator;
 use IteratorAggregate;
 use Psr\Cache\CacheItemPoolInterface;
+use Refugis\ODM\Elastica\Collection\CollectionInterface;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Hydrator\HydratorInterface;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
@@ -67,9 +68,15 @@ class Search implements IteratorAggregate
      */
     private DocumentManagerInterface $documentManager;
 
-    public function __construct(DocumentManagerInterface $documentManager, string $documentClass)
+    /**
+     * The collection to search into.
+     */
+    private CollectionInterface $collection;
+
+    public function __construct(DocumentManagerInterface $documentManager, string $documentClass, CollectionInterface $collection = null)
     {
         $this->documentManager = $documentManager;
+        $this->collection = $collection ?? $documentManager->getCollection($documentClass);
         $this->documentClass = $documentClass;
         $this->hydrationMode = HydratorInterface::HYDRATE_OBJECT;
         $this->scroll = false;
@@ -108,9 +115,7 @@ class Search implements IteratorAggregate
      */
     public function count(): int
     {
-        return $this->documentManager
-            ->getCollection($this->documentClass)
-            ->count($this->query);
+        return $this->collection->count($this->query);
     }
 
     /**
@@ -184,8 +189,8 @@ class Search implements IteratorAggregate
             $sort = [];
             $fields = is_array($fieldName) ? $fieldName : [$fieldName => $order];
 
-            foreach ($fields as $fieldName => $order) {
-                $sort[] = [$fieldName => $order];
+            foreach ($fields as $key => $value) {
+                $sort[] = [$key => $value];
             }
         } else {
             $sort = null;
@@ -283,16 +288,14 @@ class Search implements IteratorAggregate
      */
     private function _doExecute(Query $query): Generator // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $collection = $this->documentManager->getCollection($this->documentClass);
-
         if ($this->isScroll()) {
-            $scroll = $collection->scroll($query);
+            $scroll = $this->collection->scroll($query);
 
             foreach ($scroll as $resultSet) {
                 yield $resultSet;
             }
         } else {
-            yield $collection->search($query);
+            yield $this->collection->search($query);
         }
     }
 

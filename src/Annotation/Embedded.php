@@ -43,9 +43,14 @@ final class Embedded
     public bool $multiple;
 
     /**
+     * Whether this field should be a collection or not.
+     */
+    public bool $lazy;
+
+    /**
      * @param class-string|array<string, mixed> $targetClass
      */
-    public function __construct($targetClass, ?string $name = null, bool $enabled = true, bool $multiple = false)
+    public function __construct($targetClass, ?string $name = null, bool $enabled = true, bool $multiple = false, bool $lazy = false)
     {
         if (is_string($targetClass)) {
             $data = ['targetClass' => $targetClass];
@@ -59,5 +64,6 @@ final class Embedded
         $this->name = $data['name'] ?? $name;
         $this->enabled = $data['enabled'] ?? $enabled;
         $this->multiple = $data['multiple'] ?? $multiple;
+        $this->lazy = $data['lazy'] ?? $lazy;
     }
 }

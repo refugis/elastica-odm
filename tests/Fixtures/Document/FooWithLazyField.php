@@ -2,6 +2,7 @@
 
 namespace Tests\Fixtures\Document;
 
+use Doctrine\Common\Collections\Collection;
 use Refugis\ODM\Elastica\Annotation\Analyzer;
 use Refugis\ODM\Elastica\Annotation\Document;
 use Refugis\ODM\Elastica\Annotation\DocumentId;
@@ -43,4 +44,11 @@ class FooWithLazyField
      * @Field(type="string", lazy=true)
      */
     public $lazyField;
+
+    /**
+     * @var Collection<string>
+     *
+     * @Field(type="string", multiple=true, lazy=true)
+     */
+    public $multiLazyField;
 }

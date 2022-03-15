@@ -44,6 +44,7 @@ trait AnnotationLoaderTrait
         $factory->registerProcessor(Annotation\SequenceNumber::class, Processor\SequenceNumberProcessor::class);
         $factory->registerProcessor(Annotation\Setting::class, Processor\SettingProcessor::class);
         $factory->registerProcessor(Annotation\TypeName::class, Processor\TypeNameProcessor::class);
+        $factory->registerProcessor(Annotation\Version::class, Processor\VersionProcessor::class);
 
         return $factory;
     }

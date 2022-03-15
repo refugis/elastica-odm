@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Elastica\Index;
 use Elastica\Type;
 use PHPUnit\Framework\TestCase;
@@ -59,20 +60,35 @@ class DocumentManagerTest extends TestCase
 
     public function testFindShouldLoadProxyWithoutLazyFields(): void
     {
+        $repository = $this->dm->getRepository(FooWithLazyField::class);
         /** @var FooWithLazyField[] $result */
-        $result = $this->dm->getRepository(FooWithLazyField::class)
-            ->findBy(['stringField' => 'bazbaz']);
+        $result = $repository->findBy(['stringField' => 'bazbaz']);
 
         self::assertCount(1, $result);
         $this->assertDumpEquals(<<<EOF
-Tests\Fixtures\Document\FooWithLazyField (proxy) {
-  +id: "foo_test_document"
-  +stringField: "bazbaz"
-}
-EOF
-        , $result[0]);
+        Tests\Fixtures\Document\FooWithLazyField (proxy) {
+          +id: "foo_test_document"
+          +stringField: "bazbaz"
+        }
+        EOF, $result[0]);
 
         self::assertEquals('lazyBaz', $result[0]->lazyField);
+        self::assertEquals(new ArrayCollection(), $result[0]->multiLazyField);
+
+        $result = $repository->findBy(['stringField' => 'barbaz'])[0];
+        $this->assertDumpMatchesFormat(<<<EOF
+        Tests\Fixtures\Document\FooWithLazyField (proxy) {
+          +id: "%a"
+          +stringField: "barbaz"
+        }
+        EOF, $result);
+
+        self::assertEquals('lazyBar', $result->lazyField);
+        self::assertEquals(new ArrayCollection(['multiLazy']), $result->multiLazyField);
+
+        $result = $repository->findBy(['stringField' => 'foobar'])[0];
+        self::assertNull($result->multiLazyField);
+
     }
 
     public function testPersistAndFlush(): void
@@ -80,6 +96,7 @@ EOF
         $document = new Foo();
         $document->id = 'test_persist_and_flush';
         $document->stringField = 'footest_string';
+        $document->multiStringField = new ArrayCollection(['footest_multistring_1', 'footest_multistring_2']);
 
         $this->dm->persist($document);
         $this->dm->flush();
@@ -93,6 +110,7 @@ EOF
         $result = $this->dm->find(Foo::class, 'test_persist_and_flush');
         self::assertInstanceOf(Foo::class, $result);
         self::assertEquals('footest_string', $document->stringField);
+        self::assertEquals(['footest_multistring_1', 'footest_multistring_2'], $document->multiStringField->toArray());
     }
 
     public function testMergeAndFlush(): void
@@ -100,6 +118,7 @@ EOF
         $document = new Foo();
         $document->id = 'test_merge_and_flush';
         $document->stringField = 'footest_string';
+        $document->multiStringField = new ArrayCollection(['footest_multistring_1', 'footest_multistring_2']);
 
         $this->dm->persist($document);
         $this->dm->flush();
@@ -108,6 +127,7 @@ EOF
         $document = new Foo();
         $document->id = 'test_merge_and_flush';
         $document->stringField = 'footest_merge_string';
+        $document->multiStringField = new ArrayCollection(['footest_merge_multistring_1']);
 
         /** @var Foo $result */
         $result = $this->dm->merge($document);
@@ -117,8 +137,11 @@ EOF
         $this->dm->clear();
 
         $result = $this->dm->find(Foo::class, 'test_merge_and_flush');
+        self::assertInstanceOf(Foo::class, $result);
         self::assertEquals('test_merge_and_flush', $result->id);
         self::assertEquals('footest_merge_string', $result->stringField);
+        self::assertEquals(['footest_merge_multistring_1'], $result->multiStringField->toArray());
+        self::assertNotNull($result->version);
     }
 
     public function testGetReferenceShouldReturnAReference(): void

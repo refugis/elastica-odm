@@ -108,10 +108,12 @@ trait FixturesTestTrait
         $connection->requestEndpoint($index([
             'stringField' => 'barbaz',
             'lazyField' => 'lazyBar',
+            'multiLazyField' => ['multiLazy'],
         ]));
         $connection->requestEndpoint($index([
             'stringField' => 'bazbaz',
             'lazyField' => 'lazyBaz',
+            'multiLazyField' => [],
         ])->setId('foo_test_document'));
 
         $connection->requestEndpoint((new Endpoints\Indices\Refresh())->setIndex($fooIndex->getName()));

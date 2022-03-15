@@ -141,7 +141,7 @@ class Collection implements CollectionInterface
 
     public function createSearch(DocumentManagerInterface $documentManager, Query $query): Search
     {
-        $search = new Search($documentManager, $this->documentClass);
+        $search = new Search($documentManager, $this->documentClass, $this);
         $search->setQuery($this->prepareQuery($query));
 
         return $search;
@@ -476,6 +476,7 @@ class Collection implements CollectionInterface
     {
         $query = clone $query;
         $query->setParam('seq_no_primary_term', true);
+        $query->setParam('version', true);
 
         if ($this->joinType === null) {
             return $query;
