@@ -19,6 +19,7 @@ use Elastica\SearchableInterface;
 use Elastica\Type;
 use Elasticsearch\Endpoints;
 use Elasticsearch\Serializers\ArrayToJSONSerializer;
+use Refugis\ODM\Elastica\Annotation\Version;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Exception\CannotDropAnAliasException;
 use Refugis\ODM\Elastica\Exception\IndexNotFoundException;
@@ -249,7 +250,13 @@ class Collection implements CollectionInterface
         $endpoint = new Endpoints\Index();
         $params = [];
         if (! empty($id)) {
-            $params['op_type'] = 'create';
+            if (
+                ! isset($options['version']) ||
+                ! in_array($options['version_type'] ?? Version::INTERNAL, [Version::EXTERNAL, Version::EXTERNAL_GTE], true)
+            ) {
+                $params['op_type'] = 'create';
+            }
+
             $endpoint->setID($id);
         }
 

@@ -148,20 +148,21 @@ class DocumentPersister
 
             $doc = new Document($id, $body);
             $action = new Bulk\Action\CreateDocument($doc);
+            $metadata = [];
             if ($routing !== null) {
-                $action->setRouting($routing);
+                $metadata['routing'] = $routing;
             }
 
-            $metadata = $action->getMetadata();
-            if ($class->versionType === Version::EXTERNAL) {
+            if ($class->versionType === Version::EXTERNAL || $class->versionType === Version::EXTERNAL_GTE) {
                 $version = $class->getVersion($document);
                 if ($version !== null) {
-                    $metadata['version_type'] = Version::EXTERNAL;
+                    $metadata['version_type'] = $class->versionType;
                     $metadata['version'] = $version;
-                    $action->setMetadata($metadata);
+                    $action = new Bulk\Action\IndexDocument($doc);
                 }
             }
 
+            $action->setMetadata($metadata + $action->getMetadata());
             $operations[] = $action;
         }
 
@@ -235,10 +236,10 @@ class DocumentPersister
         $routing = $this->getRouting($class, $document);
 
         $options = ['routing' => $routing];
-        if ($class->versionType === Version::EXTERNAL) {
+        if ($class->versionType === Version::EXTERNAL || $class->versionType === Version::EXTERNAL_GTE) {
             $version = $class->getVersion($document);
             if ($version !== null) {
-                $options['version_type'] = Version::EXTERNAL;
+                $options['version_type'] = $class->versionType;
                 $options['version'] = $version;
             }
         }

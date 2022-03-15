@@ -23,6 +23,7 @@ final class Version
 {
     public const INTERNAL = 'internal';
     public const EXTERNAL = 'external';
+    public const EXTERNAL_GTE = 'external_gte';
 
     /**
      * Whether the version type is external or internal.

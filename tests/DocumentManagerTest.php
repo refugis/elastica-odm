@@ -16,6 +16,7 @@ use Tests\Fixtures\Document\FooNestedEmbeddable;
 use Tests\Fixtures\Document\FooNoAutoCreate;
 use Tests\Fixtures\Document\FooWithEmbedded;
 use Tests\Fixtures\Document\FooWithLazyField;
+use Tests\Fixtures\Document\FooWithVersion;
 use Tests\Traits\DocumentManagerTestTrait;
 use Tests\Traits\FixturesTestTrait;
 use Refugis\ODM\Elastica\VarDumper\VarDumperTestTrait;
@@ -281,5 +282,46 @@ class DocumentManagerTest extends TestCase
         self::assertNotNull($result->emb);
         self::assertEquals(__FUNCTION__, $result->emb->stringField);
         self::assertEquals(__METHOD__, $result->emb->nestedEmbeddable->stringFieldRenest);
+    }
+
+    public function testShouldPersistWithExternalVersioning(): void
+    {
+        $document = new FooWithVersion();
+        $document->id = 'test_persist_with_version';
+        $document->stringField = __METHOD__;
+        $document->version = 5;
+
+        $this->dm->persist($document);
+        $this->dm->flush();
+        $this->dm->clear();
+
+        $result = $this->dm->find(FooWithVersion::class, 'test_persist_with_version');
+        self::assertInstanceOf(FooWithVersion::class, $result);
+        self::assertEquals('test_persist_with_version', $result->id);
+        self::assertEquals(__METHOD__, $result->stringField);
+        self::assertEquals(5, $result->version);
+
+        $this->dm->clear();
+
+        $document = new FooWithVersion();
+        $document->id = 'test_persist_with_version';
+        $document->stringField = 'foobar';
+        $document->version = 2;
+
+        $this->dm->persist($document);
+        try {
+            $this->dm->flush();
+            self::fail('Expected exception');
+        } catch (VersionConflictException $e) {
+            // Do nothing
+        }
+
+        $this->dm->clear();
+
+        $result = $this->dm->find(FooWithVersion::class, 'test_persist_with_version');
+        self::assertInstanceOf(FooWithVersion::class, $result);
+        self::assertEquals('test_persist_with_version', $result->id);
+        self::assertEquals(__METHOD__, $result->stringField);
+        self::assertEquals(5, $result->version);
     }
 }

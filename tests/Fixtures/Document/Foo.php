@@ -66,7 +66,7 @@ class Foo
     public $primaryTerm;
 
     /**
-     * @Version(type=Version::EXTERNAL)
+     * @Version(type=Version::INTERNAL)
      */
     public ?int $version = null;
 
