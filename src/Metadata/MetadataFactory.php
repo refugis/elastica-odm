@@ -169,6 +169,7 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
 
             if ($classMetadata->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_SINGLE_INDEX || $classMetadata->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_PARENT_CHILD) {
                 $classMetadata->collectionName = $parentMetadata->collectionName;
+                $classMetadata->refreshOnCommit = $parentMetadata->refreshOnCommit;
             }
         }
 
