@@ -7,7 +7,7 @@ namespace Refugis\ODM\Elastica\Internal;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
 use function array_filter;
-use function array_reverse;
+use function array_values;
 use function in_array;
 use function iterator_to_array;
 

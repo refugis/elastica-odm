@@ -14,7 +14,7 @@ use ReflectionClass;
 use Refugis\ODM\Elastica\Annotation\Version;
 use Refugis\ODM\Elastica\Exception\RuntimeException;
 
-use Tests\Fixtures\Document\JoinField\FooParent;
+use function array_filter;
 use function array_merge;
 use function array_unique;
 use function reset;
@@ -28,7 +28,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
 
     public const INHERITANCE_TYPE_SINGLE_INDEX = 0;
     public const INHERITANCE_TYPE_PARENT_CHILD = 1;
-    public const INHERITANCE_TYPE_INDEX_PER_CLASS= 1;
+    public const INHERITANCE_TYPE_INDEX_PER_CLASS = 1;
 
     private const JOIN_FIELD_ASSOCIATION = '$$join';
 
@@ -82,6 +82,8 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
 
     /**
      * @internal
+     *
+     * @var string[]|null
      */
     public ?array $sourceEagerFields = null;
 
@@ -500,15 +502,20 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
                 continue;
             }
 
-            if ($attributeMetadata->identifier) {
-                $identifier = $attributeMetadata;
+            if (! $attributeMetadata->identifier) {
+                continue;
             }
+
+            $identifier = $attributeMetadata;
         }
 
         $this->identifier = $identifier;
         $this->eagerFieldNames = array_filter($this->eagerFieldNames);
     }
 
+    /**
+     * @return string[]
+     */
     public function getSourceEagerFields(): array
     {
         if ($this->sourceEagerFields !== null) {

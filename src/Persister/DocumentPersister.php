@@ -31,6 +31,7 @@ use function array_values;
 use function assert;
 use function count;
 use function implode;
+use function is_array;
 use function str_replace;
 
 class DocumentPersister
@@ -175,7 +176,7 @@ class DocumentPersister
             $schemaGenerator = new SchemaGenerator($this->dm);
             try {
                 $schema = $schemaGenerator->generateSchema()->getCollectionByClass($this->class->name);
-            } catch (RuntimeException $_) {
+            } catch (RuntimeException $_) { // phpcs:ignore Squiz.NamingConventions.ValidVariableName.NotCamelCaps
                 throw $e;
             }
 
@@ -253,7 +254,7 @@ class DocumentPersister
             $schemaGenerator = new SchemaGenerator($this->dm);
             try {
                 $schema = $schemaGenerator->generateSchema()->getCollectionByName($index ?? $class->collectionName);
-            } catch (RuntimeException $_) {
+            } catch (RuntimeException $_) { // phpcs:ignore Squiz.NamingConventions.ValidVariableName.NotCamelCaps
                 throw $e;
             }
 

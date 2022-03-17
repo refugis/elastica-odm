@@ -11,7 +11,6 @@ use Doctrine\Common\EventManager;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectManagerAware;
 use Elastica\Document;
-use Kcs\Metadata\PropertyMetadata;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Refugis\ODM\Elastica\Events\LifecycleEventManager;
 use Refugis\ODM\Elastica\Events\PreFlushEventArgs;
@@ -774,7 +773,7 @@ final class UnitOfWork
                     $parentMetadata = $this->getClassMetadata($parentObject);
                     $actualData[$class->joinField] = [
                         'name' => $class->discriminatorValue,
-                        'parent' => $parentMetadata->getSingleIdentifier($parentObject)
+                        'parent' => $parentMetadata->getSingleIdentifier($parentObject),
                     ];
                 } else {
                     $actualData[$field->fieldName] = $field->getValue($document);

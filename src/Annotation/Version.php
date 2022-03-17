@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Refugis\ODM\Elastica\Annotation;
 
 use Attribute;
-use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
 use TypeError;
 

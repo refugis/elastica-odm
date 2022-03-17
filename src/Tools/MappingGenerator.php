@@ -13,8 +13,10 @@ use Refugis\ODM\Elastica\Metadata\EmbeddedMetadata;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 use Refugis\ODM\Elastica\Type\TypeManager;
 
+use function array_search;
 use function assert;
 use function class_exists;
+use function is_array;
 use function sprintf;
 
 final class MappingGenerator
@@ -88,7 +90,7 @@ final class MappingGenerator
             $discriminatorMap = $class->discriminatorMap;
 
             $result = [];
-            $processLevel = static function (array &$result, array $map, string $parent = null) use (&$processLevel, &$discriminatorMap): void {
+            $processLevel = static function (array &$result, array $map, ?string $parent = null) use (&$processLevel, &$discriminatorMap): void {
                 foreach ($map as $key => $value) {
                     $val = array_search($key, $discriminatorMap, true);
                     if ($parent === null) {
@@ -97,9 +99,11 @@ final class MappingGenerator
                         $result[$parent][] = $val;
                     }
 
-                    if (is_array($value)) {
-                        $processLevel($result, $value, $val);
+                    if (! is_array($value)) {
+                        continue;
                     }
+
+                    $processLevel($result, $value, $val);
                 }
             };
 

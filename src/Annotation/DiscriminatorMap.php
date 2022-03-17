@@ -22,9 +22,13 @@ final class DiscriminatorMap
      * The discriminator map.
      *
      * @Required()
+     * @var array<string, class-string>
      */
     public array $map;
 
+    /**
+     * @param array<string, class-string> $map
+     */
     public function __construct(array $map)
     {
         $data = $map;

@@ -33,6 +33,9 @@ final class InheritanceType
      */
     public string $type;
 
+    /**
+     * @param array<string, string>|string $type
+     */
     public function __construct($type)
     {
         if (is_string($type)) {

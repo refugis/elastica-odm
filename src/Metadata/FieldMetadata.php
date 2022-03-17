@@ -15,8 +15,6 @@ use function preg_match;
 use function sprintf;
 use function str_contains;
 
-use const PHP_VERSION_ID;
-
 class FieldMetadata extends PropertyMetadata
 {
     public bool $identifier = false;

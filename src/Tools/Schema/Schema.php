@@ -40,7 +40,7 @@ class Schema
      */
     public function getCollectionByClass(string $className): Collection
     {
-        if (!isset($this->collectionMapping[$className])) {
+        if (! isset($this->collectionMapping[$className])) {
             throw new RuntimeException(sprintf('Mapping for class "%s" does not exist', $className));
         }
 

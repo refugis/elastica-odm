@@ -9,11 +9,6 @@ use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
 use TypeError;
 
-use function get_debug_type;
-use function is_array;
-use function is_string;
-use function Safe\sprintf;
-
 /**
  * @Annotation
  * @Target({"CLASS"})
@@ -25,9 +20,13 @@ final class JoinRelationsMap
      * The join relations map.
      *
      * @Required()
+     * @var array<string, mixed>
      */
     public array $map;
 
+    /**
+     * @param array<string, mixed> $map
+     */
     public function __construct(array $map)
     {
         $data = $map;

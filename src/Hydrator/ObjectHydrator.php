@@ -13,6 +13,9 @@ use Refugis\ODM\Elastica\Exception\ResponseException;
 use Refugis\ODM\Elastica\Hydrator\Internal\ProxyInstantiator;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
+use function array_filter;
+use function array_keys;
+use function array_map;
 use function assert;
 use function Safe\sort;
 

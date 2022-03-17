@@ -73,7 +73,7 @@ class Search implements IteratorAggregate
      */
     private CollectionInterface $collection;
 
-    public function __construct(DocumentManagerInterface $documentManager, string $documentClass, CollectionInterface $collection = null)
+    public function __construct(DocumentManagerInterface $documentManager, string $documentClass, ?CollectionInterface $collection = null)
     {
         $this->documentManager = $documentManager;
         $this->collection = $collection ?? $documentManager->getCollection($documentClass);

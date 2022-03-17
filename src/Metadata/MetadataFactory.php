@@ -14,7 +14,12 @@ use ReflectionClass;
 use Refugis\ODM\Elastica\Annotation\InheritanceType;
 use Refugis\ODM\Elastica\Metadata\Loader\LoaderInterface;
 
-use function array_filter;
+use function array_key_exists;
+use function array_search;
+use function array_values;
+use function assert;
+use function get_parent_class;
+use function is_array;
 use function method_exists;
 use function Safe\preg_replace;
 use function Safe\sprintf;
@@ -51,10 +56,13 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
     {
         $metadatas = [];
         foreach ($this->loader->getAllClassNames() as $className) {
-            $metadatas[] = $this->getMetadataFor($className);
+            do {
+                $metadatas[$className] = $this->getMetadataFor($className);
+                $className = get_parent_class($className);
+            } while ($className);
         }
 
-        return $metadatas;
+        return array_values($metadatas);
     }
 
     /**
@@ -169,7 +177,7 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
                 throw new InvalidMetadataException(sprintf(
                     'Class "%s" has inheritance type %s but no discriminator map has been defined.',
                     $classMetadata->getName(),
-                    DocumentMetadata::INHERITANCE_TYPE_SINGLE_INDEX === $classMetadata->inheritanceType ? InheritanceType::SINGLE_INDEX : InheritanceType::PARENT_CHILD
+                    $classMetadata->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_SINGLE_INDEX ? InheritanceType::SINGLE_INDEX : InheritanceType::PARENT_CHILD
                 ));
             }
         }
@@ -203,25 +211,28 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
                             return true;
                         }
 
-                        if (is_array($value)) {
-                            $result = $isPresentInMap($key, $value);
-                            if ($result === true) {
-                                return $mapKey;
-                            }
+                        if (! is_array($value)) {
+                            continue;
+                        }
 
-                            if ($result !== false) {
-                                return $result;
-                            }
+                        $result = $isPresentInMap($key, $value);
+                        if ($result === true) {
+                            return $mapKey;
+                        }
 
+                        if ($result !== false) {
+                            return $result;
                         }
                     }
 
                     return false;
                 };
 
-
-                if (! $isRoot && ! $parentClass = $isPresentInMap($classMetadata->name, $classMetadata->joinRelationMap)) {
-                    throw new InvalidMetadataException(sprintf('Class "%s" is not present in the join relations map.', $classMetadata->getName()));
+                if (! $isRoot) {
+                    $parentClass = $isPresentInMap($classMetadata->name, $classMetadata->joinRelationMap);
+                    if (! $parentClass) {
+                        throw new InvalidMetadataException(sprintf('Class "%s" is not present in the join relations map.', $classMetadata->getName()));
+                    }
                 }
 
                 $classMetadata->joinParentClass = $parentClass;
@@ -233,13 +244,15 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
                             continue;
                         }
 
-                        if ($attributeMetadata->parentDocument) {
-                            if ($parentField !== null) {
-                                throw new InvalidMetadataException(sprintf('Class "%s" declared multiple parent field, you can only set one per class.', $classMetadata->getName()));
-                            }
-
-                            $parentField = $attributeMetadata;
+                        if (! $attributeMetadata->parentDocument) {
+                            continue;
                         }
+
+                        if ($parentField !== null) {
+                            throw new InvalidMetadataException(sprintf('Class "%s" declared multiple parent field, you can only set one per class.', $classMetadata->getName()));
+                        }
+
+                        $parentField = $attributeMetadata;
                     }
 
                     if ($parentField === null) {
@@ -249,23 +262,25 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
             }
         }
 
-        if ($classMetadata->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_PARENT_CHILD) {
-            if (empty($classMetadata->joinField)) {
-                throw new InvalidMetadataException(sprintf('Class "%s" has empty join field name.', $classMetadata->getName()));
-            }
-
-            foreach ($classMetadata->getAttributesMetadata() as $attributeMetadata) {
-                if (! $attributeMetadata instanceof FieldMetadata && ! $attributeMetadata instanceof EmbeddedMetadata) {
-                    continue;
-                }
-
-                if ($attributeMetadata->fieldName === $classMetadata->joinField) {
-                    throw new InvalidMetadataException(sprintf('Join field name collides with field "%s" on "%s".', $attributeMetadata->name, $classMetadata->getName()));
-                }
-            }
-
-            unset($attributeMetadata);
+        if ($classMetadata->inheritanceType !== DocumentMetadata::INHERITANCE_TYPE_PARENT_CHILD) {
+            return;
         }
+
+        if (empty($classMetadata->joinField)) {
+            throw new InvalidMetadataException(sprintf('Class "%s" has empty join field name.', $classMetadata->getName()));
+        }
+
+        foreach ($classMetadata->getAttributesMetadata() as $attributeMetadata) {
+            if (! $attributeMetadata instanceof FieldMetadata && ! $attributeMetadata instanceof EmbeddedMetadata) {
+                continue;
+            }
+
+            if ($attributeMetadata->fieldName === $classMetadata->joinField) {
+                throw new InvalidMetadataException(sprintf('Join field name collides with field "%s" on "%s".', $attributeMetadata->name, $classMetadata->getName()));
+            }
+        }
+
+        unset($attributeMetadata);
     }
 
     protected function createMetadata(ReflectionClass $class): ClassMetadataInterface
