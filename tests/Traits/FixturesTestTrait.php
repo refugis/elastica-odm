@@ -33,7 +33,7 @@ trait FixturesTestTrait
 
         (new Settings($connection))->set([
             'persistent' => [
-                'action.auto_create_index' => '-foo_index_no_auto_create,+*',
+                'action.auto_create_index' => '-foo_index_no_auto_create,-foo_join_index,+*',
             ],
         ]);
 

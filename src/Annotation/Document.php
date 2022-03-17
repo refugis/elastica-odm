@@ -38,16 +38,6 @@ final class Document
     public ?bool $readOnly = null;
 
     /**
-     * The label of join type for this document class.
-     */
-    public ?string $joinType = null;
-
-    /**
-     * The name of join field type for this document class. Defaults to "joinField".
-     */
-    public ?string $joinFieldName = null;
-
-    /**
      * Whether to auto-refresh collection on flush. Defaults to true.
      */
     public ?bool $refreshOnFlush = null;
@@ -65,8 +55,6 @@ final class Document
     public function __construct(
         $collection = null,
         ?string $repositoryClass = null,
-        ?string $joinType = null,
-        ?string $joinFieldName = null,
         ?bool $refreshOnFlush = null,
         ?string $locking = null
     ) {
@@ -81,13 +69,11 @@ final class Document
 
             $data = $collection;
         } else {
-            throw new TypeError(sprintf('Argument #1 passed to %s must be a string. %s passed', __METHOD__, get_debug_type($type)));
+            throw new TypeError(sprintf('Argument #1 passed to %s must be a string. %s passed', __METHOD__, get_debug_type($collection)));
         }
 
         $this->collection = $data['collection'] ?? null;
         $this->repositoryClass = $data['repositoryClass'] ?? $repositoryClass;
-        $this->joinType = $data['joinType'] ?? $joinType;
-        $this->joinFieldName = $data['joinFieldName'] ?? $joinFieldName;
         $this->refreshOnFlush = $data['refreshOnFlush'] ?? $refreshOnFlush ?? true;
         $this->locking = $data['locking'] ?? $locking ?? 'none';
     }

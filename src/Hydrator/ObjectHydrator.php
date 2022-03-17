@@ -49,13 +49,20 @@ class ObjectHydrator implements HydratorInterface
         }
 
         $allFields = [...$class->fieldNames, ...$class->embeddedFieldNames];
-        if ($class->join !== null && $class->join['fieldName']) {
-            $allFields[] = $class->join['fieldName'];
-        }
 
         sort($allFields);
         if ($source !== null && $source !== $allFields) {
-            $fields = $source === false ? [] : $source;
+            $fields = array_filter(array_map(static function (string $fieldName) use ($class) {
+                if ($class->joinField === $fieldName) {
+                    return $class->getParentDocumentField()->name;
+                }
+
+                if ($class->discriminatorField === $fieldName) {
+                    return null;
+                }
+
+                return $fieldName;
+            }, $source === false ? [] : $source));
             $instantiator = new ProxyInstantiator($fields, $this->manager);
         } else {
             $instantiator = $this->getInstantiator();
@@ -66,9 +73,32 @@ class ObjectHydrator implements HydratorInterface
         foreach ($resultSet as $result) {
             $document = $result->getDocument();
             $object = $this->manager->getUnitOfWork()->tryGetById($document->getId(), $class);
-
             if ($object === null) {
-                $object = $instantiator->instantiate($className);
+                $discrField = $class->discriminatorField;
+                if ($discrField !== null) {
+                    $value = $document->get($discrField);
+                    $resultClassName = $class->discriminatorMap[$value];
+                } else {
+                    $resultClassName = $className;
+                }
+
+                if ($resultClassName !== $className) {
+                    $fields = array_filter(array_map(static function (string $fieldName) use ($class) {
+                        if ($class->joinField === $fieldName) {
+                            return $class->getParentDocumentField()->name;
+                        }
+
+                        if ($class->discriminatorField === $fieldName) {
+                            return null;
+                        }
+
+                        return $fieldName;
+                    }, array_keys($document->getData())));
+
+                    $instantiator = new ProxyInstantiator($fields, $this->manager);
+                }
+
+                $object = $instantiator->instantiate($resultClassName);
                 $this->manager->getUnitOfWork()->createDocument($document, $object);
             }
 

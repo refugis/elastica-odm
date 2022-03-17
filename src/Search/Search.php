@@ -132,11 +132,7 @@ class Search implements IteratorAggregate
             $class = $this->documentManager->getClassMetadata($this->documentClass);
             assert($class instanceof DocumentMetadata);
 
-            $fields = $class->eagerFieldNames;
-            if ($class->join !== null && $class->join['fieldName']) {
-                $fields[] = $class->join['fieldName'];
-            }
-
+            $fields = $class->getSourceEagerFields();
             $query->setSource($fields);
         }
 

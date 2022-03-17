@@ -363,31 +363,27 @@ final class UnitOfWork
 
         $class = $this->getClassMetadata($document);
         $actualData = [];
-        $joinFieldName = $class->join['fieldName'] ?? null;
+        if ($class->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_SINGLE_INDEX || $class->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_PARENT_CHILD) {
+            $actualData[$class->discriminatorField] = $class->discriminatorValue;
+        }
+
         foreach ($class->attributesMetadata as $field) {
             if ($field instanceof FieldMetadata && $field->isStored()) {
-                if ($field->fieldName === $class->parentField) {
-                    $parentField = $class->getAttributeMetadata($class->parentField);
-                    assert($parentField instanceof PropertyMetadata);
+                if ($field->parentDocument) {
+                    $parentObject = $field->getValue($document);
+                    if ($parentObject === null) {
+                        continue;
+                    }
 
-                    $refl = $parentField->getReflection();
-                    $refl->setAccessible(true);
-
-                    $parentObject = $refl->getValue($document);
                     $parentMetadata = $this->getClassMetadata($parentObject);
                     $parentId = $parentMetadata->getSingleIdentifier($parentObject);
-
-                    $actualData[$joinFieldName] = ['name' => $class->join['type'], 'parent' => $parentId];
+                    $actualData[$class->joinField] = ['name' => $class->discriminatorValue, 'parent' => $parentId];
                 } else {
                     $actualData[$field->fieldName] = $field->getValue($document);
                 }
             } elseif ($field instanceof EmbeddedMetadata) {
                 $actualData[$field->fieldName] = $field->getValue($document);
             }
-        }
-
-        if ($joinFieldName !== null && $class->parentField === null) {
-            $actualData[$joinFieldName] = ['name' => $class->join['type']];
         }
 
         if (! isset($this->originalDocumentData[$oid])) {
@@ -588,9 +584,9 @@ final class UnitOfWork
                 } else {
                     $value = $fieldType->toPHP($value, $field->options);
                 }
-            } elseif ($class->join !== null && $key === $class->join['fieldName'] && $class->parentField !== null) {
-                $value = $this->manager->getReference($class->join['parentClass'], $value['parent']);
-                $field = $class->getField($class->parentField);
+            } elseif ($key === $class->joinField) {
+                $value = $this->manager->getReference($class->joinParentClass, $value['parent']);
+                $field = $class->getParentDocumentField();
             } else {
                 continue;
             }
@@ -763,35 +759,29 @@ final class UnitOfWork
         }
 
         $actualData = [];
-        $joinFieldName = $class->join['fieldName'] ?? null;
+        if ($class->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_SINGLE_INDEX || $class->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_PARENT_CHILD) {
+            $actualData[$class->discriminatorField] = $class->discriminatorValue;
+        }
+
         foreach ($class->attributesMetadata as $field) {
             if ($field instanceof FieldMetadata && $field->isStored()) {
-                if ($field->fieldName === $class->parentField) {
-                    $parentField = $class->getAttributeMetadata($class->parentField);
-                    assert($parentField instanceof PropertyMetadata);
-
-                    $refl = $parentField->getReflection();
-                    $refl->setAccessible(true);
-
-                    $parentObject = $refl->getValue($document);
-                    if ($parentObject !== null) {
-                        $parentMetadata = $this->getClassMetadata($parentObject);
-                        $parentId = $parentMetadata->getSingleIdentifier($parentObject);
-                    } else {
-                        $parentId = null;
+                if ($field->parentDocument) {
+                    $parentObject = $field->getValue($document);
+                    if ($parentObject === null) {
+                        continue;
                     }
 
-                    $actualData[$joinFieldName] = ['name' => $class->join['type'], 'parent' => $parentId];
+                    $parentMetadata = $this->getClassMetadata($parentObject);
+                    $actualData[$class->joinField] = [
+                        'name' => $class->discriminatorValue,
+                        'parent' => $parentMetadata->getSingleIdentifier($parentObject)
+                    ];
                 } else {
                     $actualData[$field->fieldName] = $field->getValue($document);
                 }
             } elseif ($field instanceof EmbeddedMetadata) {
                 $actualData[$field->fieldName] = $field->getValue($document);
             }
-        }
-
-        if ($joinFieldName !== null && $class->parentField === null) {
-            $actualData[$joinFieldName] = ['name' => $class->join['type']];
         }
 
         if (! isset($this->originalDocumentData[$oid]) || $this->getDocumentState($document) === self::STATE_NEW) {

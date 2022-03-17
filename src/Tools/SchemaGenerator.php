@@ -28,7 +28,7 @@ final class SchemaGenerator
 
         foreach ($factory->getAllMetadata() as $metadata) {
             assert($metadata instanceof DocumentMetadata);
-            if ($metadata->join !== null && isset($metadata->join['parentClass'])) {
+            if ($metadata->discriminatorField !== null && $metadata->getReflectionClass()->getParentClass() !== false) {
                 continue;
             }
 

@@ -62,7 +62,7 @@ final class MappingGenerator
                 $properties[$field->fieldName] = $mapping;
             }
 
-            if (! $field instanceof FieldMetadata || ! $field->isStored()) {
+            if (! $field instanceof FieldMetadata || $field->parentDocument || ! $field->isStored()) {
                 continue;
             }
 
@@ -79,24 +79,54 @@ final class MappingGenerator
             $properties[$field->fieldName] = $mapping;
         }
 
-        if (isset($class->join['type']) && ! isset($class->join['parentClass'])) {
-            $properties[$class->join['fieldName']] = [
+        if ($class->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_SINGLE_INDEX || $class->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_PARENT_CHILD) {
+            $properties[$class->discriminatorField] = ['type' => 'keyword'];
+        }
+
+        if ($class->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_PARENT_CHILD) {
+            $relationsMap = $class->joinRelationMap;
+            $discriminatorMap = $class->discriminatorMap;
+
+            $result = [];
+            $processLevel = static function (array &$result, array $map, string $parent = null) use (&$processLevel, &$discriminatorMap): void {
+                foreach ($map as $key => $value) {
+                    $val = array_search($key, $discriminatorMap, true);
+                    if ($parent === null) {
+                        $result[$val] = [];
+                    } else {
+                        $result[$parent][] = $val;
+                    }
+
+                    if (is_array($value)) {
+                        $processLevel($result, $value, $val);
+                    }
+                }
+            };
+
+            $processLevel($result, $relationsMap);
+            $properties[$class->joinField] = [
                 'type' => 'join',
-                'relations' => $class->join['relations'],
+                'relations' => $result,
             ];
         }
 
-        foreach ($class->childrenClasses as $childClassName) {
-            $childClass = $this->metadataFactory->getMetadataFor($childClassName);
-            assert($childClass instanceof DocumentMetadata);
-
-            $childProperties = $this->generatePropertiesMapping($childClass);
-            foreach ($childProperties as $name => $childProperty) {
-                if (isset($properties[$name]) && $properties[$name] !== $childProperty) {
-                    throw new RuntimeException(sprintf('Conflicting property definition while generating mapping for class "%s" and its children: definitions of field "%s" are incompatible.', $class->name, $name));
+        if ($class->discriminatorMap !== null && $class->getReflectionClass()->getParentClass() === false) {
+            foreach ($class->discriminatorMap as $childClassName) {
+                if ($childClassName === $class->name) {
+                    continue;
                 }
 
-                $properties[$name] = $childProperty;
+                $childClass = $this->metadataFactory->getMetadataFor($childClassName);
+                assert($childClass instanceof DocumentMetadata);
+
+                $childProperties = $this->generatePropertiesMapping($childClass);
+                foreach ($childProperties as $name => $childProperty) {
+                    if (isset($properties[$name]) && $properties[$name] !== $childProperty) {
+                        throw new RuntimeException(sprintf('Conflicting property definition while generating mapping for class "%s" and its children: definitions of field "%s" are incompatible.', $class->name, $name));
+                    }
+
+                    $properties[$name] = $childProperty;
+                }
             }
         }
 

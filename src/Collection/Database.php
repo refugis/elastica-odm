@@ -39,8 +39,8 @@ class Database implements DatabaseInterface
         $collection->setStaticSettings($class->staticSettings ?? []);
         $collection->setDynamicSettings($class->dynamicSettings ?? []);
 
-        if ($class->join !== null) {
-            $collection->setJoin($class->join['type'], $class->join['fieldName']);
+        if ($class->discriminatorField !== null) {
+            $collection->setDiscriminator($class->discriminatorField, $class->discriminatorValue);
         }
 
         return $this->collectionList[$class->name] = $collection;

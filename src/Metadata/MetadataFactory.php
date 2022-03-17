@@ -11,6 +11,7 @@ use Kcs\Metadata\Exception\InvalidMetadataException;
 use Kcs\Metadata\Factory\AbstractMetadataFactory;
 use Psr\Cache\CacheItemPoolInterface;
 use ReflectionClass;
+use Refugis\ODM\Elastica\Annotation\InheritanceType;
 use Refugis\ODM\Elastica\Metadata\Loader\LoaderInterface;
 
 use function array_filter;
@@ -130,53 +131,141 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
             }
 
             if ($count > 1) {
-                throw new InvalidMetadataException('@DocumentId, @IndexName, @TypeName, @SequenceNumber, @PrimaryTerm and @Version are mutually exclusive. Please select one for "' . $attributeMetadata->getName() . '"');
+                throw new InvalidMetadataException(sprintf(
+                    '@DocumentId, @IndexName, @TypeName, @SequenceNumber, @PrimaryTerm and @Version are mutually exclusive. Please select one for "%s"',
+                    $attributeMetadata->getName()
+                ));
             }
         }
 
+        unset($attributeMetadata);
+
         if ($identifier === null && ! $classMetadata->embeddable) {
-            throw new InvalidMetadataException('At least one @DocumentId is required for an elastic document');
+            throw new InvalidMetadataException(sprintf('At least one @DocumentId is required for an elastic document. Please add one to "%s" class', $classMetadata->getName()));
         }
 
-        $classMetadata->identifier = $identifier;
-        $classMetadata->eagerFieldNames = array_filter($classMetadata->eagerFieldNames);
+        $reflectionClass = $classMetadata->getReflectionClass();
+        $parentClass = $reflectionClass->getParentClass();
+        if ($parentClass) {
+            $parentMetadata = $this->getMetadataFor($parentClass->getName());
+            assert($parentMetadata instanceof DocumentMetadata);
+            if ($parentMetadata->inheritanceType === null && ! $parentMetadata->mappedSuperclass) {
+                throw new InvalidMetadataException(sprintf('Class "%s" extends "%s" which is not mapped. Please add @MappedSuperclass to the parent class or define an inheritance type.', $classMetadata->getName(), $parentMetadata->getName()));
+            }
 
-        if ($classMetadata->join === null || ! isset($classMetadata->join['parentClass'])) {
-            return;
+            $classMetadata->inheritanceType = $parentMetadata->inheritanceType;
+            $classMetadata->discriminatorField = $parentMetadata->discriminatorField;
+            $classMetadata->discriminatorMap = $parentMetadata->discriminatorMap;
+            $classMetadata->joinField = $parentMetadata->joinField;
+            $classMetadata->joinRelationMap = $parentMetadata->joinRelationMap;
+
+            if ($classMetadata->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_SINGLE_INDEX || $classMetadata->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_PARENT_CHILD) {
+                $classMetadata->collectionName = $parentMetadata->collectionName;
+            }
         }
 
-        $parentClass = $classMetadata->join['parentClass'];
-        $parentMetadata = $this->getMetadataFor($parentClass);
-        if (! $parentMetadata instanceof DocumentMetadata || ! $parentMetadata->document) {
-            throw new InvalidMetadataException(sprintf('Invalid document parent class "%s" is invalid for "%s".', $parentClass, $classMetadata->name));
+        if ($classMetadata->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_SINGLE_INDEX || $classMetadata->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_PARENT_CHILD) {
+            if (empty($classMetadata->discriminatorMap)) {
+                throw new InvalidMetadataException(sprintf(
+                    'Class "%s" has inheritance type %s but no discriminator map has been defined.',
+                    $classMetadata->getName(),
+                    DocumentMetadata::INHERITANCE_TYPE_SINGLE_INDEX === $classMetadata->inheritanceType ? InheritanceType::SINGLE_INDEX : InheritanceType::PARENT_CHILD
+                ));
+            }
         }
 
-        if ($parentMetadata->join === null || ! isset($parentMetadata->join['type'])) {
-            throw new InvalidMetadataException(sprintf('Document parent class "%s" does not define a join type. Please add a joinType attribute to its definition.', $parentClass));
+        if ($classMetadata->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_PARENT_CHILD) {
+            if (empty($classMetadata->discriminatorMap)) {
+                throw new InvalidMetadataException(sprintf(
+                    'Class "%s" has inheritance type %s but no relations map has been defined.',
+                    $classMetadata->getName(),
+                    InheritanceType::PARENT_CHILD
+                ));
+            }
         }
 
-        $classMetadata->collectionName = $parentMetadata->collectionName;
-        $classMetadata->dynamicSettings = $parentMetadata->dynamicSettings;
-        $classMetadata->staticSettings = $parentMetadata->staticSettings;
+        if (! $reflectionClass->isAbstract()) {
+            if ($classMetadata->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_SINGLE_INDEX || $classMetadata->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_PARENT_CHILD) {
+                $value = array_search($classMetadata->getName(), $classMetadata->discriminatorMap, true);
+                if ($value === false) {
+                    throw new InvalidMetadataException(sprintf('Class "%s" is not present in the discriminator map. Please add it with a unique discriminator value.', $classMetadata->getName()));
+                }
 
-        $joinFieldName = $parentMetadata->join['fieldName'];
-        $classMetadata->join['fieldName'] = $joinFieldName;
+                $classMetadata->discriminatorValue = $value;
+            }
 
-        $fieldMetadata = $classMetadata->getField($joinFieldName);
-        if ($fieldMetadata !== null) {
-            throw new InvalidMetadataException(sprintf('Join field name "%s" conflicts with field name of property "%s" on class "%s".', $joinFieldName, $fieldMetadata->name, $classMetadata->name));
+            if ($classMetadata->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_PARENT_CHILD) {
+                $isRoot = array_key_exists($classMetadata->name, $classMetadata->joinRelationMap);
+                $parentClass = null;
+                $isPresentInMap = static function (string $key, array $map) use (&$isPresentInMap) {
+                    foreach ($map as $mapKey => $value) {
+                        if ($key === $mapKey) {
+                            return true;
+                        }
+
+                        if (is_array($value)) {
+                            $result = $isPresentInMap($key, $value);
+                            if ($result === true) {
+                                return $mapKey;
+                            }
+
+                            if ($result !== false) {
+                                return $result;
+                            }
+
+                        }
+                    }
+
+                    return false;
+                };
+
+
+                if (! $isRoot && ! $parentClass = $isPresentInMap($classMetadata->name, $classMetadata->joinRelationMap)) {
+                    throw new InvalidMetadataException(sprintf('Class "%s" is not present in the join relations map.', $classMetadata->getName()));
+                }
+
+                $classMetadata->joinParentClass = $parentClass;
+
+                if (! $isRoot) {
+                    $parentField = null;
+                    foreach ($classMetadata->getAttributesMetadata() as $attributeMetadata) {
+                        if (! $attributeMetadata instanceof FieldMetadata) {
+                            continue;
+                        }
+
+                        if ($attributeMetadata->parentDocument) {
+                            if ($parentField !== null) {
+                                throw new InvalidMetadataException(sprintf('Class "%s" declared multiple parent field, you can only set one per class.', $classMetadata->getName()));
+                            }
+
+                            $parentField = $attributeMetadata;
+                        }
+                    }
+
+                    if ($parentField === null) {
+                        throw new InvalidMetadataException(sprintf('Class "%s" has no parent field, but is not at relations root-level. Please add one.', $classMetadata->getName()));
+                    }
+                }
+            }
         }
 
-        $rootMetadata = $parentMetadata;
-        while (isset($rootMetadata->join['parentClass'])) {
-            $rootMetadata = $this->getMetadataFor($rootMetadata->join['parentClass']);
+        if ($classMetadata->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_PARENT_CHILD) {
+            if (empty($classMetadata->joinField)) {
+                throw new InvalidMetadataException(sprintf('Class "%s" has empty join field name.', $classMetadata->getName()));
+            }
+
+            foreach ($classMetadata->getAttributesMetadata() as $attributeMetadata) {
+                if (! $attributeMetadata instanceof FieldMetadata && ! $attributeMetadata instanceof EmbeddedMetadata) {
+                    continue;
+                }
+
+                if ($attributeMetadata->fieldName === $classMetadata->joinField) {
+                    throw new InvalidMetadataException(sprintf('Join field name collides with field "%s" on "%s".', $attributeMetadata->name, $classMetadata->getName()));
+                }
+            }
+
+            unset($attributeMetadata);
         }
-
-        $rootMetadata->join['relations'][$parentMetadata->join['type']][] = $classMetadata->join['type'];
-        $rootMetadata->childrenClasses[] = $classMetadata->name;
-        $this->setMetadataFor($rootMetadata->name, $rootMetadata);
-
-        $classMetadata->join['rootClass'] = $rootMetadata->name;
     }
 
     protected function createMetadata(ReflectionClass $class): ClassMetadataInterface

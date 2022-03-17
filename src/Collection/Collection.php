@@ -42,6 +42,8 @@ class Collection implements CollectionInterface
     private SearchableInterface $searchable;
     private ?string $_lastInsertId;
     private string $name;
+    private ?string $discriminatorField;
+    private ?string $discriminatorValue;
 
     /** @var array<string, mixed> */
     private array $dynamicSettings;
@@ -49,15 +51,14 @@ class Collection implements CollectionInterface
     /** @var array<string, mixed> */
     private array $staticSettings;
 
-    private ?string $joinFieldName = null;
-    private ?string $joinType = null;
-
     public function __construct(string $documentClass, SearchableInterface $searchable)
     {
         $this->documentClass = $documentClass;
         $this->searchable = $searchable;
         $this->dynamicSettings = [];
         $this->staticSettings = [];
+        $this->discriminatorField = null;
+        $this->discriminatorValue = null;
 
         if ($searchable instanceof Type) {
             $this->name = $searchable->getIndex()->getName() . '/' . $searchable->getName();
@@ -91,13 +92,10 @@ class Collection implements CollectionInterface
         $this->staticSettings = $staticSettings;
     }
 
-    /**
-     * Sets the join type and field name.
-     */
-    public function setJoin(string $joinType, string $joinFieldName): void
+    public function setDiscriminator(string $field, string $value): void
     {
-        $this->joinType = $joinType;
-        $this->joinFieldName = $joinFieldName;
+        $this->discriminatorField = $field;
+        $this->discriminatorValue = $value;
     }
 
     public function scroll(Query $query, string $expiryTime = '1m'): Scroll
@@ -174,10 +172,10 @@ class Collection implements CollectionInterface
             $meta = $action->getMetadata();
             if ($this->searchable instanceof Type) {
                 $action->setType($this->searchable->getName());
-                if (! isset($meta['_index'])) {
+                if (empty($meta['_index'])) {
                     $action->setIndex($this->searchable->getIndex()->getName());
                 }
-            } elseif (! isset($meta['_index']) && $this->searchable instanceof Index) {
+            } elseif (empty($meta['_index']) && $this->searchable instanceof Index) {
                 $action->setIndex($this->searchable->getName());
             }
 
@@ -485,17 +483,13 @@ class Collection implements CollectionInterface
         $query->setParam('seq_no_primary_term', true);
         $query->setParam('version', true);
 
-        if ($this->joinType === null) {
-            return $query;
+        if ($this->discriminatorField !== null) {
+            $innerQuery = (new Query\BoolQuery())
+                ->addFilter(new Query\Term([$this->discriminatorField => ['value' => $this->discriminatorValue]]))
+                ->addMust($query->getQuery());
+
+            $query->setQuery($innerQuery);
         }
-
-        $innerQuery = $query->getQuery();
-        $bool = new Query\BoolQuery();
-        $bool
-            ->addFilter(new Query\Term([$this->joinFieldName => ['value' => $this->joinType]]))
-            ->addMust($innerQuery);
-
-        $query->setQuery($bool);
 
         return $query;
     }

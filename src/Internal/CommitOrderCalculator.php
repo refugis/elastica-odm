@@ -51,6 +51,6 @@ final class CommitOrderCalculator
             return in_array($node->getClassName(), $classNames, true);
         });
 
-        return array_reverse($elements, false);
+        return array_values($elements);
     }
 }

@@ -7,22 +7,22 @@ namespace Refugis\ODM\Elastica\Metadata\Processor;
 use Kcs\Metadata\Loader\Processor\Annotation\Processor;
 use Kcs\Metadata\Loader\Processor\ProcessorInterface;
 use Kcs\Metadata\MetadataInterface;
-use Refugis\ODM\Elastica\Annotation\ParentDocument;
-use Refugis\ODM\Elastica\Metadata\FieldMetadata;
+use Refugis\ODM\Elastica\Annotation\JoinRelationsMap;
+use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
 /**
- * @Processor(annotation=ParentDocument::class)
+ * @Processor(annotation=JoinRelationsMap::class)
  */
-class ParentDocumentProcessor implements ProcessorInterface
+class JoinRelationsMapProcessor implements ProcessorInterface
 {
     /**
      * {@inheritdoc}
      *
-     * @param FieldMetadata  $metadata
-     * @param ParentDocument $subject
+     * @param DocumentMetadata $metadata
+     * @param JoinRelationsMap $subject
      */
     public function process(MetadataInterface $metadata, $subject): void
     {
-        $metadata->parentDocument = true;
+        $metadata->joinRelationMap = $subject->map;
     }
 }

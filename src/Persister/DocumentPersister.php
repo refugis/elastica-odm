@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Persister;
 
+use ArrayObject;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection as DoctrineCollection;
 use Elastica\Bulk;
@@ -15,6 +16,7 @@ use Refugis\ODM\Elastica\Collection\CollectionInterface;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Exception\ConversionFailedException;
 use Refugis\ODM\Elastica\Exception\IndexNotFoundException;
+use Refugis\ODM\Elastica\Exception\RuntimeException;
 use Refugis\ODM\Elastica\Hydrator\HydratorInterface;
 use Refugis\ODM\Elastica\Id\PostInsertId;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
@@ -170,11 +172,10 @@ class DocumentPersister
         try {
             $responseSet = $this->collection->bulk($operations)->getBulkResponses();
         } catch (IndexNotFoundException $e) {
-            $mappingClass = $this->class->join['rootClass'] ?? $this->class->name;
             $schemaGenerator = new SchemaGenerator($this->dm);
-            $schema = $schemaGenerator->generateSchema()->getMapping()[$mappingClass] ?? null;
-
-            if ($schema === null) {
+            try {
+                $schema = $schemaGenerator->generateSchema()->getCollectionByClass($this->class->name);
+            } catch (RuntimeException $_) {
                 throw $e;
             }
 
@@ -235,8 +236,9 @@ class DocumentPersister
         $id = $postIdGenerator ? null : $class->getSingleIdentifier($document);
         $body = $this->prepareUpdateData($document)['body'];
         $routing = $this->getRouting($class, $document);
+        $index = $class->getIndexName($document);
 
-        $options = ['routing' => $routing];
+        $options = ['routing' => $routing, 'index' => $index];
         if ($class->versionType === Version::EXTERNAL || $class->versionType === Version::EXTERNAL_GTE) {
             $version = $class->getVersion($document);
             if ($version !== null) {
@@ -249,9 +251,9 @@ class DocumentPersister
             $response = $this->collection->create($id, $body, $options);
         } catch (IndexNotFoundException $e) {
             $schemaGenerator = new SchemaGenerator($this->dm);
-            $schema = $schemaGenerator->generateSchema()->getMapping()[$this->class->name] ?? null;
-
-            if ($schema === null) {
+            try {
+                $schema = $schemaGenerator->generateSchema()->getCollectionByName($index ?? $class->collectionName);
+            } catch (RuntimeException $_) {
                 throw $e;
             }
 
@@ -430,10 +432,14 @@ class DocumentPersister
         $class = $this->dm->getClassMetadata(ClassUtil::getClass($document));
         assert($class instanceof DocumentMetadata);
 
-        $joinFieldName = $class->join['fieldName'] ?? null;
         foreach ($changeSet as $name => $value) {
-            if ($name === $joinFieldName) {
-                $body[$joinFieldName] = $value[1];
+            if ($name === $class->joinField) {
+                $body[$class->joinField] = $value[1];
+                continue;
+            }
+
+            if ($name === $class->discriminatorField) {
+                $body[$class->discriminatorField] = $value[1];
                 continue;
             }
 
@@ -480,7 +486,7 @@ class DocumentPersister
         }
 
         return [
-            'body' => $body,
+            'body' => empty($body) ? new ArrayObject() : $body,
             'script' => implode('; ', $script),
         ];
     }
@@ -542,15 +548,15 @@ class DocumentPersister
 
     private function getRouting(DocumentMetadata $class, object $document): ?string
     {
-        if ($class->join === null) {
+        if ($class->joinField === null) {
             return null;
         }
 
         $routingObject = $document;
         $metadata = $class;
 
-        while ($metadata->parentField !== null) {
-            $obj = $metadata->getField($metadata->parentField)->getValue($routingObject);
+        while ($metadata->getParentDocumentField() !== null) {
+            $obj = $metadata->getParentDocument($routingObject);
             if ($obj === null) {
                 break;
             }

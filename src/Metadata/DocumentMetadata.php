@@ -14,6 +14,7 @@ use ReflectionClass;
 use Refugis\ODM\Elastica\Annotation\Version;
 use Refugis\ODM\Elastica\Exception\RuntimeException;
 
+use Tests\Fixtures\Document\JoinField\FooParent;
 use function array_merge;
 use function array_unique;
 use function reset;
@@ -24,6 +25,10 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
 {
     public const GENERATOR_TYPE_NONE = 0;
     public const GENERATOR_TYPE_AUTO = 1;
+
+    public const INHERITANCE_TYPE_SINGLE_INDEX = 0;
+    public const INHERITANCE_TYPE_PARENT_CHILD = 1;
+    public const INHERITANCE_TYPE_INDEX_PER_CLASS= 1;
 
     private const JOIN_FIELD_ASSOCIATION = '$$join';
 
@@ -36,6 +41,11 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
      * Whether this class is representing an embeddable document.
      */
     public bool $embeddable;
+
+    /**
+     * Whether this class is extended by a document class and its properties should be mapped.
+     */
+    public bool $mappedSuperclass;
 
     /**
      * Whether this document is readonly. Not applicable to embedded documents.
@@ -71,6 +81,11 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     public array $eagerFieldNames = [];
 
     /**
+     * @internal
+     */
+    public ?array $sourceEagerFields = null;
+
+    /**
      * An array containing all the field names.
      *
      * @var string[]
@@ -83,26 +98,6 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
      * @var string[]
      */
     public array $embeddedFieldNames = [];
-
-    /**
-     * The join settings.
-     *
-     * @var array<string, mixed>|null
-     * @phpstan-var array{type: string, fieldName: string, parentClass?: class-string, rootClass?: class-string, relations?: array<string, array<string>>}|null
-     */
-    public ?array $join = null;
-
-    /**
-     * The join parent field.
-     */
-    public ?string $parentField = null;
-
-    /**
-     * While processing joins, this property will contain all the children class names (all levels).
-     *
-     * @var array<class-string>
-     */
-    public array $childrenClasses = [];
 
     /**
      * Gets the index dynamic settings.
@@ -133,6 +128,45 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
      */
     private Instantiator $instantiator;
 
+    /**
+     * The inheritance type of the current class hierarchy.
+     */
+    public ?int $inheritanceType;
+
+    /**
+     * The discriminator map for the current class hierarchy.
+     *
+     * @var array<string, class-string>
+     */
+    public ?array $discriminatorMap;
+
+    /**
+     * The discriminator field name for the current class hierarchy.
+     */
+    public ?string $discriminatorField;
+
+    /**
+     * The discriminator value for the current class.
+     */
+    public ?string $discriminatorValue;
+
+    /**
+     * The join field name for the current class hierarchy.
+     */
+    public ?string $joinField;
+
+    /**
+     * The join parent class name.
+     */
+    public ?string $joinParentClass;
+
+    /**
+     * The relations map for parent-child inheritance.
+     *
+     * @var array<string, mixed>
+     */
+    public ?array $joinRelationMap;
+
     public function __construct(ReflectionClass $class)
     {
         parent::__construct($class);
@@ -140,9 +174,17 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
         $this->instantiator = new Instantiator();
         $this->document = false;
         $this->embeddable = false;
+        $this->mappedSuperclass = false;
         $this->isReadOnly = false;
         $this->refreshOnCommit = true;
         $this->versionType = Version::INTERNAL;
+        $this->inheritanceType = null;
+        $this->discriminatorMap = null;
+        $this->discriminatorField = null;
+        $this->discriminatorValue = null;
+        $this->joinField = null;
+        $this->joinRelationMap = null;
+        $this->joinParentClass = null;
     }
 
     public function __wakeup(): void
@@ -275,7 +317,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     public function getAssociationNames(): array
     {
         $associations = [];
-        if ($this->join !== null && isset($this->join['parentClass'])) {
+        if ($this->joinParentClass !== null) {
             $associations[] = self::JOIN_FIELD_ASSOCIATION;
         }
 
@@ -301,7 +343,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     public function getAssociationTargetClass($assocName): string
     {
         if ($assocName === self::JOIN_FIELD_ASSOCIATION) {
-            return $this->join['parentClass'];
+            return $this->joinParentClass;
         }
     }
 
@@ -425,5 +467,72 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
         }
 
         return null;
+    }
+
+    public function getParentDocumentField(): ?FieldMetadata
+    {
+        foreach ($this->attributesMetadata as $metadata) {
+            if (! $metadata instanceof FieldMetadata || ! $metadata->parentDocument) {
+                continue;
+            }
+
+            return $metadata;
+        }
+
+        return null;
+    }
+
+    public function getParentDocument(object $object): ?object
+    {
+        $field = $this->getParentDocumentField();
+        if ($field !== null) {
+            return $field->getValue($object);
+        }
+
+        return null;
+    }
+
+    public function finalize(): void
+    {
+        $identifier = null;
+        foreach ($this->getAttributesMetadata() as $attributeMetadata) {
+            if (! $attributeMetadata instanceof FieldMetadata) {
+                continue;
+            }
+
+            if ($attributeMetadata->identifier) {
+                $identifier = $attributeMetadata;
+            }
+        }
+
+        $this->identifier = $identifier;
+        $this->eagerFieldNames = array_filter($this->eagerFieldNames);
+    }
+
+    public function getSourceEagerFields(): array
+    {
+        if ($this->sourceEagerFields !== null) {
+            return $this->sourceEagerFields;
+        }
+
+        $fields = [];
+        foreach ($this->eagerFieldNames as $fieldName) {
+            $field = $this->getField($fieldName);
+            if ($field instanceof FieldMetadata && (! $field->isStored() || $field->parentDocument)) {
+                continue;
+            }
+
+            $fields[] = $fieldName;
+        }
+
+        if ($this->discriminatorField !== null) {
+            $fields[] = $this->discriminatorField;
+        }
+
+        if ($this->joinField !== null) {
+            $fields[] = $this->joinField;
+        }
+
+        return $this->sourceEagerFields = $fields;
     }
 }

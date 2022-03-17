@@ -23,6 +23,7 @@ class FieldMetadata extends PropertyMetadata
     public bool $field = false;
     public bool $indexName = false;
     public bool $typeName = false;
+    public bool $parentDocument = false;
     public bool $seqNo = false;
     public bool $primaryTerm = false;
     public bool $version = false;

@@ -17,6 +17,9 @@ use Tests\Fixtures\Document\FooNoAutoCreate;
 use Tests\Fixtures\Document\FooWithEmbedded;
 use Tests\Fixtures\Document\FooWithLazyField;
 use Tests\Fixtures\Document\FooWithVersion;
+use Tests\Fixtures\Document\JoinField\FooChild;
+use Tests\Fixtures\Document\JoinField\FooGrandParent;
+use Tests\Fixtures\Document\JoinField\FooParent;
 use Tests\Traits\DocumentManagerTestTrait;
 use Tests\Traits\FixturesTestTrait;
 use Refugis\ODM\Elastica\VarDumper\VarDumperTestTrait;
@@ -323,5 +326,55 @@ class DocumentManagerTest extends TestCase
         self::assertEquals('test_persist_with_version', $result->id);
         self::assertEquals(__METHOD__, $result->stringField);
         self::assertEquals(5, $result->version);
+    }
+
+    public function testShouldPersistJoinRelationships(): void
+    {
+        $grandParent = new FooGrandParent();
+        $grandParent->id = 'grand_parent_1';
+
+        $parent = new FooParent();
+        $parent->id = 'parent_1';
+        $parent->fooGrandParent = $grandParent;
+
+        $parent2 = new FooParent();
+        $parent2->id = 'parent_2';
+
+        $child1 = new FooChild();
+        $child1->id = 'child_1';
+        $child1->fooParent = $parent;
+
+        $child2 = new FooChild();
+        $child2->id = 'child_2';
+        $child2->fooParent = $parent2;
+
+        $child3 = new FooChild();
+        $child3->id = 'child_3';
+
+        $this->dm->persist($grandParent);
+        $this->dm->persist($parent);
+        $this->dm->persist($parent2);
+        $this->dm->persist($child1);
+        $this->dm->persist($child2);
+        $this->dm->persist($child3);
+
+        $this->dm->flush();
+
+        $parents = $this->dm
+            ->getRepository(FooParent::class)
+            ->findAll();
+
+        self::assertCount(2, $parents);
+
+        $children = $this->dm
+            ->getRepository(FooChild::class)
+            ->findAll();
+
+        self::assertCount(3, $children);
+
+        $this->dm->clear();
+
+        $child1 = $this->dm->find(FooChild::class, 'child_1');
+        self::assertEquals('child_1', $child1->id);
     }
 }

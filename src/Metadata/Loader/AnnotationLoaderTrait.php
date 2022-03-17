@@ -32,6 +32,8 @@ trait AnnotationLoaderTrait
     public static function createProcessorFactory(): ProcessorFactoryInterface
     {
         $factory = new ProcessorFactory();
+        $factory->registerProcessor(Annotation\DiscriminatorField::class, Processor\DiscriminatorFieldProcessor::class);
+        $factory->registerProcessor(Annotation\DiscriminatorMap::class, Processor\DiscriminatorMapProcessor::class);
         $factory->registerProcessor(Annotation\DocumentId::class, Processor\DocumentIdProcessor::class);
         $factory->registerProcessor(Annotation\Document::class, Processor\DocumentProcessor::class);
         $factory->registerProcessor(Annotation\Embeddable::class, Processor\EmbeddableProcessor::class);
@@ -39,6 +41,10 @@ trait AnnotationLoaderTrait
         $factory->registerProcessor(Annotation\Field::class, Processor\FieldProcessor::class);
         $factory->registerProcessor(Annotation\IndexName::class, Processor\IndexNameProcessor::class);
         $factory->registerProcessor(Annotation\Index::class, Processor\IndexProcessor::class);
+        $factory->registerProcessor(Annotation\InheritanceType::class, Processor\InheritanceTypeProcessor::class);
+        $factory->registerProcessor(Annotation\JoinField::class, Processor\JoinFieldProcessor::class);
+        $factory->registerProcessor(Annotation\JoinRelationsMap::class, Processor\JoinRelationsMapProcessor::class);
+        $factory->registerProcessor(Annotation\MappedSuperclass::class, Processor\MappedSuperclassProcessor::class);
         $factory->registerProcessor(Annotation\ParentDocument::class, Processor\ParentDocumentProcessor::class);
         $factory->registerProcessor(Annotation\PrimaryTerm::class, Processor\PrimaryTermProcessor::class);
         $factory->registerProcessor(Annotation\SequenceNumber::class, Processor\SequenceNumberProcessor::class);
