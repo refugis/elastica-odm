@@ -20,10 +20,15 @@ jobs:
                     php-version: "7.4"
                     tools: cs2pr
 
+            -   name: Get Composer Cache Directory
+                id: composer-cache
+                run: |
+                    echo "::set-output name=dir::$(composer config cache-files-dir)"
+
             -   name: Cache dependencies installed with composer
                 uses: actions/cache@v1
                 with:
-                    path: "~/.composer/cache"
+                    path: ${{ steps.composer-cache.outputs.dir }}
                     key: php-${{ matrix.php-version }}-composer-locked-${{ hashFiles('composer.lock') }}
                     restore-keys: php-${{ matrix.php-version }}-composer-locked-
 

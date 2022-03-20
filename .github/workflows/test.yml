@@ -36,6 +36,18 @@ jobs:
                   php-version: ${{ matrix.php_version }}
                   extensions: :opcache
 
+            -   name: Get Composer Cache Directory
+                id: composer-cache
+                run: |
+                    echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+            -   name: Cache dependencies installed with composer
+                uses: actions/cache@v1
+                with:
+                    path: ${{ steps.composer-cache.outputs.dir }}
+                    key: php-${{ matrix.php_version }}-composer-locked-${{ hashFiles('composer.lock') }}
+                    restore-keys: php-${{ matrix.php_version }}-composer-locked-
+
             - name: Adding correct version of elastica to composer.json
               run: composer require --no-update ruflin/elastica ${{ matrix.es_version.lib }}
             - run: composer install
