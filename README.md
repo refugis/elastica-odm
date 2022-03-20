@@ -13,18 +13,19 @@ Originally written by [Fazland team](https://www.github.com/fazland/elastica-odm
 
 Requirements
 ------------
-- php ^7.4|^8.0
+- php ^7.4 || ^8.0
 - doctrine/annotations ^1.6
 - doctrine/common ^3.0
 - doctrine/inflector ^2.0
 - doctrine/persistence ^2.0
-- kcs/class-finder ^0.1|^0.2
-- kcs/metadata: ^3.1|^4.0
+- kcs/class-finder ^0.1 || ^0.2 || ^0.3
+- kcs/metadata: ^3.1 || ^4.0
 - ocramius/proxy-manager ^2.0
 - psr/cache-implementation ^1.0
 - psr/log ^1.0
-- ruflin/elastica ^5.0|^6.0
+- ruflin/elastica ^5.0 || ^6.0 || ^7.0
 - symfony/polyfill-php80 ^1.0
+- thecodingmachine/safe ^1.0
 
 Installation
 ------------
