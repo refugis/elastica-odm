@@ -28,13 +28,14 @@ abstract class AbstractDateTimeType extends AbstractType
             return null;
         }
 
+        $format = $options['format'] ?? DateTime::ATOM;
         if ($value instanceof DateTimeInterface) {
-            $value = $value->format(DateTime::ATOM);
+            $value = $value->format($format);
         }
 
         $class = $this->getClass();
 
-        return new $class($value);
+        return $class::createFromFormat($format, $value) ?: new $class($value);
     }
 
     /**
@@ -53,7 +54,7 @@ abstract class AbstractDateTimeType extends AbstractType
 
         assert($value instanceof DateTimeInterface);
 
-        return $value->format($options['format'] ?? DateTime::ISO8601);
+        return $value->format($options['format'] ?? DateTime::ATOM);
     }
 
     /**
@@ -63,7 +64,7 @@ abstract class AbstractDateTimeType extends AbstractType
     {
         return [
             'type' => 'date',
-            'format' => $this->toJoda($options['format'] ?? DateTime::ISO8601),
+            'format' => $this->toJoda($options['format'] ?? DateTime::ATOM),
         ];
     }
 
@@ -116,10 +117,10 @@ abstract class AbstractDateTimeType extends AbstractType
                     return 'x';
 
                 case 'Y':       // A full numeric representation of a year, 4 digits
-                    return 'YYYY';
+                    return 'yyyy';
 
                 case 'y':       // A two digit representation of a year
-                    return 'YY';
+                    return 'yy';
 
                 case 'A':       // Uppercase Ante meridiem and Post meridiem
                     return 'a';
@@ -158,15 +159,15 @@ abstract class AbstractDateTimeType extends AbstractType
                     return 'ZZ';
 
                 case 'c':       // ISO 8601 date
-                    return 'YYYY-MM-dd\'T\'HH:mm:ssZ';
+                    return 'yyyy-MM-dd\'T\'HH:mm:ssZ';
 
                 case 'S':       // English ordinal suffix for the day of the month, 2 characters
                 case 'z':       // The day of the year (starting from 0)
                 case 't':       // Number of days in the given month
                 case 'L':       // Whether it's a leap year
-                case 'a':       // Lowercase Ante meridiem and Post meridiem
+                case 'a':       // Lowercase Ante meridian and Post meridian
                 case 'B':       // Swatch Internet time
-                case 'I':       // Whether or not the date is in daylight saving time
+                case 'I':       // Whether the date is in daylight saving time
                 case 'T':       // Timezone abbreviation
                 case 'Z':       // Timezone offset in seconds.
                 case 'U':       // UNIX timestamp.
