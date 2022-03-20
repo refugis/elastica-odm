@@ -192,6 +192,9 @@ class Collection implements CollectionInterface
             $response = $this->getClient()->requestEndpoint($endpoint);
         } catch (ResponseException $exception) {
             $response = $exception->getResponse();
+            if ($response->getStatus() === 413) {
+                throw new ODMResponseException($response, 'Server responded with HTTP 413 Payload too large');
+            }
         }
 
         $data = $response->getData();
