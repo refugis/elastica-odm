@@ -276,6 +276,22 @@ class Search implements IteratorAggregate
     }
 
     /**
+     * Gets the total hits (if available).
+     */
+    public function getTotalHits(): ?int
+    {
+        return $this->totalHits;
+    }
+
+    /**
+     * Gets the total hits relation (if available).
+     */
+    public function getTotalHitsRelation(): ?string
+    {
+        return $this->totalHitsRelation;
+    }
+
+    /**
      * Instructs the executor to use a result cache.
      */
     public function useResultCache(?string $cacheKey = null, int $ttl = 0): self
