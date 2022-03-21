@@ -156,7 +156,7 @@ abstract class AbstractDateTimeType extends AbstractType
                     return 'Z';
 
                 case 'P':       // Difference to Greenwich time (GMT) with colon between hours and minutes
-                    return 'ZZ';
+                    return 'XXX';
 
                 case 'c':       // ISO 8601 date
                     return 'yyyy-MM-dd\'T\'HH:mm:ssZ';

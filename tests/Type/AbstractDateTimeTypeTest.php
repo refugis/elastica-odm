@@ -38,6 +38,6 @@ abstract class AbstractDateTimeTypeTest extends TestCase implements TypeTestInte
         $mapping = $type->getMappingDeclaration();
 
         self::assertArrayHasKey('format', $mapping);
-        self::assertEquals('yyyy-MM-dd\'T\'HH:mm:ssZZ', $mapping['format']);
+        self::assertEquals('yyyy-MM-dd\'T\'HH:mm:ssXXX', $mapping['format']);
     }
 }
