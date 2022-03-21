@@ -4,6 +4,7 @@ namespace Tests;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Elastica\Index;
+use Elastica\Query;
 use Elastica\Type;
 use PHPUnit\Framework\TestCase;
 use ProxyManager\Proxy\ProxyInterface;
@@ -330,6 +331,8 @@ class DocumentManagerTest extends TestCase
 
     public function testShouldPersistJoinRelationships(): void
     {
+        self::resetFixtures($this->dm);
+
         $grandParent = new FooGrandParent();
         $grandParent->id = 'grand_parent_1';
 
@@ -376,5 +379,48 @@ class DocumentManagerTest extends TestCase
 
         $child1 = $this->dm->find(FooChild::class, 'child_1');
         self::assertEquals('child_1', $child1->id);
+    }
+
+    public function testParentCouldBeChanged(): void
+    {
+        self::resetFixtures($this->dm);
+
+        $grandParent1 = new FooGrandParent();
+        $grandParent1->id = 'grand_parent_changeable_1';
+
+        $grandParent2 = new FooGrandParent();
+        $grandParent2->id = 'grand_parent_changeable_2';
+
+        $parent = new FooParent();
+        $parent->id = 'parent_1';
+        $parent->fooGrandParent = $grandParent1;
+
+        $this->dm->persist($grandParent1);
+        $this->dm->persist($grandParent2);
+        $this->dm->persist($parent);
+
+        $this->dm->flush();
+        $this->dm->clear();
+
+        $parent = $this->dm->find(FooParent::class, 'parent_1');
+
+        self::assertNotNull($parent);
+        self::assertInstanceOf(FooParent::class, $parent);
+        self::assertEquals('grand_parent_changeable_1', $parent->fooGrandParent->id);
+
+        $parent->fooGrandParent = $grandParent2;
+        $this->dm->flush();
+        $this->dm->clear();
+
+        $idQuery = new Query\Ids(['parent_1']);
+        $q = new Query($idQuery);
+        $parents = $this->dm->getRepository(FooParent::class)
+            ->createSearch()
+            ->setQuery($q)
+            ->execute();
+
+        self::assertCount(1, $parents);
+        self::assertInstanceOf(FooParent::class, $parents[0]);
+        self::assertEquals('grand_parent_changeable_2', $parents[0]->fooGrandParent->id);
     }
 }
