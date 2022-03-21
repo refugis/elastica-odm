@@ -423,4 +423,26 @@ class DocumentManagerTest extends TestCase
         self::assertInstanceOf(FooParent::class, $parents[0]);
         self::assertEquals('grand_parent_changeable_2', $parents[0]->fooGrandParent->id);
     }
+
+    public function testShouldFireMultipleBulkRequestsIfThereAreTooManyOperations(): void
+    {
+        self::resetFixtures($this->dm);
+
+        $this->dm->getCollection(Foo::class)
+            ->deleteByQuery(new Query\MatchAll());
+
+        for ($i = 0; $i < 1024 * 103; ++$i) {
+            $document = new Foo();
+            $document->id = 'big_foo_' . $i;
+            $document->stringField = 'string';
+
+            $this->dm->persist($document);
+        }
+
+        $this->dm->flush();
+        $this->dm->clear();
+
+        $search = $this->dm->getRepository(Foo::class)->createSearch();
+        self::assertEquals(103 * 1024, $search->count());
+    }
 }

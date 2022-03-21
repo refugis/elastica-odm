@@ -36,6 +36,7 @@ use function implode;
 use function in_array;
 use function is_array;
 use function Safe\preg_match;
+use function strlen;
 
 class Collection implements CollectionInterface
 {
@@ -168,41 +169,37 @@ class Collection implements CollectionInterface
      */
     public function bulk(array $operations): Bulk\ResponseSet
     {
-        $body = [];
-        foreach ($operations as $action) {
-            $meta = $action->getMetadata();
-            if ($this->searchable instanceof Type) {
-                $action->setType($this->searchable->getName());
-                if (empty($meta['_index'])) {
-                    $action->setIndex($this->searchable->getIndex()->getName());
-                }
-            } elseif (empty($meta['_index']) && $this->searchable instanceof Index) {
-                $action->setIndex($this->searchable->getName());
-            }
-
-            foreach ($action->toArray() as $data) {
-                $body[] = $data;
-            }
-        }
-
-        $endpoint = new Endpoints\Bulk(new ArrayToJSONSerializer());
-        $endpoint->setBody($body);
-
-        try {
-            $response = $this->getClient()->requestEndpoint($endpoint);
-        } catch (ResponseException $exception) {
-            $response = $exception->getResponse();
-            if ($response->getStatus() === 413) {
-                throw new ODMResponseException($response, 'Server responded with HTTP 413 Payload too large');
-            }
-        }
-
-        $data = $response->getData();
+        $body = '';
+        $serializer = new ArrayToJSONSerializer();
         $bulkResponses = [];
         $exception = null;
+        $startIndex = 0;
 
-        if (isset($data['items']) && is_array($data['items'])) {
+        $sendRequest = function (string $body, int $startIndex) use (&$operations, &$bulkResponses, &$exception): void {
+            if ($body === '') {
+                return;
+            }
+
+            $endpoint = new Endpoints\Bulk(new ArrayToJSONSerializer());
+            $endpoint->setBody($body);
+
+            try {
+                $response = $this->getClient()->requestEndpoint($endpoint);
+            } catch (ResponseException $exception) {
+                $response = $exception->getResponse();
+                if ($response->getStatus() === 413) {
+                    throw new ODMResponseException($response, 'Server responded with HTTP 413 Payload too large');
+                }
+            }
+
+            $data = $response->getData();
+
+            if (! isset($data['items']) || ! is_array($data['items'])) {
+                return;
+            }
+
             foreach ($data['items'] as $key => $item) {
+                $key += $startIndex;
                 if (! isset($operations[$key])) {
                     throw new InvalidException('No response found for action #' . $key);
                 }
@@ -226,19 +223,44 @@ class Collection implements CollectionInterface
 
                 $bulkResponses[] = $bulkResponse;
             }
+        };
+
+        foreach ($operations as $key => $action) {
+            $meta = $action->getMetadata();
+            if ($this->searchable instanceof Type) {
+                $action->setType($this->searchable->getName());
+                if (empty($meta['_index'])) {
+                    $action->setIndex($this->searchable->getIndex()->getName());
+                }
+            } elseif (empty($meta['_index']) && $this->searchable instanceof Index) {
+                $action->setIndex($this->searchable->getName());
+            }
+
+            foreach ($action->toArray() as $data) {
+                $body .= $serializer->serialize($data) . "\n";
+            }
+
+            if (strlen($body) <= 8 * 1024 * 1024) {
+                continue;
+            }
+
+            $sendRequest($body, $startIndex);
+            $startIndex = $key + 1;
+            $body = '';
         }
 
-        $bulkResponseSet = new ResponseSet($response, $bulkResponses);
+        $sendRequest($body, $startIndex);
+        $bulkResponseSet = new ResponseSet(new Response([]), $bulkResponses);
         if ($exception !== null) {
             throw $exception($bulkResponseSet);
         }
 
         if ($bulkResponseSet->hasError()) {
-            throw new ODMResponseException($bulkResponseSet, 'Response has errors: ' . $response->getErrorMessage());
+            throw new ODMResponseException($bulkResponseSet, 'Response has errors: ' . $bulkResponseSet->getErrorMessage());
         }
 
         if ($bulkResponseSet->getStatus() >= 400) {
-            throw new ODMResponseException($bulkResponseSet, 'Response not OK: ' . $response->getErrorMessage());
+            throw new ODMResponseException($bulkResponseSet, 'Response not OK: ' . $bulkResponseSet->getErrorMessage());
         }
 
         return $bulkResponseSet;
