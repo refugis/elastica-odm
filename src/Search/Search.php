@@ -18,6 +18,7 @@ use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use function assert;
 use function is_array;
 use function iterator_to_array;
+use function method_exists;
 
 class Search implements IteratorAggregate
 {
@@ -62,6 +63,16 @@ class Search implements IteratorAggregate
      * Skipped documents.
      */
     private ?int $offset = null;
+
+    /**
+     * Gets the query total hits (estimate, if query is executed)
+     */
+    private ?int $totalHits = null;
+
+    /**
+     * Gets the query total hits creation (if query is executed)
+     */
+    private ?string $totalHitsRelation = null;
 
     /**
      * The document manager which this search is bound.
@@ -115,7 +126,11 @@ class Search implements IteratorAggregate
      */
     public function count(): int
     {
-        return $this->collection->count($this->query);
+        $query = clone $this->query;
+        $query->setSort([]);
+        $query->setSize(0);
+
+        return $this->collection->count($query);
     }
 
     /**
@@ -150,6 +165,11 @@ class Search implements IteratorAggregate
 
         $generator = $this->cacheProfile !== null ? $this->_doExecuteCached($query) : $this->_doExecute($query);
         foreach ($generator as $resultSet) {
+            $this->totalHits = $resultSet->getTotalHits();
+            if (method_exists($resultSet, 'getTotalHitsRelation')) {
+                $this->totalHitsRelation = $resultSet->getTotalHitsRelation();
+            }
+
             yield from $hydrator->hydrateAll($resultSet, $this->documentClass);
         }
     }
