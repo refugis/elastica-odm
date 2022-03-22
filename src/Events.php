@@ -47,4 +47,10 @@ final class Events
      * but before any changes to managed documents have been calculated.
      */
     public const preFlush = 'preFlush';
+
+    /**
+     * The onIndexNotFound event occurs when the DocumentManager#flush() operation is invoked,
+     * and an index does not exist and action.auto_create_index is set to false.
+     */
+    public const onIndexNotFound = 'onIndexNotFound';
 }

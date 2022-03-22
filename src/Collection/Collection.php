@@ -117,7 +117,7 @@ class Collection implements CollectionInterface
         }
 
         if ($response->getStatus() === 404 && $response->getFullError()['type'] === 'index_not_found_exception' ?? null) {
-            throw new IndexNotFoundException($response, 'Index not found: ' . $response->getErrorMessage());
+            throw new IndexNotFoundException($response, $response->getFullError()['index'], 'Index not found: ' . $response->getErrorMessage());
         }
 
         throw new ODMResponseException($response, 'Response not OK: ' . $response->getErrorMessage());
@@ -134,7 +134,7 @@ class Collection implements CollectionInterface
         }
 
         if ($response->getStatus() === 404 && $response->getFullError()['type'] === 'index_not_found_exception' ?? null) {
-            throw new IndexNotFoundException($response, 'Index not found: ' . $response->getErrorMessage());
+            throw new IndexNotFoundException($response, $response->getFullError()['index'], 'Index not found: ' . $response->getErrorMessage());
         }
 
         throw new ODMResponseException($response, 'Response not OK: ' . $response->getErrorMessage());
@@ -211,7 +211,7 @@ class Collection implements CollectionInterface
                 $bulkResponse = new BulkResponse($bulkResponseData, $action, $opType);
                 if (! $bulkResponse->isOk()) {
                     if (($bulkResponseData['status'] ?? null) === 404 && ($bulkResponse->getFullError()['type'] ?? null) === 'index_not_found_exception') {
-                        $exception ??= static fn (Response $r) => new IndexNotFoundException($r, 'Index not found: ' . $bulkResponse->getErrorMessage());
+                        $exception ??= static fn (Response $r) => new IndexNotFoundException($r, $bulkResponse->getFullError()['index'], 'Index not found: ' . $bulkResponse->getErrorMessage());
                     }
 
                     if (($bulkResponseData['status'] ?? null) === 409 && ($bulkResponse->getFullError()['type'] ?? null) === 'version_conflict_engine_exception') {
@@ -312,7 +312,7 @@ class Collection implements CollectionInterface
         $data = $response->getData();
         if (! $response->isOk()) {
             if ($response->getStatus() === 404 && ($response->getFullError()['type'] ?? null) === 'index_not_found_exception') {
-                throw new IndexNotFoundException($response, 'Index not found: ' . $response->getErrorMessage());
+                throw new IndexNotFoundException($response, $response->getFullError()['index'], 'Index not found: ' . $response->getErrorMessage());
             }
 
             throw new ODMResponseException($response, 'Response not OK: ' . $response->getErrorMessage());

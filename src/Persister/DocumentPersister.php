@@ -14,6 +14,8 @@ use Elastica\Script\Script;
 use Refugis\ODM\Elastica\Annotation\Version;
 use Refugis\ODM\Elastica\Collection\CollectionInterface;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
+use Refugis\ODM\Elastica\Events;
+use Refugis\ODM\Elastica\Events\IndexNotFoundEventArgs;
 use Refugis\ODM\Elastica\Exception\ConversionFailedException;
 use Refugis\ODM\Elastica\Exception\IndexNotFoundException;
 use Refugis\ODM\Elastica\Exception\RuntimeException;
@@ -184,14 +186,27 @@ class DocumentPersister
         try {
             $responseSet = $this->collection->bulk($operations)->getBulkResponses();
         } catch (IndexNotFoundException $e) {
-            $schemaGenerator = new SchemaGenerator($this->dm);
-            try {
-                $schema = $schemaGenerator->generateSchema()->getCollectionByClass($this->class->name);
-            } catch (RuntimeException $_) { // phpcs:ignore Squiz.NamingConventions.ValidVariableName.NotCamelCaps
+            $evm = $this->dm->getEventManager();
+            $event = new IndexNotFoundEventArgs($this->dm, $e->getIndexName(), $e->getResponse());
+
+            if (! $evm->hasListeners(Events::onIndexNotFound)) {
+                $schemaGenerator = new SchemaGenerator($this->dm);
+                try {
+                    $schema = $schemaGenerator->generateSchema()->getCollectionByClass($this->class->name);
+                } catch (RuntimeException $_) { // phpcs:ignore Squiz.NamingConventions.ValidVariableName.NotCamelCaps
+                    throw $e;
+                }
+
+                $this->collection->updateMapping($schema->getMapping());
+                $event->markForRetry();
+            } else {
+                $evm->dispatchEvent(Events::onIndexNotFound, $event);
+            }
+
+            if (! $event->shouldRetry()) {
                 throw $e;
             }
 
-            $this->collection->updateMapping($schema->getMapping());
             $responseSet = $this->collection->bulk($operations)->getBulkResponses();
         }
 
@@ -249,14 +264,26 @@ class DocumentPersister
         try {
             $response = $this->collection->create($id, $body, $options);
         } catch (IndexNotFoundException $e) {
-            $schemaGenerator = new SchemaGenerator($this->dm);
-            try {
-                $schema = $schemaGenerator->generateSchema()->getCollectionByName($index ?? $class->collectionName);
-            } catch (RuntimeException $_) { // phpcs:ignore Squiz.NamingConventions.ValidVariableName.NotCamelCaps
+            $evm = $this->dm->getEventManager();
+            $event = new IndexNotFoundEventArgs($this->dm, $e->getIndexName(), $e->getResponse());
+
+            if (! $evm->hasListeners(Events::onIndexNotFound)) {
+                $schemaGenerator = new SchemaGenerator($this->dm);
+                try {
+                    $schema = $schemaGenerator->generateSchema()->getCollectionByName($index ?? $class->collectionName);
+                } catch (RuntimeException $_) { // phpcs:ignore Squiz.NamingConventions.ValidVariableName.NotCamelCaps
+                    throw $e;
+                }
+
+                $this->collection->updateMapping($schema->getMapping());
+            } else {
+                $evm->dispatchEvent(Events::onIndexNotFound, $event);
+            }
+
+            if (! $event->shouldRetry()) {
                 throw $e;
             }
 
-            $this->collection->updateMapping($schema->getMapping());
             $response = $this->collection->create($id, $body, $options);
         }
 
