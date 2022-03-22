@@ -305,7 +305,9 @@ class DocumentPersister
             $id = $class->getSingleIdentifier($document);
             $data = $this->prepareUpdateData($document);
 
-            $routing = $this->getRouting($class, $document);
+            $platform = $this->dm->getPlatform();
+            $routing = $platform->supportsRoutingKeyUpdate() ? $this->getRouting($class, $document) : null;
+
             $seqNo = $class->getSequenceNumber($document);
             $primaryTerm = $class->getPrimaryTerm($document);
             $index = $class->getIndexName($document);

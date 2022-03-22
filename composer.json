@@ -41,6 +41,7 @@
         "thecodingmachine/safe": "^1.0"
     },
     "require-dev": {
+        "aws/aws-sdk-php": "^3.0",
         "phpspec/prophecy-phpunit": "^2.0",
         "phpunit/phpunit": "^9.0",
         "roave/security-advisories": "dev-master",

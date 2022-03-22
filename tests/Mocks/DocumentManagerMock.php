@@ -2,6 +2,7 @@
 
 namespace Tests\Mocks;
 
+use Composer\InstalledVersions;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\EventManager;
 use Kcs\Metadata\Loader\Processor\ProcessorFactory;
@@ -13,6 +14,8 @@ use Refugis\ODM\Elastica\Metadata\Loader\AnnotationLoader;
 use Refugis\ODM\Elastica\Metadata\Loader\AttributesLoader;
 use Refugis\ODM\Elastica\Metadata\Loader\ChainLoader;
 use Refugis\ODM\Elastica\Metadata\MetadataFactory;
+use Refugis\ODM\Elastica\Platform\ES6Platform;
+use Refugis\ODM\Elastica\Platform\Platform;
 use Refugis\ODM\Elastica\Type\StringType;
 use Refugis\ODM\Elastica\UnitOfWork;
 
@@ -68,6 +71,9 @@ class DocumentManagerMock extends DocumentManager
             $config->setProxyFactory(new LazyLoadingGhostFactory());
             $config->setMetadataFactory(new MetadataFactory($loader));
             $config->getTypeManager()->addType(new StringType());
+
+            $platform = version_compare(InstalledVersions::getVersion('ruflin/elastica'), '7.0', '<') ? new ES6Platform() : new Platform();
+            $config->setPlatform($platform);
         }
 
         if (null === $eventManager) {

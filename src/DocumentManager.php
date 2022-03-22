@@ -18,6 +18,7 @@ use Refugis\ODM\Elastica\Hydrator\HydratorInterface;
 use Refugis\ODM\Elastica\Hydrator\Internal\ProxyInstantiator;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Persister\Hints;
+use Refugis\ODM\Elastica\Platform\PlatformInterface;
 use Refugis\ODM\Elastica\Repository\DocumentRepositoryInterface;
 use Refugis\ODM\Elastica\Repository\RepositoryFactoryInterface;
 use Refugis\ODM\Elastica\Search\Search;
@@ -38,6 +39,7 @@ class DocumentManager implements DocumentManagerInterface
     private TypeManager $typeManager;
     private UnitOfWork $unitOfWork;
     private EventManager $eventManager;
+    private PlatformInterface $platform;
     private RepositoryFactoryInterface $repositoryFactory;
     private ?CacheItemPoolInterface $resultCache;
 
@@ -49,6 +51,7 @@ class DocumentManager implements DocumentManagerInterface
         $this->metadataFactory = $configuration->getMetadataFactory();
         $this->proxyFactory = $configuration->getProxyFactory();
         $this->typeManager = $configuration->getTypeManager();
+        $this->platform = $configuration->getPlatform();
         $this->unitOfWork = new UnitOfWork($this);
         $this->repositoryFactory = $configuration->getRepositoryFactory();
         $this->resultCache = $configuration->getResultCache();
@@ -225,6 +228,11 @@ class DocumentManager implements DocumentManagerInterface
     public function getEventManager(): EventManager
     {
         return $this->eventManager;
+    }
+
+    public function getPlatform(): PlatformInterface
+    {
+        return $this->platform;
     }
 
     public function getUnitOfWork(): UnitOfWork

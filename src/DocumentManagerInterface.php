@@ -11,6 +11,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Refugis\ODM\Elastica\Collection\CollectionInterface;
 use Refugis\ODM\Elastica\Collection\DatabaseInterface;
 use Refugis\ODM\Elastica\Hydrator\HydratorInterface;
+use Refugis\ODM\Elastica\Platform\PlatformInterface;
 use Refugis\ODM\Elastica\Search\Search;
 use Refugis\ODM\Elastica\Type\TypeManager;
 
@@ -51,6 +52,11 @@ interface DocumentManagerInterface extends ObjectManager
      * Gets the event manager used by this document manager.
      */
     public function getEventManager(): EventManager;
+
+    /**
+     * Gets the platform linked to this document manager.
+     */
+    public function getPlatform(): PlatformInterface;
 
     /**
      * Gets the document collection for a given object class.

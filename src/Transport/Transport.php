@@ -35,16 +35,18 @@ use const JSON_UNESCAPED_UNICODE;
 
 class Transport extends AwsAuthV4
 {
+    private const DEFAULT_OPTIONS = [
+        'aws_auth_v4' => false,
+        'insecure' => false,
+    ];
+
     /** @var array<string, mixed> */
     private array $options;
 
     /**
      * @param array<string, mixed> $options
      */
-    public function __construct(array $options = [
-        'aws_auth_v4' => false,
-        'insecure' => false,
-    ])
+    public function __construct(array $options = self::DEFAULT_OPTIONS)
     {
         parent::__construct();
 

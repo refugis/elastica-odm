@@ -9,6 +9,7 @@ use ProxyManager\Factory\LazyLoadingGhostFactory;
 use Psr\Cache\CacheItemPoolInterface;
 use ReflectionClass;
 use Refugis\ODM\Elastica\Exception\InvalidDocumentRepositoryException;
+use Refugis\ODM\Elastica\Platform\PlatformInterface;
 use Refugis\ODM\Elastica\Repository\DefaultRepositoryFactory;
 use Refugis\ODM\Elastica\Repository\DocumentRepository;
 use Refugis\ODM\Elastica\Repository\DocumentRepositoryInterface;
@@ -31,6 +32,11 @@ final class Configuration
      * The result cache implementation.
      */
     private ?CacheItemPoolInterface $resultCache = null;
+
+    /**
+     * ES platform.
+     */
+    private PlatformInterface $platform;
 
     /**
      * The type manager.
@@ -67,6 +73,16 @@ final class Configuration
         $this->metadataFactory = $metadataFactory;
 
         return $this;
+    }
+
+    /**
+     * Sets the platform service.
+     *
+     * @required
+     */
+    public function setPlatform(PlatformInterface $platform): void
+    {
+        $this->platform = $platform;
     }
 
     /**
@@ -138,6 +154,14 @@ final class Configuration
     public function getResultCache(): ?CacheItemPoolInterface
     {
         return $this->resultCache;
+    }
+
+    /**
+     * Gets the injected platform service.
+     */
+    public function getPlatform(): PlatformInterface
+    {
+        return $this->platform;
     }
 
     /**

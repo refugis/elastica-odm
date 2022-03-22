@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica;
 
+use Composer\InstalledVersions;
 use Elastica\Client;
 use ProxyManager\Factory\LazyLoadingGhostFactory;
 use Psr\Log\LoggerInterface;
@@ -11,12 +12,17 @@ use Refugis\ODM\Elastica\Collection\Database;
 use Refugis\ODM\Elastica\Exception\InvalidArgumentException;
 use Refugis\ODM\Elastica\Metadata\Loader;
 use Refugis\ODM\Elastica\Metadata\MetadataFactory;
+use Refugis\ODM\Elastica\Platform\ES6Platform;
+use Refugis\ODM\Elastica\Platform\Platform;
+use Refugis\ODM\Elastica\Platform\PlatformInterface;
 use Refugis\ODM\Elastica\Transport\Transport;
 use Refugis\ODM\Elastica\Type\TypeInterface;
 use Refugis\ODM\Elastica\Type\TypeManager;
 
 use function array_filter;
+use function assert;
 use function parse_url;
+use function version_compare;
 
 final class Builder
 {
@@ -27,6 +33,7 @@ final class Builder
     private ?LoggerInterface $logger = null;
     private ?LazyLoadingGhostFactory $proxyFactory = null;
     private ?MetadataFactory $metadataFactory = null;
+    private ?PlatformInterface $platform = null;
     private TypeManager $typeManager;
     private bool $addDefaultTypes = true;
     private ?Loader\LoaderInterface $metadataLoader = null;
@@ -85,6 +92,13 @@ final class Builder
     public function setMetadataFactory(MetadataFactory $metadataFactory): self
     {
         $this->metadataFactory = $metadataFactory;
+
+        return $this;
+    }
+
+    public function setPlatform(PlatformInterface $platform): self
+    {
+        $this->platform = $platform;
 
         return $this;
     }
@@ -176,6 +190,16 @@ final class Builder
         $configuration->setMetadataFactory($this->metadataFactory);
         $configuration->setProxyFactory($this->proxyFactory);
         $configuration->setTypeManager($this->typeManager);
+
+        $platform = $this->platform;
+        if ($platform === null) {
+            $version = InstalledVersions::getVersion('ruflin/elastica');
+            assert($version !== null);
+
+            $platform = version_compare($version, '7.0', '<') ? new ES6Platform() : new Platform();
+        }
+
+        $configuration->setPlatform($platform);
 
         return new DocumentManager(new Database($this->client), $configuration);
     }
