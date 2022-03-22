@@ -58,6 +58,11 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     public string $collectionName;
 
     /**
+     * Whether the collection name represents multiple indexes/aliases.
+     */
+    public bool $multiIndex;
+
+    /**
      * The identifier field name.
      */
     public ?FieldMetadata $identifier;
@@ -234,6 +239,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
 
         $this->customRepositoryClassName ??= $metadata->customRepositoryClassName;
         $this->collectionName ??= $metadata->collectionName;
+        $this->multiIndex ??= $metadata->multiIndex;
         $this->identifier ??= $metadata->identifier;
         $this->idGeneratorType ??= $metadata->idGeneratorType;
 

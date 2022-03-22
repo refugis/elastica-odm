@@ -16,6 +16,7 @@ use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use function class_exists;
 use function explode;
 use function Safe\sprintf;
+use function str_contains;
 use function strpos;
 use function trigger_error;
 
@@ -36,6 +37,7 @@ class DocumentProcessor implements ProcessorInterface
     {
         $metadata->document = true;
         $metadata->collectionName = $subject->collection ?? $this->calculateType($metadata->getReflectionClass()->getShortName());
+        $metadata->multiIndex = str_contains($metadata->collectionName, '*');
         $metadata->isReadOnly = $subject->readOnly ?? false;
         $metadata->refreshOnCommit = $subject->refreshOnFlush ?? true;
 

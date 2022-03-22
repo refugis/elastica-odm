@@ -32,6 +32,7 @@ use function assert;
 use function count;
 use function implode;
 use function is_array;
+use function Safe\sprintf;
 use function str_replace;
 
 class DocumentPersister
@@ -58,7 +59,7 @@ class DocumentPersister
      *
      * @param array<string, mixed> $criteria query criteria
      * @param array<string, mixed> $hints
-     * @param object $document The document to load data into. If not given, a new document will be created.
+     * @param object|null $document The document to load data into. If not given, a new document will be created.
      *
      * @return object|null the loaded and managed document instance or null if no document was found
      */
@@ -84,7 +85,8 @@ class DocumentPersister
             return $document;
         }
 
-        return $this->dm->newHydrator(HydratorInterface::HYDRATE_OBJECT)
+        return $this->dm
+            ->newHydrator(HydratorInterface::HYDRATE_OBJECT)
             ->hydrateOne($esDoc, $this->class->name);
     }
 
@@ -150,9 +152,18 @@ class DocumentPersister
             $body = $this->prepareUpdateData($document)['body'];
             $routing = $this->getRouting($class, $document);
 
+            $index = $class->getIndexName($document);
+            if ($index === null && $class->multiIndex) {
+                throw new RuntimeException(sprintf('Cannot insert document (%s): collection is multi index and document does not specify an index name for write operation.', $class->name));
+            }
+
             $doc = new Document($id, $body);
             $action = new Bulk\Action\CreateDocument($doc);
             $metadata = [];
+            if ($index !== null) {
+                $metadata['_index'] = $index;
+            }
+
             if ($routing !== null) {
                 $metadata['routing'] = $routing;
             }
@@ -191,23 +202,7 @@ class DocumentPersister
 
             $class = $this->dm->getClassMetadata(ClassUtil::getClass($document));
             assert($class instanceof DocumentMetadata);
-            foreach ($class->attributesMetadata as $field) {
-                if (! $field instanceof FieldMetadata) {
-                    continue;
-                }
-
-                if ($field->indexName) {
-                    $field->setValue($document, $data['_index'] ?? null);
-                } elseif ($field->typeName) {
-                    $field->setValue($document, $data['_type'] ?? null);
-                } elseif ($field->seqNo) {
-                    $field->setValue($document, $data['_seq_no'] ?? null);
-                } elseif ($field->primaryTerm) {
-                    $field->setValue($document, $data['_primary_term'] ?? null);
-                } elseif ($field->version) {
-                    $field->setValue($document, $data['_version'] ?? null);
-                }
-            }
+            self::processDocumentMetadata($class, $document, $data);
 
             $idGenerator = $this->dm->getUnitOfWork()->getIdGenerator($class->idGeneratorType);
             $postIdGenerator = $idGenerator->isPostInsertGenerator();
@@ -238,6 +233,9 @@ class DocumentPersister
         $body = $this->prepareUpdateData($document)['body'];
         $routing = $this->getRouting($class, $document);
         $index = $class->getIndexName($document);
+        if ($index === null && $class->multiIndex) {
+            throw new RuntimeException(sprintf('Cannot insert document (%s): collection is multi index and document does not specify an index name for write operation.', $class->name));
+        }
 
         $options = ['routing' => $routing, 'index' => $index];
         if ($class->versionType === Version::EXTERNAL || $class->versionType === Version::EXTERNAL_GTE) {
@@ -263,24 +261,7 @@ class DocumentPersister
         }
 
         $data = $response->getData();
-
-        foreach ($class->attributesMetadata as $field) {
-            if (! $field instanceof FieldMetadata) {
-                continue;
-            }
-
-            if ($field->indexName) {
-                $field->setValue($document, $data['_index'] ?? null);
-            } elseif ($field->typeName) {
-                $field->setValue($document, $data['_type'] ?? null);
-            } elseif ($field->seqNo) {
-                $field->setValue($document, $data['_seq_no'] ?? null);
-            } elseif ($field->primaryTerm) {
-                $field->setValue($document, $data['_primary_term'] ?? null);
-            } elseif ($field->version) {
-                $field->setValue($document, $data['_version'] ?? null);
-            }
-        }
+        self::processDocumentMetadata($class, $document, $data);
 
         $postInsertId = null;
         if ($postIdGenerator) {
@@ -311,6 +292,9 @@ class DocumentPersister
             $seqNo = $class->getSequenceNumber($document);
             $primaryTerm = $class->getPrimaryTerm($document);
             $index = $class->getIndexName($document);
+            if ($index === null && $class->multiIndex) {
+                throw new RuntimeException(sprintf('Cannot update document with ID "%s": collection is multi index and document does not specify an index name for write operation.', $id));
+            }
 
             $body = array_filter([
                 'doc' => $data['body'],
@@ -492,6 +476,30 @@ class DocumentPersister
             'body' => empty($body) ? new ArrayObject() : $body,
             'script' => implode('; ', $script),
         ];
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private static function processDocumentMetadata(DocumentMetadata $class, object $document, array $data): void
+    {
+        foreach ($class->attributesMetadata as $field) {
+            if (! $field instanceof FieldMetadata) {
+                continue;
+            }
+
+            if ($field->indexName) {
+                $field->setValue($document, $data['_index'] ?? null);
+            } elseif ($field->typeName) {
+                $field->setValue($document, $data['_type'] ?? null);
+            } elseif ($field->seqNo) {
+                $field->setValue($document, $data['_seq_no'] ?? null);
+            } elseif ($field->primaryTerm) {
+                $field->setValue($document, $data['_primary_term'] ?? null);
+            } elseif ($field->version) {
+                $field->setValue($document, $data['_version'] ?? null);
+            }
+        }
     }
 
     /**
