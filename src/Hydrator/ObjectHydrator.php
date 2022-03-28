@@ -9,7 +9,7 @@ use Elastica\Document;
 use Elastica\Exception\InvalidException;
 use Elastica\ResultSet;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
-use Refugis\ODM\Elastica\Exception\ResponseException;
+use Refugis\ODM\Elastica\Exception\BadResponseException;
 use Refugis\ODM\Elastica\Hydrator\Internal\ProxyInstantiator;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
@@ -35,7 +35,7 @@ class ObjectHydrator implements HydratorInterface
     {
         $response = $resultSet->getResponse();
         if (! $response->isOk()) {
-            throw new ResponseException($response, 'Response not OK: ' . $response->getErrorMessage());
+            throw new BadResponseException($response);
         }
 
         if ($resultSet->count() === 0) {

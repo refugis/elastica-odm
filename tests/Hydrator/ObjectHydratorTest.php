@@ -85,10 +85,11 @@ class ObjectHydratorTest extends TestCase
         $resultSet->count()->willReturn(0);
 
         $response->isOk()->willReturn(false);
+        $response->getStatus()->willReturn(400);
         $response->getErrorMessage()->willReturn('Test error');
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Response not OK: Test error');
+        $this->expectExceptionMessage('Response not OK [400 Bad Request]: Test error');
         $this->hydrator->hydrateAll($resultSet->reveal(), TestDocument::class);
     }
 

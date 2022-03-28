@@ -21,12 +21,12 @@ use Elasticsearch\Endpoints;
 use Elasticsearch\Serializers\ArrayToJSONSerializer;
 use Refugis\ODM\Elastica\Annotation\Version;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
+use Refugis\ODM\Elastica\Exception\BadResponseException;
 use Refugis\ODM\Elastica\Exception\CannotDropAnAliasException;
 use Refugis\ODM\Elastica\Exception\IndexNotFoundException;
 use Refugis\ODM\Elastica\Exception\ResponseException as ODMResponseException;
 use Refugis\ODM\Elastica\Exception\VersionConflictException;
 use Refugis\ODM\Elastica\Search\Search;
-use RuntimeException;
 
 use function array_filter;
 use function array_key_first;
@@ -120,7 +120,7 @@ class Collection implements CollectionInterface
             throw new IndexNotFoundException($response, $response->getFullError()['index'], 'Index not found: ' . $response->getErrorMessage());
         }
 
-        throw new ODMResponseException($response, 'Response not OK: ' . $response->getErrorMessage());
+        throw new BadResponseException($response);
     }
 
     public function search(Query $query): ResultSet
@@ -137,7 +137,7 @@ class Collection implements CollectionInterface
             throw new IndexNotFoundException($response, $response->getFullError()['index'], 'Index not found: ' . $response->getErrorMessage());
         }
 
-        throw new ODMResponseException($response, 'Response not OK: ' . $response->getErrorMessage());
+        throw new BadResponseException($response);
     }
 
     public function createSearch(DocumentManagerInterface $documentManager, Query $query): Search
@@ -211,14 +211,16 @@ class Collection implements CollectionInterface
                 $bulkResponse = new BulkResponse($bulkResponseData, $action, $opType);
                 if (! $bulkResponse->isOk()) {
                     if (($bulkResponseData['status'] ?? null) === 404 && ($bulkResponse->getFullError()['type'] ?? null) === 'index_not_found_exception') {
-                        $exception ??= static fn (Response $r) => new IndexNotFoundException($r, $bulkResponse->getFullError()['index'], 'Index not found: ' . $bulkResponse->getErrorMessage());
+                        $exception = static fn (Response $r) => new IndexNotFoundException($r, $bulkResponse->getFullError()['index'], 'Index not found: ' . $bulkResponse->getErrorMessage());
                     }
 
                     if (($bulkResponseData['status'] ?? null) === 409 && ($bulkResponse->getFullError()['type'] ?? null) === 'version_conflict_engine_exception') {
                         $exception ??= static fn (Response $r) => new VersionConflictException($r, 'Version conflict: ' . $bulkResponse->getErrorMessage());
                     }
 
-                    $exception ??= static fn (Response $r) => new ODMResponseException($r, 'Response not OK: ' . $bulkResponse->getErrorMessage());
+                    $exception ??= static function (Response $r): void {
+                        throw new BadResponseException($r);
+                    };
                 }
 
                 $bulkResponses[] = $bulkResponse;
@@ -260,7 +262,7 @@ class Collection implements CollectionInterface
         }
 
         if ($bulkResponseSet->getStatus() >= 400) {
-            throw new ODMResponseException($bulkResponseSet, 'Response not OK: ' . $bulkResponseSet->getErrorMessage());
+            throw new BadResponseException($bulkResponseSet);
         }
 
         return $bulkResponseSet;
@@ -315,7 +317,7 @@ class Collection implements CollectionInterface
                 throw new IndexNotFoundException($response, $response->getFullError()['index'], 'Index not found: ' . $response->getErrorMessage());
             }
 
-            throw new ODMResponseException($response, 'Response not OK: ' . $response->getErrorMessage());
+            throw new BadResponseException($response);
         }
 
         $this->_lastInsertId = $data['_id'] ?? null;
@@ -389,7 +391,7 @@ class Collection implements CollectionInterface
                 throw new VersionConflictException($response, 'Version conflict: ' . $response->getErrorMessage());
             }
 
-            throw new ODMResponseException($response, 'Response not OK: ' . $response->getErrorMessage());
+            throw new BadResponseException($response);
         }
     }
 
@@ -420,7 +422,7 @@ class Collection implements CollectionInterface
         }
 
         if (! $response->isOk()) {
-            throw new RuntimeException('Response not OK: ' . $response->getErrorMessage());
+            throw new BadResponseException($response);
         }
     }
 
@@ -442,7 +444,7 @@ class Collection implements CollectionInterface
         }
 
         if (! $response->isOk()) {
-            throw new RuntimeException('Response not OK: ' . $response->getErrorMessage());
+            throw new BadResponseException($response);
         }
     }
 
@@ -477,7 +479,7 @@ class Collection implements CollectionInterface
         }
 
         if (! $response->isOk()) {
-            throw new RuntimeException('Response not OK: ' . $response->getErrorMessage());
+            throw new BadResponseException($response);
         }
     }
 
