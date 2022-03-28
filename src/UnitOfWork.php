@@ -1161,12 +1161,20 @@ final class UnitOfWork
 
     private function dispatchOnFlush(): void
     {
-        // @todo
+        if (! $this->evm->hasListeners(Events::postFlush)) {
+            return;
+        }
+
+        $this->evm->dispatchEvent(Events::postFlush, new Events\PostFlushEventArgs($this->manager));
     }
 
     private function dispatchPostFlush(): void
     {
-        // @todo
+        if (! $this->evm->hasListeners(Events::postFlush)) {
+            return;
+        }
+
+        $this->evm->dispatchEvent(Events::postFlush, new Events\PostFlushEventArgs($this->manager));
     }
 
     private function executeInserts(string $className): void
