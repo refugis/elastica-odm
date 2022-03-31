@@ -12,8 +12,8 @@ use Refugis\ODM\Elastica\Exception\ConversionFailedException;
 use function assert;
 use function preg_replace_callback;
 use function Safe\preg_match;
+use function Safe\sprintf;
 use function Safe\substr;
-use function sprintf;
 
 abstract class AbstractDateTimeType extends AbstractType
 {
@@ -79,7 +79,7 @@ abstract class AbstractDateTimeType extends AbstractType
             return 'epoch_second';
         }
 
-        return preg_replace_callback('/(\\\\[a-z0-9]|.)/i', static function ($match): string {
+        $result = preg_replace_callback('/(\\\\[a-z0-9]|.)/i', static function ($match): string {
             $token = $match[1];
             switch ($token) {
                 case 'd':       // Day of the month, 2 digits with leading zeros
@@ -186,5 +186,9 @@ abstract class AbstractDateTimeType extends AbstractType
                     return $token;
             }
         }, $format);
+
+        assert($result !== null);
+
+        return $result;
     }
 }

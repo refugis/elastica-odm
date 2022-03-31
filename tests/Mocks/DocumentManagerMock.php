@@ -5,14 +5,11 @@ namespace Tests\Mocks;
 use Composer\InstalledVersions;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\EventManager;
-use Kcs\Metadata\Loader\Processor\ProcessorFactory;
 use ProxyManager\Factory\LazyLoadingGhostFactory;
 use Refugis\ODM\Elastica\Collection\DatabaseInterface;
 use Refugis\ODM\Elastica\Configuration;
 use Refugis\ODM\Elastica\DocumentManager;
 use Refugis\ODM\Elastica\Metadata\Loader\AnnotationLoader;
-use Refugis\ODM\Elastica\Metadata\Loader\AttributesLoader;
-use Refugis\ODM\Elastica\Metadata\Loader\ChainLoader;
 use Refugis\ODM\Elastica\Metadata\MetadataFactory;
 use Refugis\ODM\Elastica\Platform\ES6Platform;
 use Refugis\ODM\Elastica\Platform\Platform;
@@ -50,10 +47,7 @@ class DocumentManagerMock extends DocumentManager
         $this->uowMock = $uowMock;
     }
 
-    /**
-     * @param LazyLoadingGhostFactory|null $proxyFactoryMock
-     */
-    public function setProxyFactory($proxyFactoryMock): void
+    public function setProxyFactory(?LazyLoadingGhostFactory $proxyFactoryMock): void
     {
         $this->proxyFactoryMock = $proxyFactoryMock;
     }
@@ -61,7 +55,7 @@ class DocumentManagerMock extends DocumentManager
     /**
      * Mock factory method to create a DocumentManager.
      */
-    public static function create(DatabaseInterface $database, Configuration $config = null, EventManager $eventManager = null)
+    public static function create(DatabaseInterface $database, Configuration $config = null, EventManager $eventManager = null): self
     {
         if (null === $config) {
             $loader = new AnnotationLoader(AnnotationLoader::createProcessorFactory(), __DIR__.'/../Fixtures/Document');

@@ -17,7 +17,7 @@ use function array_search;
 use function assert;
 use function class_exists;
 use function is_array;
-use function sprintf;
+use function Safe\sprintf;
 
 final class MappingGenerator
 {
@@ -47,6 +47,8 @@ final class MappingGenerator
         foreach ($class->getAttributesMetadata() as $field) {
             if ($field instanceof EmbeddedMetadata) {
                 $embeddedClass = $this->metadataFactory->getMetadataFor($field->targetClass);
+                assert($embeddedClass instanceof DocumentMetadata);
+
                 if ($field->enabled) {
                     $mapping = ['type' => 'nested'];
                 } else {
@@ -86,6 +88,9 @@ final class MappingGenerator
         }
 
         if ($class->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_PARENT_CHILD) {
+            assert($class->joinRelationMap !== null);
+            assert($class->discriminatorMap !== null);
+
             $relationsMap = $class->joinRelationMap;
             $discriminatorMap = $class->discriminatorMap;
 
@@ -93,6 +98,8 @@ final class MappingGenerator
             $processLevel = static function (array &$result, array $map, ?string $parent = null) use (&$processLevel, &$discriminatorMap): void {
                 foreach ($map as $key => $value) {
                     $val = array_search($key, $discriminatorMap, true);
+                    assert($val !== false);
+
                     if ($parent === null) {
                         $result[$val] = [];
                     } else {

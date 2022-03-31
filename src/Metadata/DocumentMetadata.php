@@ -21,6 +21,10 @@ use function reset;
 use function Safe\sort;
 use function Safe\sprintf;
 
+/**
+ * @template T of object
+ * @implements ClassMetadataInterface<T>
+ */
 final class DocumentMetadata extends ClassMetadata implements ClassMetadataInterface
 {
     public const GENERATOR_TYPE_NONE = 0;
@@ -405,7 +409,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
         return reset($id);
     }
 
-    public function setIdentifierValue(object $object, string $value): void
+    public function setIdentifierValue(object $object, ?string $value): void
     {
         $this->identifier->setValue($object, $value);
     }

@@ -47,6 +47,12 @@ abstract class AbstractRepositoryFactory implements RepositoryFactoryInterface
 
     /**
      * Create a new repository instance for a document class.
+     *
+     * @param class-string<T> $documentName
+     *
+     * @return DocumentRepositoryInterface<T>
+     *
+     * @template T of object
      */
     protected function createRepository(DocumentManagerInterface $documentManager, string $documentName): DocumentRepositoryInterface
     {
@@ -60,6 +66,13 @@ abstract class AbstractRepositoryFactory implements RepositoryFactoryInterface
 
     /**
      * Instantiates requested repository.
+     *
+     * @param class-string<T> $repositoryClassName
+     *
+     * @return T
+     *
+     * @template D of object
+     * @template T of DocumentRepositoryInterface<D>
      */
     abstract protected function instantiateRepository(
         string $repositoryClassName,

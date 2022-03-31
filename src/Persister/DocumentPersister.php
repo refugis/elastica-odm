@@ -37,6 +37,9 @@ use function is_array;
 use function Safe\sprintf;
 use function str_replace;
 
+/**
+ * @template T of object
+ */
 class DocumentPersister
 {
     private DocumentManagerInterface $dm;

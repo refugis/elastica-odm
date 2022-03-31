@@ -13,7 +13,7 @@ use Refugis\ODM\Elastica\Search\Search;
 use Refugis\ODM\Elastica\UnitOfWork;
 
 /**
- * @template T
+ * @template T of object
  * @implements DocumentRepositoryInterface<T>
  */
 class DocumentRepository implements DocumentRepositoryInterface
@@ -35,6 +35,8 @@ class DocumentRepository implements DocumentRepositoryInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return T|null
      */
     public function find($id): ?object
     {
@@ -43,6 +45,8 @@ class DocumentRepository implements DocumentRepositoryInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return T[]
      */
     public function findAll(): array
     {
@@ -51,6 +55,8 @@ class DocumentRepository implements DocumentRepositoryInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return T[]
      */
     public function findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null): array
     {
@@ -59,12 +65,17 @@ class DocumentRepository implements DocumentRepositoryInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return T|null
      */
     public function findOneBy(array $criteria): ?object
     {
         return $this->getDocumentPersister()->load($criteria);
     }
 
+    /**
+     * @return class-string<T>
+     */
     public function getClassName(): string
     {
         return $this->documentClass;
@@ -78,6 +89,9 @@ class DocumentRepository implements DocumentRepositoryInterface
         // TODO: Implement matching() method.
     }
 
+    /**
+     * @return Search<T>
+     */
     public function createSearch(): Search
     {
         return $this->dm->createSearch($this->documentClass);
@@ -85,6 +99,8 @@ class DocumentRepository implements DocumentRepositoryInterface
 
     /**
      * Gets the document persister for this document class.
+     *
+     * @return DocumentPersister<T>
      */
     protected function getDocumentPersister(): DocumentPersister
     {

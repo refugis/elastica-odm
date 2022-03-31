@@ -92,7 +92,7 @@ class Transport extends AwsAuthV4
         $response = new Response($responseBody, $res->getStatusCode());
         $response->setQueryTime($end - $start);
         if ($connection->hasConfig('bigintConversion')) {
-            $response->setJsonBigintConversion($connection->getConfig('bigintConversion'));
+            $response->setJsonBigintConversion((bool) $connection->getConfig('bigintConversion'));
         }
 
         $response->setTransferInfo(
@@ -122,7 +122,7 @@ class Transport extends AwsAuthV4
             if (method_exists(Utils::class, 'chooseHandler')) {
                 $stack = HandlerStack::create(Utils::chooseHandler());
             } else {
-                $stack = HandlerStack::create(GuzzleHttp\choose_handler());
+                $stack = HandlerStack::create(GuzzleHttp\choose_handler()); /** @phpstan-ignore-line */
             }
 
             if ($this->options['aws_auth_v4'] ?? false) {
@@ -149,7 +149,7 @@ class Transport extends AwsAuthV4
         );
 
         $data = $request->getData();
-        if (! empty($data) || $data === '0') {
+        if (! empty($data) || $data === '0') { /** @phpstan-ignore-line */
             if ($req->getMethod() === Request::GET) {
                 $req = $req->withMethod(Request::POST);
             }
@@ -211,8 +211,11 @@ class Transport extends AwsAuthV4
             $data = JSON::stringify($data, JSON_UNESCAPED_UNICODE);
         }
 
-        return class_exists(Psr7\Utils::class)
-            ? Psr7\Utils::streamFor($data)
-            : Psr7\stream_for($data);
+        if (class_exists(Psr7\Utils::class)) {
+            return Psr7\Utils::streamFor($data);
+        }
+
+        /** @phpstan-ignore-next-line */
+        return Psr7\stream_for($data);
     }
 }

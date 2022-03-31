@@ -41,6 +41,7 @@ use function assert;
 use function get_class;
 use function in_array;
 use function is_array;
+use function is_object;
 use function method_exists;
 use function spl_object_id;
 
@@ -54,7 +55,7 @@ final class UnitOfWork
     /**
      * Map documents by identifiers.
      *
-     * @var array<string, array<array-key, object>>
+     * @var array<class-string, array<array-key, object>>
      */
     private array $identityMap = [];
 
@@ -129,7 +130,7 @@ final class UnitOfWork
      * Map of read-only document.
      * Keys are the object hash.
      *
-     * @var array<array-key, object>
+     * @var array<array-key, bool>
      */
     private array $readOnlyObjects = [];
 
@@ -179,6 +180,12 @@ final class UnitOfWork
 
     /**
      * Gets the document persister for a given document class.
+     *
+     * @param class-string<T> $documentClass
+     *
+     * @return DocumentPersister<T>
+     *
+     * @template T of object
      */
     public function getDocumentPersister(string $documentClass): DocumentPersister
     {
@@ -374,6 +381,7 @@ final class UnitOfWork
                         continue;
                     }
 
+                    assert(is_object($parentObject));
                     $parentMetadata = $this->getClassMetadata($parentObject);
                     $parentId = $parentMetadata->getSingleIdentifier($parentObject);
                     $actualData[$class->joinField] = ['name' => $class->discriminatorValue, 'parent' => $parentId];
@@ -584,12 +592,14 @@ final class UnitOfWork
                     $value = $fieldType->toPHP($value, $field->options);
                 }
             } elseif ($key === $class->joinField) {
+                assert($class->joinParentClass !== null);
                 $value = $this->manager->getReference($class->joinParentClass, $value['parent']);
                 $field = $class->getParentDocumentField();
             } else {
                 continue;
             }
 
+            assert($field !== null);
             $field->setValue($result, $value);
         }
 
@@ -770,6 +780,8 @@ final class UnitOfWork
                         continue;
                     }
 
+                    assert(is_object($parentObject));
+
                     $parentMetadata = $this->getClassMetadata($parentObject);
                     $actualData[$class->joinField] = [
                         'name' => $class->discriminatorValue,
@@ -875,13 +887,13 @@ final class UnitOfWork
             throw new InvalidIdentifierException('Documents must have an identifier in order to be added to the identity map.');
         }
 
-        unset($this->identityMap[$class->name][$id], $this->readOnlyObjects[$class->name][$id]);
+        unset($this->identityMap[$class->name][$id], $this->readOnlyObjects[spl_object_id($object)]);
     }
 
     /**
      * Executes a persist operation.
      *
-     * @param array<string, bool> $visited
+     * @param array<int, bool> $visited
      *
      * @throws InvalidArgumentException if document state is equal to NEW.
      */
@@ -918,7 +930,7 @@ final class UnitOfWork
     /**
      * Executes a remove operation.
      *
-     * @param array<string, bool> $visited
+     * @param array<int, bool> $visited
      *
      * @throws InvalidArgumentException if document state is equal to NEW.
      */
@@ -959,9 +971,14 @@ final class UnitOfWork
     /**
      * Executes a merge operation on a document.
      *
-     * @param array<string, bool> $visited
+     * @param T $object
+     * @param array<int, T> $visited
+     *
+     * @return T
      *
      * @throws \InvalidArgumentException if document state is equal to NEW.
+     *
+     * @template T of object
      */
     private function doMerge(object $object, array &$visited): object
     {
@@ -983,6 +1000,7 @@ final class UnitOfWork
 
             if ($id !== null) {
                 try {
+                    /** @var T $managedCopy */ // phpcs:ignore
                     $managedCopy = $this->manager->find($class->name, $id);
                 } catch (IndexNotFoundException $e) {
                     // @ignoreException
@@ -999,6 +1017,7 @@ final class UnitOfWork
             }
 
             if ($managedCopy === null) {
+                /** @var T $managedCopy */ // phpcs:ignore
                 $managedCopy = $this->newInstance($class);
                 if ($id !== null) {
                     $class->setIdentifierValue($managedCopy, $id);
@@ -1011,13 +1030,14 @@ final class UnitOfWork
                 $name = $property->name;
                 $property->setAccessible(true);
 
+                /*
+                 * todo: associations
+                 */
                 if (! isset($class->associationMappings[$name])) {
                     if (! $class->isIdentifier($name)) {
                         $property->setValue($managedCopy, $property->getValue($object));
                     }
                 }
-
-                // todo: associations
             }
         }
 
@@ -1030,7 +1050,7 @@ final class UnitOfWork
     /**
      * Execute detach operation.
      *
-     * @param array<string, bool> $visited
+     * @param array<int, bool> $visited
      *
      * @throws InvalidIdentifierException
      */
@@ -1177,6 +1197,9 @@ final class UnitOfWork
         $this->evm->dispatchEvent(Events::postFlush, new Events\PostFlushEventArgs($this->manager));
     }
 
+    /**
+     * @phpstan-param class-string $className
+     */
     private function executeInserts(string $className): void
     {
         $inserts = array_filter($this->documentInsertions, fn (object $document): bool => $className === $this->getClassMetadata($document)->name);
@@ -1185,6 +1208,8 @@ final class UnitOfWork
         }
 
         $classMetadata = $this->manager->getClassMetadata($className);
+        assert($classMetadata instanceof DocumentMetadata);
+
         $persister = $this->getDocumentPersister($className);
         $postInsertIds = $persister->bulkInsert($inserts);
 
@@ -1205,6 +1230,9 @@ final class UnitOfWork
         }
     }
 
+    /**
+     * @phpstan-param class-string $className
+     */
     private function executeUpdates(string $className): void
     {
         $updates = array_filter($this->documentUpdates, fn (object $document): bool => $className === $this->getClassMetadata($document)->name);
@@ -1213,8 +1241,9 @@ final class UnitOfWork
         }
 
         $classMetadata = $this->manager->getClassMetadata($className);
-        $persister = $this->getDocumentPersister($className);
+        assert($classMetadata instanceof DocumentMetadata);
 
+        $persister = $this->getDocumentPersister($className);
         $realUpdates = [];
         foreach ($updates as $oid => $document) {
             $this->lifecycleEventManager->preUpdate($classMetadata, $document);
@@ -1290,7 +1319,7 @@ final class UnitOfWork
      * Calculates the commit order, based on associations
      * on document metadata.
      *
-     * @return string[]
+     * @return class-string[]
      */
     private function getCommitOrder(): array
     {
@@ -1315,6 +1344,13 @@ final class UnitOfWork
         }, $order);
     }
 
+    /**
+     * @param T $document
+     *
+     * @return DocumentMetadata<T>
+     *
+     * @template T of object
+     */
     private function getClassMetadata(object $document): DocumentMetadata
     {
         $class = $this->manager->getClassMetadata(ClassUtil::getClass($document));

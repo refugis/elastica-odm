@@ -12,6 +12,8 @@ final class EmbeddedMetadata extends PropertyMetadata
 {
     /**
      * The embedded target class.
+     *
+     * @var class-string
      */
     public string $targetClass;
 

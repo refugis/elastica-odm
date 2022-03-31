@@ -22,6 +22,8 @@ abstract class AbstractDoctrineType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @phpstan-param array{class?: class-string} $options
      */
     public function toPHP($value, array $options = []): ?object
     {
@@ -43,6 +45,8 @@ abstract class AbstractDoctrineType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @phpstan-param array{class?: class-string} $options
      */
     public function toDatabase($value, array $options = []): ?array
     {

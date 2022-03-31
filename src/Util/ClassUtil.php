@@ -21,7 +21,11 @@ final class ClassUtil
     /**
      * Gets the object "real" class.
      *
-     * @phpstan-return class-string
+     * @param T $object
+     *
+     * @phpstan-return class-string<T>
+     *
+     * @template T of object
      */
     public static function getClass(object $object): string
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Tools;
 
+use Kcs\Metadata\Factory\MetadataFactoryInterface;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Tools\Schema\Collection;
@@ -22,8 +23,11 @@ final class SchemaGenerator
 
     public function generateSchema(): Schema
     {
+        $metadataFactory = $this->documentManager->getMetadataFactory();
+        assert($metadataFactory instanceof MetadataFactoryInterface);
+
         $schema = new Schema();
-        $mappingGenerator = new MappingGenerator($this->documentManager->getTypeManager(), $this->documentManager->getMetadataFactory());
+        $mappingGenerator = new MappingGenerator($this->documentManager->getTypeManager(), $metadataFactory);
         $factory = $this->documentManager->getMetadataFactory();
 
         foreach ($factory->getAllMetadata() as $metadata) {

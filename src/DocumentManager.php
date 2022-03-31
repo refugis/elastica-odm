@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Refugis\ODM\Elastica;
 
 use Doctrine\Common\EventManager;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Elastica\Query;
 use InvalidArgumentException;
 use Kcs\Metadata\Factory\MetadataFactoryInterface;
@@ -67,7 +68,7 @@ class DocumentManager implements DocumentManagerInterface
         $class = $this->getClassMetadata($className);
         $document = $this->unitOfWork->tryGetById($id, $class);
 
-        return $document ?? $this->getUnitOfWork()->getDocumentPersister($className)->load(['_id' => $id]);
+        return $document ?? $this->unitOfWork->getDocumentPersister($className)->load(['_id' => $id]);
     }
 
     /**
@@ -173,6 +174,12 @@ class DocumentManager implements DocumentManagerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param class-string<T> $className
+     *
+     * @return ClassMetadata<T>
+     *
+     * @template T of object
      */
     public function getClassMetadata($className): DocumentMetadata
     {
@@ -269,8 +276,8 @@ class DocumentManager implements DocumentManagerInterface
 
     public function createSearch(string $className): Search
     {
-        $collection = $this->getCollection($className);
-
-        return $collection->createSearch($this, Query::create(''));
+        return $this
+            ->getCollection($className)
+            ->createSearch($this, Query::create(''));
     }
 }

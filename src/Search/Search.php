@@ -20,10 +20,16 @@ use function is_array;
 use function iterator_to_array;
 use function method_exists;
 
+/**
+ * @template T of object
+ * @implements IteratorAggregate<int, T>
+ */
 class Search implements IteratorAggregate
 {
     /**
      * The target document class.
+     *
+     * @var class-string
      */
     private string $documentClass;
 
@@ -50,7 +56,7 @@ class Search implements IteratorAggregate
     /**
      * Sort fields.
      *
-     * @var string[]
+     * @var array<array<string, string>>|null
      */
     private ?array $sort = null;
 
@@ -84,6 +90,9 @@ class Search implements IteratorAggregate
      */
     private CollectionInterface $collection;
 
+    /**
+     * @param class-string $documentClass
+     */
     public function __construct(DocumentManagerInterface $documentManager, string $documentClass, ?CollectionInterface $collection = null)
     {
         $this->documentManager = $documentManager;
@@ -202,6 +211,7 @@ class Search implements IteratorAggregate
     public function setSort($fieldName, string $order = 'asc'): self
     {
         if ($fieldName !== null) {
+            /** @var array<array<string, string>> $sort */
             $sort = [];
             $fields = is_array($fieldName) ? $fieldName : [$fieldName => $order];
 
@@ -338,6 +348,7 @@ class Search implements IteratorAggregate
      */
     private function _doExecuteCached(Query $query): Generator // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        assert($this->cacheProfile !== null);
         $resultCache = $this->documentManager->getResultCache();
         if ($resultCache !== null) {
             $item = $resultCache->getItem($this->cacheProfile->getCacheKey());
