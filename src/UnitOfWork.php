@@ -1033,11 +1033,15 @@ final class UnitOfWork
                 /*
                  * todo: associations
                  */
-                if (! isset($class->associationMappings[$name])) {
-                    if (! $class->isIdentifier($name)) {
-                        $property->setValue($managedCopy, $property->getValue($object));
-                    }
+                if (isset($class->associationMappings[$name])) {
+                    continue;
                 }
+
+                if ($class->isIdentifier($name)) {
+                    continue;
+                }
+
+                $property->setValue($managedCopy, $property->getValue($object));
             }
         }
 

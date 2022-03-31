@@ -57,7 +57,12 @@ class ObjectHydrator implements HydratorInterface
         if ($source !== null && $source !== $allFields) {
             $fields = array_filter(array_map(static function (string $fieldName) use ($class) {
                 if ($class->joinField === $fieldName) {
-                    return $class->getParentDocumentField()->name;
+                    $parentField = $class->getParentDocumentField();
+                    if ($parentField === null) {
+                        return null;
+                    }
+
+                    return $parentField->name;
                 }
 
                 if ($class->discriminatorField === $fieldName) {
@@ -88,7 +93,12 @@ class ObjectHydrator implements HydratorInterface
                 if ($resultClassName !== $className) {
                     $fields = array_filter(array_map(static function (string $fieldName) use ($class) {
                         if ($class->joinField === $fieldName) {
-                            return $class->getParentDocumentField()->name;
+                            $parentField = $class->getParentDocumentField();
+                            if ($parentField === null) {
+                                return null;
+                            }
+
+                            return $parentField->name;
                         }
 
                         if ($class->discriminatorField === $fieldName) {
