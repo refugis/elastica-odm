@@ -77,4 +77,9 @@ final class EmbeddedMetadata extends PropertyMetadata
     {
         $this->getReflection()->setValue($object, $value);
     }
+
+    public function isStored(): bool
+    {
+        return true;
+    }
 }

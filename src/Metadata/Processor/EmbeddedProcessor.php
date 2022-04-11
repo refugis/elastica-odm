@@ -28,5 +28,6 @@ class EmbeddedProcessor implements ProcessorInterface
         $metadata->enabled = $subject->enabled;
         $metadata->fieldName = $subject->name ?? $metadata->name;
         $metadata->multiple = $subject->multiple;
+        $metadata->lazy = $subject->lazy;
     }
 }

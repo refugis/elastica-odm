@@ -8,6 +8,7 @@ use Doctrine\Instantiator\InstantiatorInterface;
 use ProxyManager\Proxy\GhostObjectInterface;
 use Refugis\ODM\Elastica\DocumentManagerInterface;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
+use Refugis\ODM\Elastica\Metadata\EmbeddedMetadata;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 
 use function array_map;
@@ -77,11 +78,11 @@ class ProxyInstantiator implements InstantiatorInterface
 
         $skippedProperties = [];
         foreach ($class->attributesMetadata as $field) {
-            if (! $field instanceof FieldMetadata) {
+            if (! $field instanceof FieldMetadata && ! $field instanceof EmbeddedMetadata) {
                 continue;
             }
 
-            if ($field->isStored() && ! in_array($field->getName(), $fields, true)) {
+            if ($field->isStored() && ! in_array($field->fieldName, $fields, true)) {
                 continue;
             }
 
