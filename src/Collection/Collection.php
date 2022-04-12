@@ -160,7 +160,12 @@ class Collection implements CollectionInterface
         try {
             $this->searchable->requestEndpoint($endpoint);
         } catch (ResponseException $exception) {
-            throw new ODMResponseException($exception->getResponse(), $exception->getMessage(), 0, $exception);
+            $response = $exception->getResponse();
+            if ($response->getStatus() === 404 && $response->getFullError()['type'] === 'index_not_found_exception' ?? null) {
+                throw new IndexNotFoundException($response, $response->getFullError()['index'], 'Index not found: ' . $response->getErrorMessage());
+            }
+
+            throw new ODMResponseException($response, $exception->getMessage(), 0, $exception);
         }
     }
 
@@ -444,6 +449,10 @@ class Collection implements CollectionInterface
         }
 
         if (! $response->isOk()) {
+            if ($response->getStatus() === 404 && $response->getFullError()['type'] === 'index_not_found_exception' ?? null) {
+                throw new IndexNotFoundException($response, $response->getFullError()['index'], 'Index not found: ' . $response->getErrorMessage());
+            }
+
             throw new BadResponseException($response);
         }
     }
