@@ -393,6 +393,10 @@ final class UnitOfWork
             }
         }
 
+        if ($class->joinField !== null && $class->joinParentClass === null) {
+            $actualData[$class->joinField] = ['name' => $class->discriminatorValue];
+        }
+
         if (! isset($this->originalDocumentData[$oid])) {
             throw new RuntimeException('Cannot call recomputeSingleDocumentChangeset before computeChangeSet on a document.');
         }
@@ -793,6 +797,10 @@ final class UnitOfWork
             } elseif ($field instanceof EmbeddedMetadata) {
                 $actualData[$field->fieldName] = $field->getValue($document);
             }
+        }
+
+        if ($class->joinField !== null && $class->joinParentClass === null) {
+            $actualData[$class->joinField] = ['name' => $class->discriminatorValue];
         }
 
         if (! isset($this->originalDocumentData[$oid]) || $this->getDocumentState($document) === self::STATE_NEW) {

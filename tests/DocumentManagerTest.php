@@ -445,4 +445,32 @@ class DocumentManagerTest extends TestCase
         $search = $this->dm->getRepository(Foo::class)->createSearch();
         self::assertEquals(103 * 1024, $search->count());
     }
+
+    public function testHasChildShouldWork(): void
+    {
+        self::resetFixtures($this->dm);
+
+        $grandParent = new FooGrandParent();
+        $grandParent->id = 'grand_parent_1';
+
+        $parent = new FooParent();
+        $parent->id = 'parent_1';
+        $parent->fooGrandParent = $grandParent;
+
+        $this->dm->persist($grandParent);
+        $this->dm->persist($parent);
+
+        $this->dm->flush();
+
+        $search = $this->dm
+            ->getRepository(FooGrandParent::class)
+            ->createSearch();
+
+        $q = new Query(new Query\HasChild(new Query\Ids(['parent_1']), 'parent'));
+        $search->setQuery($q);
+
+        $docs = $search->execute();
+        self::assertCount(1, $docs);
+    }
+
 }
