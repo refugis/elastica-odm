@@ -461,6 +461,7 @@ class DocumentManagerTest extends TestCase
         $this->dm->persist($parent);
 
         $this->dm->flush();
+        $this->dm->clear();
 
         $search = $this->dm
             ->getRepository(FooGrandParent::class)
