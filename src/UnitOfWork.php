@@ -595,8 +595,7 @@ final class UnitOfWork
                 } else {
                     $value = $fieldType->toPHP($value, $field->options);
                 }
-            } elseif ($key === $class->joinField) {
-                assert($class->joinParentClass !== null);
+            } elseif ($key === $class->joinField && $class->joinParentClass !== null) {
                 $value = $this->manager->getReference($class->joinParentClass, $value['parent']);
                 $field = $class->getParentDocumentField();
             } else {
