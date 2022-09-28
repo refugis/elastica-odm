@@ -215,7 +215,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
         if ($metadata instanceof EmbeddedMetadata) {
             $this->embeddedFieldNames[] = $metadata->fieldName;
             sort($this->embeddedFieldNames);
-        } elseif ($metadata instanceof FieldMetadata) {
+        } elseif ($metadata instanceof FieldMetadata && ! $metadata->identifier) {
             $this->fieldNames[] = $metadata->fieldName;
             sort($this->fieldNames);
 
