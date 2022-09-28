@@ -206,7 +206,7 @@ class Search implements IteratorAggregate
     /**
      * Sets the sort fields and directions.
      *
-     * @param array<string, string>[]|string|null $fieldName
+     * @param array<string, string>|string|null $fieldName
      */
     public function setSort($fieldName, string $order = 'asc'): self
     {
