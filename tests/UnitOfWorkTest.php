@@ -43,6 +43,7 @@ class UnitOfWorkTest extends TestCase
         $this->transport = $this->prophesize(AbstractTransport::class);
         $this->transport->setConnection(Argument::any())->willReturn($this->transport);
         $this->eventManager = $this->prophesize(EventManager::class);
+        $this->eventManager->hasListeners(Argument::any())->willReturn(false);
 
         $database = new Database(new Client([
             'transport' => $this->transport->reveal(),
