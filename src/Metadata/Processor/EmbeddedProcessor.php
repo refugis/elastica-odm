@@ -11,13 +11,11 @@ use Refugis\ODM\Elastica\Annotation\Embeddable;
 use Refugis\ODM\Elastica\Annotation\Embedded;
 use Refugis\ODM\Elastica\Metadata\EmbeddedMetadata;
 
-/**
- * @Processor(annotation=Embeddable::class)
- */
+/** @Processor(annotation=Embeddable::class) */
 class EmbeddedProcessor implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param EmbeddedMetadata $metadata
      * @param Embedded         $subject

@@ -10,13 +10,11 @@ use Kcs\Metadata\MetadataInterface;
 use Refugis\ODM\Elastica\Annotation\ParentDocument;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 
-/**
- * @Processor(annotation=ParentDocument::class)
- */
+/** @Processor(annotation=ParentDocument::class) */
 class ParentDocumentProcessor implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param FieldMetadata  $metadata
      * @param ParentDocument $subject

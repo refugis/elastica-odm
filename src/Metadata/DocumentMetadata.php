@@ -201,6 +201,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     public function __wakeup(): void
     {
         parent::__wakeup();
+
         $this->instantiator = new Instantiator();
     }
 
@@ -233,7 +234,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param self $metadata
      */
@@ -260,7 +261,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getIdentifier(): array
     {
@@ -268,7 +269,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isIdentifier($fieldName): bool
     {
@@ -276,7 +277,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function hasField($fieldName): bool
     {
@@ -284,7 +285,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function hasAssociation($fieldName): bool
     {
@@ -292,7 +293,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isSingleValuedAssociation($fieldName): bool
     {
@@ -300,7 +301,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isCollectionValuedAssociation($fieldName): bool
     {
@@ -308,7 +309,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getFieldNames(): array
     {
@@ -316,7 +317,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getIdentifierFieldNames(): array
     {
@@ -324,7 +325,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getAssociationNames(): array
     {
@@ -337,7 +338,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getTypeOfField($fieldName): string
     {
@@ -350,7 +351,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getAssociationTargetClass($assocName): string
     {
@@ -360,7 +361,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isAssociationInverseSide($assocName): bool
     {
@@ -368,7 +369,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getAssociationMappedByTargetField($assocName): string
     {
@@ -376,7 +377,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getIdentifierValues($object): array
     {
@@ -523,9 +524,7 @@ final class DocumentMetadata extends ClassMetadata implements ClassMetadataInter
         $this->eagerFieldNames = array_filter($this->eagerFieldNames);
     }
 
-    /**
-     * @return string[]
-     */
+    /** @return string[] */
     public function getSourceEagerFields(): array
     {
         if ($this->sourceEagerFields !== null) {

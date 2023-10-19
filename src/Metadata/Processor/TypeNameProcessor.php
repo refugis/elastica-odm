@@ -10,13 +10,11 @@ use Kcs\Metadata\MetadataInterface;
 use Refugis\ODM\Elastica\Annotation\TypeName;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 
-/**
- * @Processor(annotation=TypeName::class)
- */
+/** @Processor(annotation=TypeName::class) */
 class TypeNameProcessor implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param FieldMetadata $metadata
      * @param TypeName      $subject

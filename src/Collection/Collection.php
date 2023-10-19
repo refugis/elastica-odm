@@ -170,7 +170,7 @@ class Collection implements CollectionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function bulk(array $operations): Bulk\ResponseSet
     {
@@ -274,7 +274,7 @@ class Collection implements CollectionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function create(?string $id, array $body, array $options = []): Response
     {
@@ -331,7 +331,7 @@ class Collection implements CollectionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function update(string $id, array $body, string $script = '', array $options = []): void
     {
@@ -432,7 +432,7 @@ class Collection implements CollectionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function deleteByQuery(Query\AbstractQuery $query, array $params = []): void
     {

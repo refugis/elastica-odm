@@ -26,9 +26,7 @@ final class DocumentId
      */
     public string $strategy = 'auto';
 
-    /**
-     * @param string|array<string, mixed> $strategy
-     */
+    /** @param string|array<string, mixed> $strategy */
     public function __construct($strategy = 'auto')
     {
         if (is_string($strategy)) {

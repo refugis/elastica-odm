@@ -10,13 +10,11 @@ use Kcs\Metadata\MetadataInterface;
 use Refugis\ODM\Elastica\Annotation\JoinField;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
-/**
- * @Processor(annotation=JoinField::class)
- */
+/** @Processor(annotation=JoinField::class) */
 class JoinFieldProcessor implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param DocumentMetadata $metadata
      * @param JoinField $subject

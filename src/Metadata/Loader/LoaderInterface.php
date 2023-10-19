@@ -8,8 +8,6 @@ use Kcs\Metadata\Loader\LoaderInterface as BaseLoaderInterface;
 
 interface LoaderInterface extends BaseLoaderInterface
 {
-    /**
-     * @return class-string[]
-     */
+    /** @return class-string[] */
     public function getAllClassNames(): array;
 }

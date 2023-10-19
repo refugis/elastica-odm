@@ -16,7 +16,7 @@ final class CompletionType extends AbstractType
     public const NAME = 'completion';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toPHP($value, array $options = []): ?Completion
     {
@@ -43,7 +43,7 @@ final class CompletionType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toDatabase($value, array $options = []): ?array
     {
@@ -64,7 +64,7 @@ final class CompletionType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMappingDeclaration(array $options = []): array
     {

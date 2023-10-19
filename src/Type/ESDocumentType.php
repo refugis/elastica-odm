@@ -21,7 +21,7 @@ final class ESDocumentType extends AbstractType implements ContainerAwareInterfa
     public const NAME = 'es_document';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @phpstan-param array{class?: class-string} $options
      */
@@ -42,7 +42,7 @@ final class ESDocumentType extends AbstractType implements ContainerAwareInterfa
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toDatabase($value, array $options = [])
     {
@@ -55,7 +55,7 @@ final class ESDocumentType extends AbstractType implements ContainerAwareInterfa
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMappingDeclaration(array $options = []): array
     {

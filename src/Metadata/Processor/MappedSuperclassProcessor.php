@@ -10,13 +10,11 @@ use Kcs\Metadata\MetadataInterface;
 use Refugis\ODM\Elastica\Annotation\MappedSuperclass;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
-/**
- * @Processor(annotation=MappedSuperclass::class)
- */
+/** @Processor(annotation=MappedSuperclass::class) */
 class MappedSuperclassProcessor implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param DocumentMetadata $metadata
      * @param MappedSuperclass $subject

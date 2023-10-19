@@ -26,9 +26,7 @@ final class DiscriminatorMap
      */
     public array $map;
 
-    /**
-     * @param array<string, class-string> $map
-     */
+    /** @param array<string, class-string> $map */
     public function __construct(array $map)
     {
         $data = $map;

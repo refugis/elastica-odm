@@ -10,13 +10,11 @@ use Kcs\Metadata\MetadataInterface;
 use Refugis\ODM\Elastica\Annotation\DiscriminatorMap;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
-/**
- * @Processor(annotation=DiscriminatorMap::class)
- */
+/** @Processor(annotation=DiscriminatorMap::class) */
 class DiscriminatorMapProcessor implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param DocumentMetadata $metadata
      * @param DiscriminatorMap $subject

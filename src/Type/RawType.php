@@ -10,7 +10,7 @@ final class RawType extends AbstractType
     public const NAME = 'raw';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toPHP($value, array $options = [])
     {
@@ -18,7 +18,7 @@ final class RawType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toDatabase($value, array $options = [])
     {
@@ -31,7 +31,7 @@ final class RawType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMappingDeclaration(array $options = []): array
     {

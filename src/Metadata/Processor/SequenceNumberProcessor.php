@@ -10,13 +10,11 @@ use Kcs\Metadata\MetadataInterface;
 use Refugis\ODM\Elastica\Annotation\SequenceNumber;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 
-/**
- * @Processor(annotation=SequenceNumber::class)
- */
+/** @Processor(annotation=SequenceNumber::class) */
 class SequenceNumberProcessor implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param FieldMetadata  $metadata
      * @param SequenceNumber $subject

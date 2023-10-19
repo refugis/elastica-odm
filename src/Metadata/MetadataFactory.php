@@ -88,7 +88,7 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isTransient($className): bool
     {
@@ -141,7 +141,7 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
             if ($count > 1) {
                 throw new InvalidMetadataException(sprintf(
                     '@DocumentId, @IndexName, @TypeName, @SequenceNumber, @PrimaryTerm and @Version are mutually exclusive. Please select one for "%s"',
-                    $attributeMetadata->getName()
+                    $attributeMetadata->getName(),
                 ));
             }
         }
@@ -178,7 +178,7 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
                 throw new InvalidMetadataException(sprintf(
                     'Class "%s" has inheritance type %s but no discriminator map has been defined.',
                     $classMetadata->getName(),
-                    $classMetadata->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_SINGLE_INDEX ? InheritanceType::SINGLE_INDEX : InheritanceType::PARENT_CHILD
+                    $classMetadata->inheritanceType === DocumentMetadata::INHERITANCE_TYPE_SINGLE_INDEX ? InheritanceType::SINGLE_INDEX : InheritanceType::PARENT_CHILD,
                 ));
             }
         }
@@ -188,7 +188,7 @@ class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFa
                 throw new InvalidMetadataException(sprintf(
                     'Class "%s" has inheritance type %s but no relations map has been defined.',
                     $classMetadata->getName(),
-                    InheritanceType::PARENT_CHILD
+                    InheritanceType::PARENT_CHILD,
                 ));
             }
         }

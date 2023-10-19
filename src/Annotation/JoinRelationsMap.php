@@ -24,9 +24,7 @@ final class JoinRelationsMap
      */
     public array $map;
 
-    /**
-     * @param array<string, mixed> $map
-     */
+    /** @param array<string, mixed> $map */
     public function __construct(array $map)
     {
         $data = $map;

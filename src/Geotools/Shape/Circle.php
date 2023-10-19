@@ -21,7 +21,7 @@ final class Circle extends Geoshape
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toArray(): array
     {

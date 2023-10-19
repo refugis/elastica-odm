@@ -10,13 +10,11 @@ use Kcs\Metadata\MetadataInterface;
 use Refugis\ODM\Elastica\Annotation\PrimaryTerm;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 
-/**
- * @Processor(annotation=PrimaryTerm::class)
- */
+/** @Processor(annotation=PrimaryTerm::class) */
 class PrimaryTermProcessor implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param FieldMetadata $metadata
      * @param PrimaryTerm   $subject

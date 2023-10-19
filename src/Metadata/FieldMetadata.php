@@ -54,9 +54,7 @@ class FieldMetadata extends PropertyMetadata
         return $this->reflectionProperty;
     }
 
-    /**
-     * @return mixed
-     */
+    /** @return mixed */
     public function getValue(object $object)
     {
         $reflection = $this->getReflection();
@@ -76,9 +74,7 @@ class FieldMetadata extends PropertyMetadata
         }
     }
 
-    /**
-     * @param mixed $value
-     */
+    /** @param mixed $value */
     public function setValue(object $object, $value): void
     {
         $reflection = $this->getReflection();

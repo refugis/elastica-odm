@@ -12,7 +12,7 @@ final class BinaryType extends AbstractType
     public const NAME = 'binary';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toPHP($value, array $options = []): ?string
     {
@@ -24,7 +24,7 @@ final class BinaryType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toDatabase($value, array $options = []): ?string
     {
@@ -41,7 +41,7 @@ final class BinaryType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMappingDeclaration(array $options = []): array
     {

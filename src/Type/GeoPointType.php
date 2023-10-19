@@ -18,7 +18,7 @@ final class GeoPointType extends AbstractType
     public const NAME = 'geo_point';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toPHP($value, array $options = []): ?CoordinateInterface
     {
@@ -49,7 +49,7 @@ final class GeoPointType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toDatabase($value, array $options = []): ?array
     {
@@ -70,7 +70,7 @@ final class GeoPointType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMappingDeclaration(array $options = []): array
     {

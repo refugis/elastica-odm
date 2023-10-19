@@ -26,9 +26,7 @@ class Collection
         return $this->documentMetadata;
     }
 
-    /**
-     * @return TypeMapping|Mapping
-     */
+    /** @return TypeMapping|Mapping */
     public function getMapping()
     {
         return $this->mapping;

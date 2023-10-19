@@ -21,7 +21,7 @@ abstract class AbstractDoctrineType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @phpstan-param array{class?: class-string} $options
      */
@@ -44,7 +44,7 @@ abstract class AbstractDoctrineType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @phpstan-param array{class?: class-string} $options
      */
@@ -80,7 +80,7 @@ abstract class AbstractDoctrineType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMappingDeclaration(array $options = []): array
     {

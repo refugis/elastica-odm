@@ -14,7 +14,7 @@ final class PercolatorType extends AbstractType
     public const NAME = 'percolator';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toPHP($value, array $options = []): ?Query
     {
@@ -30,7 +30,7 @@ final class PercolatorType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toDatabase($value, array $options = []): ?array
     {
@@ -59,7 +59,7 @@ final class PercolatorType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMappingDeclaration(array $options = []): array
     {

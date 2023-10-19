@@ -10,7 +10,7 @@ use Refugis\ODM\Elastica\Geotools\Shape\Geoshape;
 final class GeoShapeType extends AbstractType
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toPHP($value, array $options = []): ?Geoshape
     {
@@ -22,7 +22,7 @@ final class GeoShapeType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toDatabase($value, array $options = []): ?array
     {
@@ -43,7 +43,7 @@ final class GeoShapeType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMappingDeclaration(array $options = []): array
     {

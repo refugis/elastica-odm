@@ -13,7 +13,7 @@ final class BooleanType extends AbstractType
     public const NAME = 'boolean';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toPHP($value, array $options = []): ?bool
     {
@@ -21,7 +21,7 @@ final class BooleanType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toDatabase($value, array $options = []): ?bool
     {
@@ -34,16 +34,14 @@ final class BooleanType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMappingDeclaration(array $options = []): array
     {
         return ['type' => 'boolean'];
     }
 
-    /**
-     * @param mixed $value
-     */
+    /** @param mixed $value */
     private function doConversion($value): ?bool
     {
         if ($value === null) {

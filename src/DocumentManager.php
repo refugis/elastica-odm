@@ -61,7 +61,7 @@ class DocumentManager implements DocumentManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function find($className, $id): ?object
     {
@@ -72,7 +72,7 @@ class DocumentManager implements DocumentManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getReference(string $className, $id): object
     {
@@ -93,7 +93,7 @@ class DocumentManager implements DocumentManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function persist($object): void
     {
@@ -105,7 +105,7 @@ class DocumentManager implements DocumentManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function remove($object): void
     {
@@ -117,7 +117,7 @@ class DocumentManager implements DocumentManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function merge($object): object
     {
@@ -129,7 +129,7 @@ class DocumentManager implements DocumentManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function clear($objectName = null): void
     {
@@ -137,7 +137,7 @@ class DocumentManager implements DocumentManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function detach($object): void
     {
@@ -149,7 +149,7 @@ class DocumentManager implements DocumentManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function refresh($object): void
     {
@@ -165,7 +165,7 @@ class DocumentManager implements DocumentManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getRepository($className): DocumentRepositoryInterface
     {
@@ -173,7 +173,7 @@ class DocumentManager implements DocumentManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param class-string<T> $className
      *
@@ -199,7 +199,7 @@ class DocumentManager implements DocumentManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function initializeObject($obj): void
     {
@@ -211,7 +211,7 @@ class DocumentManager implements DocumentManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function contains($object): bool
     {

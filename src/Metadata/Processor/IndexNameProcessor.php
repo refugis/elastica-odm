@@ -10,13 +10,11 @@ use Kcs\Metadata\MetadataInterface;
 use Refugis\ODM\Elastica\Annotation\IndexName;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 
-/**
- * @Processor(annotation=IndexName::class)
- */
+/** @Processor(annotation=IndexName::class) */
 class IndexNameProcessor implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param FieldMetadata $metadata
      * @param IndexName     $subject

@@ -37,9 +37,7 @@ use function is_array;
 use function Safe\sprintf;
 use function str_replace;
 
-/**
- * @template T of object
- */
+/** @template T of object */
 class DocumentPersister
 {
     private DocumentManagerInterface $dm;
@@ -415,9 +413,7 @@ class DocumentPersister
         $this->collection->refresh();
     }
 
-    /**
-     * @param array<string, mixed> $criteria
-     */
+    /** @param array<string, mixed> $criteria */
     private function prepareQuery(array $criteria): Query
     {
         $bool = new Query\BoolQuery();
@@ -508,9 +504,7 @@ class DocumentPersister
         ];
     }
 
-    /**
-     * @param array<string, mixed> $data
-     */
+    /** @param array<string, mixed> $data */
     private static function processDocumentMetadata(DocumentMetadata $class, object $document, array $data): void
     {
         foreach ($class->attributesMetadata as $field) {

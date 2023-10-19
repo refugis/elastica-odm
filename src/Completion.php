@@ -14,9 +14,7 @@ final class Completion implements ArrayableInterface
     public $input;
     public ?int $weight = null;
 
-    /**
-     * @return array<string, mixed>|null
-     */
+    /** @return array<string, mixed>|null */
     public function toArray(): ?array
     {
         return array_filter([

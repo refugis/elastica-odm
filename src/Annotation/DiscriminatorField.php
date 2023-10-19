@@ -28,9 +28,7 @@ final class DiscriminatorField
      */
     public string $name;
 
-    /**
-     * @param array<string, string>|string $name
-     */
+    /** @param array<string, string>|string $name */
     public function __construct($name)
     {
         if (is_string($name)) {

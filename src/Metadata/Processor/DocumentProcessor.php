@@ -22,13 +22,11 @@ use function trigger_error;
 
 use const E_USER_DEPRECATED;
 
-/**
- * @Processor(annotation=Document::class)
- */
+/** @Processor(annotation=Document::class) */
 class DocumentProcessor implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param DocumentMetadata $metadata
      * @param Document         $subject

@@ -11,7 +11,7 @@ use function is_array;
 class FlattenedType extends AbstractType
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toPHP($value, array $options = [])
     {
@@ -27,7 +27,7 @@ class FlattenedType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toDatabase($value, array $options = [])
     {
@@ -48,7 +48,7 @@ class FlattenedType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMappingDeclaration(array $options = []): array
     {

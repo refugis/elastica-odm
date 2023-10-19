@@ -43,9 +43,7 @@ class Transport extends AwsAuthV4
     /** @var array<string, mixed> */
     private array $options;
 
-    /**
-     * @param array<string, mixed> $options
-     */
+    /** @param array<string, mixed> $options */
     public function __construct(array $options = self::DEFAULT_OPTIONS)
     {
         parent::__construct();
@@ -54,7 +52,7 @@ class Transport extends AwsAuthV4
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function exec(Request $request, array $params): Response
     {
@@ -99,7 +97,7 @@ class Transport extends AwsAuthV4
             [
                 'request_header' => $request->getMethod(),
                 'http_code' => $res->getStatusCode(),
-            ]
+            ],
         );
 
         if ($response->hasError()) {
@@ -113,9 +111,7 @@ class Transport extends AwsAuthV4
         return $response;
     }
 
-    /**
-     * @param bool $persistent
-     */
+    /** @param bool $persistent */
     protected function _getGuzzleClient($persistent = true): Client // phpcs:ignore
     {
         if (! $persistent || ! self::$_guzzleClientConnection) {
@@ -145,7 +141,7 @@ class Transport extends AwsAuthV4
             $this->_getActionPath($request),
             $connection->hasConfig('headers') && is_array($connection->getConfig('headers'))
                 ? $connection->getConfig('headers')
-                : []
+                : [],
         );
 
         $data = $request->getData();
@@ -179,7 +175,7 @@ class Transport extends AwsAuthV4
                 $connection->getParam('aws_secret_access_key'),
                 $connection->hasParam('aws_session_token')
                     ? $connection->getParam('aws_session_token')
-                    : null
+                    : null,
             ));
         }
 
@@ -202,9 +198,7 @@ class Transport extends AwsAuthV4
         });
     }
 
-    /**
-     * @param mixed $data
-     */
+    /** @param mixed $data */
     private function streamFor($data): StreamInterface
     {
         if (is_array($data)) {

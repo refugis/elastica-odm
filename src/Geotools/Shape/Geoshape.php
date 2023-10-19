@@ -12,9 +12,7 @@ use function array_shift;
 
 abstract class Geoshape implements GeoshapeInterface
 {
-    /**
-     * @param array<string, mixed> $shape
-     */
+    /** @param array<string, mixed> $shape */
     public static function fromArray(array $shape): Geoshape
     {
         $type = $shape['type'] ?? null;
@@ -44,7 +42,7 @@ abstract class Geoshape implements GeoshapeInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function jsonSerialize(): array
     {

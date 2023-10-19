@@ -14,13 +14,11 @@ use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
 use function Safe\sprintf;
 
-/**
- * @Processor(annotation=InheritanceType::class)
- */
+/** @Processor(annotation=InheritanceType::class) */
 class InheritanceTypeProcessor implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param DocumentMetadata $metadata
      * @param InheritanceType $subject

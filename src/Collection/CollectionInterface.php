@@ -47,9 +47,7 @@ interface CollectionInterface
      */
     public function refresh(): void;
 
-    /**
-     * @param Bulk\Action[] $operations
-     */
+    /** @param Bulk\Action[] $operations */
     public function bulk(array $operations): Bulk\ResponseSet;
 
     /**

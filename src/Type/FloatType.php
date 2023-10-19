@@ -14,7 +14,7 @@ final class FloatType extends AbstractType
     public const NAME = 'float';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toPHP($value, array $options = []): ?float
     {
@@ -26,7 +26,7 @@ final class FloatType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toDatabase($value, array $options = []): ?float
     {
@@ -47,7 +47,7 @@ final class FloatType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMappingDeclaration(array $options = []): array
     {

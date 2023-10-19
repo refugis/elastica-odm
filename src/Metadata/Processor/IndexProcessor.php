@@ -13,13 +13,11 @@ use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use function array_filter;
 use function array_merge;
 
-/**
- * @Processor(annotation=Index::class)
- */
+/** @Processor(annotation=Index::class) */
 class IndexProcessor implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param DocumentMetadata $metadata
      * @param Index            $subject

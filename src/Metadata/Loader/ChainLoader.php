@@ -14,9 +14,7 @@ class ChainLoader implements LoaderInterface
     /** @var LoaderInterface[] */
     private array $loaders;
 
-    /**
-     * @param LoaderInterface[] $loaders
-     */
+    /** @param LoaderInterface[] $loaders */
     public function __construct(array $loaders)
     {
         $this->loaders = (static function (...$loaders) {

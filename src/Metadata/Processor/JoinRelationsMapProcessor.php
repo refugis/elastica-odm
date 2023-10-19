@@ -10,13 +10,11 @@ use Kcs\Metadata\MetadataInterface;
 use Refugis\ODM\Elastica\Annotation\JoinRelationsMap;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
-/**
- * @Processor(annotation=JoinRelationsMap::class)
- */
+/** @Processor(annotation=JoinRelationsMap::class) */
 class JoinRelationsMapProcessor implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param DocumentMetadata $metadata
      * @param JoinRelationsMap $subject

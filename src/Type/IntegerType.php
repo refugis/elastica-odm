@@ -14,7 +14,7 @@ final class IntegerType extends AbstractType
     public const NAME = 'integer';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toPHP($value, array $options = []): ?int
     {
@@ -22,7 +22,7 @@ final class IntegerType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toDatabase($value, array $options = []): ?int
     {
@@ -35,7 +35,7 @@ final class IntegerType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMappingDeclaration(array $options = []): array
     {
@@ -64,9 +64,7 @@ final class IntegerType extends AbstractType
         return ['type' => $type];
     }
 
-    /**
-     * @param mixed $value
-     */
+    /** @param mixed $value */
     private function doConversion($value): ?int
     {
         if ($value === null) {

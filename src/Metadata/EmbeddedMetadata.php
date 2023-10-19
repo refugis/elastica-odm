@@ -41,6 +41,7 @@ final class EmbeddedMetadata extends PropertyMetadata
     public function __wakeup(): void
     {
         parent::__wakeup();
+
         $this->instantiator = new Instantiator();
     }
 
@@ -62,17 +63,13 @@ final class EmbeddedMetadata extends PropertyMetadata
         return $this->reflectionProperty;
     }
 
-    /**
-     * @return mixed
-     */
+    /** @return mixed */
     public function getValue(object $object)
     {
         return $this->getReflection()->getValue($object);
     }
 
-    /**
-     * @param mixed $value
-     */
+    /** @param mixed $value */
     public function setValue(object $object, $value): void
     {
         $this->getReflection()->setValue($object, $value);

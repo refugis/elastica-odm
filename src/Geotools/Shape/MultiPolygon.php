@@ -21,7 +21,7 @@ final class MultiPolygon extends Geoshape
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toArray(): array
     {

@@ -34,7 +34,7 @@ class DocumentRepository implements DocumentRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return T|null
      */
@@ -44,7 +44,7 @@ class DocumentRepository implements DocumentRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return T[]
      */
@@ -54,7 +54,7 @@ class DocumentRepository implements DocumentRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return T[]
      */
@@ -64,7 +64,7 @@ class DocumentRepository implements DocumentRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return T|null
      */
@@ -73,25 +73,19 @@ class DocumentRepository implements DocumentRepositoryInterface
         return $this->getDocumentPersister()->load($criteria);
     }
 
-    /**
-     * @return class-string<T>
-     */
+    /** @return class-string<T> */
     public function getClassName(): string
     {
         return $this->documentClass;
     }
 
-    /**
-     * @return Collection<T>
-     */
+    /** @return Collection<T> */
     public function matching(Criteria $criteria): Collection
     {
         // TODO: Implement matching() method.
     }
 
-    /**
-     * @return Search<T>
-     */
+    /** @return Search<T> */
     public function createSearch(): Search
     {
         return $this->dm->createSearch($this->documentClass);

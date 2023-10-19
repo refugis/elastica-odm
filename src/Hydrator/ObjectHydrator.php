@@ -29,7 +29,7 @@ class ObjectHydrator implements HydratorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function hydrateAll(ResultSet $resultSet, string $className): array
     {
@@ -122,7 +122,7 @@ class ObjectHydrator implements HydratorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function hydrateOne(Document $document, string $className)
     {

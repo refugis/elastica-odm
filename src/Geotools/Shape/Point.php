@@ -19,7 +19,7 @@ final class Point extends Geoshape
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toArray(): array
     {

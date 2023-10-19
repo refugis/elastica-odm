@@ -23,9 +23,7 @@ class ProxyInstantiator implements InstantiatorInterface
     private array $fields;
     private DocumentManagerInterface $manager;
 
-    /**
-     * @param string[] $fields
-     */
+    /** @param string[] $fields */
     public function __construct(array $fields, DocumentManagerInterface $manager)
     {
         $this->fields = $fields;
@@ -33,7 +31,7 @@ class ProxyInstantiator implements InstantiatorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function instantiate($className): GhostObjectInterface
     {

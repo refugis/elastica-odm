@@ -31,9 +31,7 @@ final class Version
      */
     public string $type;
 
-    /**
-     * @param string|array<string, mixed> $type
-     */
+    /** @param string|array<string, mixed> $type */
     public function __construct($type)
     {
         if (is_string($type)) {

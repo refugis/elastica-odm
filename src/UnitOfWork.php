@@ -1109,33 +1109,25 @@ final class UnitOfWork
         $this->scheduleForInsert($object);
     }
 
-    /**
-     * @param array<string, bool> $visited
-     */
+    /** @param array<string, bool> $visited */
     private function cascadeDetach(object $object, array &$visited): void
     {
         // @todo
     }
 
-    /**
-     * @param array<string, bool> $visited
-     */
+    /** @param array<string, bool> $visited */
     private function cascadeMerge(object $object, object $managedCopy, array &$visited): void
     {
         // @todo
     }
 
-    /**
-     * @param array<string, bool> $visited
-     */
+    /** @param array<string, bool> $visited */
     private function cascadeRemove(object $object, array &$visited): void
     {
         // @todo
     }
 
-    /**
-     * @param array<string, bool> $visited
-     */
+    /** @param array<string, bool> $visited */
     private function cascadePersist(object $object, array &$visited): void
     {
         // @todo
@@ -1208,9 +1200,7 @@ final class UnitOfWork
         $this->evm->dispatchEvent(Events::postFlush, new Events\PostFlushEventArgs($this->manager));
     }
 
-    /**
-     * @phpstan-param class-string $className
-     */
+    /** @phpstan-param class-string $className */
     private function executeInserts(string $className): void
     {
         $inserts = array_filter($this->documentInsertions, fn (object $document): bool => $className === $this->getClassMetadata($document)->name);
@@ -1241,9 +1231,7 @@ final class UnitOfWork
         }
     }
 
-    /**
-     * @phpstan-param class-string $className
-     */
+    /** @phpstan-param class-string $className */
     private function executeUpdates(string $className): void
     {
         $updates = array_filter($this->documentUpdates, fn (object $document): bool => $className === $this->getClassMetadata($document)->name);

@@ -48,7 +48,7 @@ class Coordinate implements CoordinateInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function compareTo($other): int
     {
@@ -146,7 +146,7 @@ class Coordinate implements CoordinateInterface
             preg_match(
                 '/(\-?\d{1,2})\D+(\d{1,2}\.?\d*)[, ] ?(\-?\d{1,3})\D+(\d{1,2}\.?\d*)$/',
                 $coordinates,
-                $match
+                $match,
             )
         ) {
             return [
@@ -171,7 +171,7 @@ class Coordinate implements CoordinateInterface
             preg_match(
                 '/(\d{1,2})\D+(\d{1,2}\.?\d*)\D*([ns])[, ] ?(\d{1,3})\D+(\d{1,2}\.?\d*)\D*([we])$/i',
                 $coordinates,
-                $match
+                $match,
             )
         ) {
             $latitude = $match[1] + $match[2] / 60;
@@ -191,7 +191,7 @@ class Coordinate implements CoordinateInterface
             preg_match(
                 '/(\d{1,2})\D+(\d{1,2})\D+(\d{1,2}\.?\d*)\D*([ns])[, ] ?(\d{1,3})\D+(\d{1,2})\D+(\d{1,2}\.?\d*)\D*([we])$/i',
                 $coordinates,
-                $match
+                $match,
             )
         ) {
             $latitude = $match[1] + ($match[2] * 60 + $match[3]) / 3600;
@@ -207,7 +207,7 @@ class Coordinate implements CoordinateInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function jsonSerialize(): array
     {
@@ -215,7 +215,7 @@ class Coordinate implements CoordinateInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toArray(): array
     {

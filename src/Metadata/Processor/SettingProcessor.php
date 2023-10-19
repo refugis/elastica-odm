@@ -12,9 +12,7 @@ use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
 use function preg_match;
 
-/**
- * @Processor(annotation=Setting::class)
- */
+/** @Processor(annotation=Setting::class) */
 class SettingProcessor implements ProcessorInterface
 {
     private const DYNAMIC_SETTINGS = [
@@ -69,7 +67,7 @@ class SettingProcessor implements ProcessorInterface
     ];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param DocumentMetadata $metadata
      * @param Setting          $subject

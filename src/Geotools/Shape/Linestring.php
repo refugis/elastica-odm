@@ -22,7 +22,7 @@ final class Linestring extends Geoshape
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toArray(): array
     {

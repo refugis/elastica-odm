@@ -60,7 +60,7 @@ final class DocumentGraphNode implements Countable, IteratorAggregate
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * Traverse the graph through the out edges.
      *

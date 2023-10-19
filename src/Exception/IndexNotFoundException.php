@@ -14,6 +14,7 @@ class IndexNotFoundException extends ResponseException
     public function __construct(Response $response, string $indexName, string $message, ?Throwable $previous = null)
     {
         parent::__construct($response, $message, 0, $previous);
+
         $this->indexName = $indexName;
     }
 

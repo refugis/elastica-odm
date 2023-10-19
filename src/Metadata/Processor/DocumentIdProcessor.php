@@ -11,13 +11,11 @@ use Refugis\ODM\Elastica\Annotation\DocumentId;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 
-/**
- * @Processor(annotation=DocumentId::class)
- */
+/** @Processor(annotation=DocumentId::class) */
 class DocumentIdProcessor implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param FieldMetadata $metadata
      * @param DocumentId    $subject

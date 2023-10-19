@@ -9,7 +9,7 @@ final class IpType extends AbstractType
     public const NAME = 'ip';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toPHP($value, array $options = []): ?string
     {
@@ -21,7 +21,7 @@ final class IpType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toDatabase($value, array $options = []): ?string
     {
@@ -38,7 +38,7 @@ final class IpType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMappingDeclaration(array $options = []): array
     {

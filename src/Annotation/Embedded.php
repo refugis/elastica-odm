@@ -47,9 +47,7 @@ final class Embedded
      */
     public bool $lazy;
 
-    /**
-     * @param class-string|array<string, mixed> $targetClass
-     */
+    /** @param class-string|array<string, mixed> $targetClass */
     public function __construct($targetClass, ?string $name = null, bool $enabled = true, bool $multiple = false, bool $lazy = false)
     {
         if (is_string($targetClass)) {
