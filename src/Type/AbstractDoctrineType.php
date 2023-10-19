@@ -9,7 +9,7 @@ use InvalidArgumentException;
 
 use function array_values;
 use function count;
-use function Safe\sprintf;
+use function sprintf;
 
 abstract class AbstractDoctrineType extends AbstractType
 {

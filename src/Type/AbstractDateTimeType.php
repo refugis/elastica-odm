@@ -10,10 +10,10 @@ use InvalidArgumentException;
 use Refugis\ODM\Elastica\Exception\ConversionFailedException;
 
 use function assert;
+use function preg_match;
 use function preg_replace_callback;
-use function Safe\preg_match;
-use function Safe\sprintf;
-use function Safe\substr;
+use function sprintf;
+use function substr;
 
 abstract class AbstractDateTimeType extends AbstractType
 {

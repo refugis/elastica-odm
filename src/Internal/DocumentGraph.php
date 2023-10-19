@@ -8,7 +8,7 @@ use Generator;
 use IteratorAggregate;
 
 use function iterator_to_array;
-use function Safe\uasort;
+use function uasort;
 
 /**
  * Represents a document dependency graph.

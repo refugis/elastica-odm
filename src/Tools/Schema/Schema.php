@@ -6,10 +6,10 @@ namespace Refugis\ODM\Elastica\Tools\Schema;
 
 use Refugis\ODM\Elastica\Exception\RuntimeException;
 
-use function Safe\sprintf;
+use function sprintf;
 
 /**
- * Holds the informations about the schema of collections.
+ * Holds information about the schema of collections.
  */
 class Schema
 {

@@ -12,7 +12,7 @@ use Kcs\Metadata\MetadataInterface;
 use Refugis\ODM\Elastica\Annotation\InheritanceType;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
-use function Safe\sprintf;
+use function sprintf;
 
 /** @Processor(annotation=InheritanceType::class) */
 class InheritanceTypeProcessor implements ProcessorInterface

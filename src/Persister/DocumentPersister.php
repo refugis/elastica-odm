@@ -34,7 +34,7 @@ use function assert;
 use function count;
 use function implode;
 use function is_array;
-use function Safe\sprintf;
+use function sprintf;
 use function str_replace;
 
 /** @template T of object */

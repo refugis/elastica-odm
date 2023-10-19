@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Refugis\ODM\Elastica\Type;
 
+use function base64_decode;
 use function base64_encode;
-use function Safe\base64_decode;
 
 final class BinaryType extends AbstractType
 {

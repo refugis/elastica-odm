@@ -6,7 +6,7 @@ namespace Refugis\ODM\Elastica\Exception;
 
 use Throwable;
 
-use function Safe\sprintf;
+use function sprintf;
 
 class DocumentNotManagedException extends InvalidArgumentException
 {

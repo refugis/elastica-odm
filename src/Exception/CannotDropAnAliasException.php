@@ -7,7 +7,7 @@ namespace Refugis\ODM\Elastica\Exception;
 use Elastica\Response;
 use Throwable;
 
-use function Safe\sprintf;
+use function sprintf;
 
 class CannotDropAnAliasException extends ResponseException
 {

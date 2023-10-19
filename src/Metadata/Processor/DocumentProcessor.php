@@ -15,7 +15,7 @@ use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 
 use function class_exists;
 use function explode;
-use function Safe\sprintf;
+use function sprintf;
 use function str_contains;
 use function strpos;
 use function trigger_error;

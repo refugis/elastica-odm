@@ -16,7 +16,7 @@ use Refugis\ODM\Elastica\Metadata\Processor;
 use TypeError;
 
 use function get_debug_type;
-use function Safe\sprintf;
+use function sprintf;
 
 trait AnnotationLoaderTrait
 {

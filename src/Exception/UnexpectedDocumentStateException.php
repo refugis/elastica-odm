@@ -7,7 +7,7 @@ namespace Refugis\ODM\Elastica\Exception;
 use Refugis\ODM\Elastica\UnitOfWork;
 use Throwable;
 
-use function Safe\sprintf;
+use function sprintf;
 
 class UnexpectedDocumentStateException extends InvalidArgumentException
 {

@@ -12,7 +12,7 @@ use function is_array;
 use function is_string;
 use function max;
 use function min;
-use function Safe\preg_match;
+use function preg_match;
 use function strtoupper;
 
 class Coordinate implements CoordinateInterface

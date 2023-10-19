@@ -18,8 +18,8 @@ use function array_filter;
 use function array_merge;
 use function array_unique;
 use function reset;
-use function Safe\sort;
-use function Safe\sprintf;
+use function sort;
+use function sprintf;
 
 /**
  * @template T of object

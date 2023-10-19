@@ -9,7 +9,7 @@ use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
 use Kcs\Metadata\Exception\InvalidMetadataException;
 
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @Annotation

@@ -17,7 +17,7 @@ use function array_search;
 use function assert;
 use function class_exists;
 use function is_array;
-use function Safe\sprintf;
+use function sprintf;
 
 final class MappingGenerator
 {

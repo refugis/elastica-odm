@@ -13,7 +13,7 @@ use function get_debug_type;
 use function in_array;
 use function is_array;
 use function is_string;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @Annotation

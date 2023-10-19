@@ -9,7 +9,7 @@ use Throwable;
 
 use function is_string;
 use function json_encode;
-use function Safe\sprintf;
+use function sprintf;
 
 use const JSON_THROW_ON_ERROR;
 

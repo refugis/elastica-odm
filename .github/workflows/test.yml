@@ -7,17 +7,20 @@ jobs:
     build:
         runs-on: ubuntu-latest
         strategy:
+            fail-fast: false
             matrix:
                 es_version:
-                    - { image: 'elasticsearch:6.8.13', lib: '^6.0', proto: http, endpoint: 'http://localhost:9200/' }
-                    - { image: 'elasticsearch:7.10.1', lib: '^7.0', proto: http, endpoint: 'http://localhost:9200/' }
-                    - { image: 'opensearchproject/opensearch:1.2.4', lib: '^7.0', proto: https, endpoint: 'https://admin:admin@localhost:9200/' }
+                    - { image: 'docker.elastic.co/elasticsearch/elasticsearch:6.8.13', lib: '^6.0', proto: http, endpoint: 'http://localhost:9200/' }
+                    - { image: 'docker.elastic.co/elasticsearch/elasticsearch:7.10.1', lib: '^7.0', proto: http, endpoint: 'http://localhost:9200/' }
+                    - { image: 'docker.elastic.co/elasticsearch/elasticsearch:8.10.4', lib: '^7.0', proto: https, endpoint: 'https://elastic:admin@localhost:9200/' }
+                    - { image: 'public.ecr.aws/opensearchproject/opensearch:1.2.4', lib: '^7.0', proto: https, endpoint: 'https://admin:admin@localhost:9200/' }
+                    - { image: 'public.ecr.aws/opensearchproject/opensearch:2.11.0', lib: '^7.0', proto: https, endpoint: 'https://admin:admin@localhost:9200/' }
 
                 php_version:
                     - '7.4'
                     - '8.0'
-                    # Currently disabled as proxy-manager for php8.1 is not released yet.
-                    # - '8.1'
+                    - '8.1'
+                    - '8.2'
 
         name: PHP ${{ matrix.php_version }} against ${{ matrix.es_version.image }}
         services:
@@ -27,9 +30,10 @@ jobs:
                     - '9200:9200'
                 options: >-
                     --env discovery.type=single-node
+                    --env ELASTIC_PASSWORD=admin
 
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
             - name: Setup PHP with pecl extension
               uses: shivammathur/setup-php@v2
               with:
@@ -39,7 +43,7 @@ jobs:
             -   name: Get Composer Cache Directory
                 id: composer-cache
                 run: |
-                    echo "::set-output name=dir::$(composer config cache-files-dir)"
+                    echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
 
             -   name: Cache dependencies installed with composer
                 uses: actions/cache@v1
@@ -53,7 +57,10 @@ jobs:
             - run: composer install
 
             - name: Waiting for ES server to become available
-              run: ./wait-for-it.sh -p ${{ matrix.es_version.proto }} localhost:9200
+              run: ./wait-for-it.sh -p ${{ matrix.es_version.proto }} localhost:9200 && sleep 30
+
+            - run: |
+                curl -X PUT "${{ matrix.es_version.endpoint }}_cluster/settings?pretty" -k -H 'Content-Type: application/json' -d'{"persistent" : {"action.destructive_requires_name" : false}}' || true
 
             - run: vendor/bin/phpunit --coverage-clover coverage.xml
               env:

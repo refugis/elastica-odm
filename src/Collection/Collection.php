@@ -35,7 +35,7 @@ use function count;
 use function implode;
 use function in_array;
 use function is_array;
-use function Safe\preg_match;
+use function preg_match;
 use function strlen;
 
 class Collection implements CollectionInterface

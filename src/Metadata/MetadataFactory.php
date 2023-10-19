@@ -21,8 +21,8 @@ use function assert;
 use function get_parent_class;
 use function is_array;
 use function method_exists;
-use function Safe\preg_replace;
-use function Safe\sprintf;
+use function preg_replace;
+use function sprintf;
 use function str_replace;
 
 class MetadataFactory extends AbstractMetadataFactory implements ClassMetadataFactory
