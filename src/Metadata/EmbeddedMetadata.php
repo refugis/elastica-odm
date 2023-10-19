@@ -30,6 +30,7 @@ final class EmbeddedMetadata extends PropertyMetadata
      * The instantiator used to build new object instances.
      */
     private Instantiator $instantiator;
+    private ReflectionProperty $reflectionProperty;
 
     public function __construct(DocumentMetadata $documentMetadata, string $name)
     {

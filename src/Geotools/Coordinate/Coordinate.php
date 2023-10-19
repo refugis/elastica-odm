@@ -77,7 +77,9 @@ class Coordinate implements CoordinateInterface
 
     public function normalizeLongitude(float $longitude): float
     {
-        if ($longitude % 360 === 180) {
+        $x = (int) $longitude;
+        $n = $longitude - (float) $x;
+        if ($n !== 0.0 && $x % 360 === 180) {
             return 180.0;
         }
 
@@ -114,13 +116,9 @@ class Coordinate implements CoordinateInterface
      */
     public function setFromString(string $coordinates): void
     {
-        if (! is_string($coordinates)) {
-            throw new InvalidArgumentException('The given coordinates should be a string!');
-        }
-
         $inDecimalDegree = $this->toDecimalDegrees($coordinates);
-        $this->setLatitude($inDecimalDegree[0]);
-        $this->setLongitude($inDecimalDegree[1]);
+        $this->setLatitude((float) $inDecimalDegree[0]);
+        $this->setLongitude((float) $inDecimalDegree[1]);
     }
 
     /**
@@ -137,14 +135,14 @@ class Coordinate implements CoordinateInterface
     private function toDecimalDegrees(string $coordinates): array
     {
         // 40.446195, -79.948862
-        if (preg_match('/(\-?\d{1,2}\.?\d*)[, ] ?(\-?\d{1,3}\.?\d*)$/', $coordinates, $match)) {
+        if (preg_match('/(-?\d{1,2}\.?\d*)[, ] ?(-?\d{1,3}\.?\d*)$/', $coordinates, $match)) {
             return [(float) $match[1], (float) $match[2]];
         }
 
         // 40° 26.7717, -79° 56.93172
         if (
             preg_match(
-                '/(\-?\d{1,2})\D+(\d{1,2}\.?\d*)[, ] ?(\-?\d{1,3})\D+(\d{1,2}\.?\d*)$/',
+                '/(-?\d{1,2})\D+(\d{1,2}\.?\d*)[, ] ?(-?\d{1,3})\D+(\d{1,2}\.?\d*)$/',
                 $coordinates,
                 $match,
             )
