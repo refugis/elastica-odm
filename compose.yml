@@ -1,8 +1,6 @@
-version: '3.7'
-
 services:
   php:
-    image: php:8.0-cli-buster
+    image: php:8.3-cli-bookworm
     environment:
       ES_ENDPOINT: 'http://elasticsearch:9200/'
     depends_on:

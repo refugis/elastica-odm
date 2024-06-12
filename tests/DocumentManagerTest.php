@@ -74,6 +74,8 @@ class DocumentManagerTest extends TestCase
         Tests\Fixtures\Document\FooWithLazyField (proxy) {
           +id: "foo_test_document"
           +stringField: "bazbaz"
+          +lazyField: ?
+          +multiLazyField: ?
         }
         EOF, $result[0]);
 
